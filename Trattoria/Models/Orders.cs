@@ -14,5 +14,14 @@ namespace Trattoria.Models
         public DateTime OrderTime { get; set; }
 
         public string Status { get; set; }
+
+        public decimal TotalAmount { get; set; }
+
+        public decimal TipAmount { get; set; }
+
+        public string PaymentMethod { get; set; } // Cash, Card, EFT
+
+        public bool IsPaid { get; set; }
     }
 }
+

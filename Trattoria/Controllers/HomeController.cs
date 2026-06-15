@@ -1,18 +1,25 @@
-using System.Diagnostics;
+
+using Trattoria.ViewModels;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using Trattoria.Models;
 
 namespace Trattoria.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _dbContext;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ApplicationDbContext dbContext, IHttpContextAccessor httpContextAccessor)
         {
-            _logger = logger;
+            _dbContext = dbContext;
+            _httpContextAccessor = httpContextAccessor;
         }
-
+        [HttpGet]
         public IActionResult Index()
         {
             return View();
