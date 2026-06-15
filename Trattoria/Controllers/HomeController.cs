@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using Trattoria.Models;
+using Trattoria.Data;
 
 namespace Trattoria.Controllers
 {
