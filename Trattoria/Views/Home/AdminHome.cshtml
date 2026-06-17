@@ -1,0 +1,710 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trattoria Bella · Admin Homepage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cream: #F5F0E8;
+            --warm-white: #FAF7F2;
+            --gold: #B8860B;
+            --gold-light: #D4A820;
+            --brown: #3D2B1F;
+            --brown-mid: #6B4226;
+            --red: #8B1A1A;
+            --text: #2A1F17;
+            --text-muted: #7A6558;
+            --shadow: 0 8px 24px rgba(0,0,0,0.08);
+            --radius: 14px;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background: #f2ede6;
+            color: var(--text);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .admin-dashboard {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        /* ----- HEADER ----- */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--brown);
+        }
+
+            .brand span {
+                color: var(--gold);
+            }
+
+        .admin-badge {
+            background: var(--brown);
+            color: var(--cream);
+            padding: 0.4rem 1.4rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-weight: 400;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 0.5rem 1.4rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Jost', sans-serif;
+        }
+
+            .btn-outline:hover {
+                background: var(--gold);
+                color: white;
+            }
+
+        .btn-primary-sm {
+            background: var(--red);
+            border: none;
+            color: white;
+            padding: 0.5rem 1.6rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Jost', sans-serif;
+        }
+
+            .btn-primary-sm:hover {
+                background: var(--brown);
+            }
+
+        /* ----- STATS ROW (admin metrics) ----- */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--warm-white);
+            padding: 1.2rem 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--gold);
+        }
+
+            .stat-card .label {
+                font-size: 0.65rem;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--text-muted);
+                font-weight: 400;
+            }
+
+            .stat-card .value {
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 2rem;
+                font-weight: 400;
+                color: var(--brown);
+                line-height: 1.2;
+            }
+
+            .stat-card .sub {
+                font-size: 0.7rem;
+                color: var(--text-muted);
+                font-weight: 300;
+            }
+
+        /* ----- MAIN GRID: management panels ----- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* ----- PANEL BASE ----- */
+        .panel {
+            background: var(--warm-white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.8rem;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+            .panel-header h3 {
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 1.4rem;
+                font-weight: 400;
+                color: var(--brown);
+            }
+
+            .panel-header .badge {
+                font-size: 0.65rem;
+                background: var(--cream);
+                padding: 0.2rem 1rem;
+                border-radius: 40px;
+                color: var(--text-muted);
+            }
+
+            .panel-header .action-link {
+                font-size: 0.7rem;
+                color: var(--gold);
+                text-decoration: none;
+                letter-spacing: 0.05em;
+                cursor: pointer;
+            }
+
+                .panel-header .action-link:hover {
+                    text-decoration: underline;
+                }
+
+        /* ----- USER LIST (staff) ----- */
+        .user-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 0.8rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid rgba(184,134,11,0.08);
+        }
+
+            .user-item .user-info {
+                display: flex;
+                align-items: center;
+                gap: 0.8rem;
+            }
+
+            .user-item .user-avatar {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: var(--gold-light);
+                color: white;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: 500;
+                font-size: 0.8rem;
+            }
+
+            .user-item .user-name {
+                font-weight: 500;
+                font-size: 0.9rem;
+            }
+
+            .user-item .user-role {
+                font-size: 0.65rem;
+                color: var(--text-muted);
+                background: var(--cream);
+                padding: 0.1rem 0.7rem;
+                border-radius: 30px;
+            }
+
+            .user-item .user-status {
+                font-size: 0.6rem;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                color: #2a5a2a;
+            }
+
+                .user-item .user-status.inactive {
+                    color: var(--text-muted);
+                }
+
+        /* ----- MENU ITEMS (quick list) ----- */
+        .menu-preview {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .menu-preview-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            font-size: 0.85rem;
+        }
+
+            .menu-preview-item .item-cat {
+                font-size: 0.6rem;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                background: var(--cream);
+                padding: 0.05rem 0.6rem;
+                border-radius: 30px;
+            }
+
+            .menu-preview-item .item-price {
+                font-weight: 500;
+                color: var(--brown);
+            }
+
+        /* ----- RESERVATIONS (today) ----- */
+        .reservation-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .reservation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0.8rem;
+            background: white;
+            border-radius: 8px;
+            border-left: 3px solid var(--gold);
+        }
+
+            .reservation-item .res-info {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .reservation-item .res-name {
+                font-weight: 500;
+                font-size: 0.85rem;
+            }
+
+            .reservation-item .res-detail {
+                font-size: 0.7rem;
+                color: var(--text-muted);
+            }
+
+            .reservation-item .res-time {
+                font-weight: 500;
+                font-size: 0.8rem;
+                color: var(--brown);
+            }
+
+        /* ----- SALES SNAPSHOT (mini chart) ----- */
+        .sales-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .sales-day {
+            text-align: center;
+            padding: 0.6rem 0.4rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid rgba(184,134,11,0.08);
+        }
+
+            .sales-day .day-label {
+                font-size: 0.6rem;
+                text-transform: uppercase;
+                color: var(--text-muted);
+                letter-spacing: 0.06em;
+            }
+
+            .sales-day .day-amount {
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 1.4rem;
+                font-weight: 400;
+                color: var(--brown);
+            }
+
+            .sales-day .day-orders {
+                font-size: 0.6rem;
+                color: var(--text-muted);
+            }
+
+            .sales-day.highlight {
+                border-color: var(--gold);
+                background: #fcf8f0;
+            }
+
+        /* ----- TOAST ----- */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--brown);
+            color: var(--cream);
+            padding: 0.8rem 1.6rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            transform: translateX(130%);
+            transition: transform 0.35s ease;
+            z-index: 999;
+        }
+
+            .toast.show {
+                transform: translateX(0);
+            }
+
+        /* responsive */
+      
+        body {
+            padding: 1rem;
+        }
+
+        }
+      
+        .sales-grid {
+            grid-template-columns: 1fr;
+        }
+
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-dashboard">
+
+        <!-- HEADER -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <div class="brand">Trattoria <span>Bella</span></div>
+                <span class="admin-badge">⚙️ Admin · Giovanni</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn-outline" id="resetAdminBtn">🔄 Reset data</button>
+                <button class="btn-primary-sm" id="addDummyDataBtn">➕ Add test data</button>
+            </div>
+        </header>
+
+        <!-- STATS -->
+        <div class="stats-row">
+            <div class="stat-card"><div class="label">Total staff</div><div class="value" id="totalStaff">0</div></div>
+            <div class="stat-card"><div class="label">Menu items</div><div class="value" id="totalMenuItems">0</div></div>
+            <div class="stat-card"><div class="label">Today's reservations</div><div class="value" id="todayReservations">0</div></div>
+            <div class="stat-card"><div class="label">Today's revenue</div><div class="value" id="todayRevenue">R 0</div><div class="sub" id="todayOrders">0 orders</div></div>
+        </div>
+
+        <!-- GRID -->
+        <div class="dashboard-grid">
+
+            <!-- LEFT COLUMN: Staff + Menu -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>👥 Staff</h3>
+                    <span class="badge" id="staffBadge">0 active</span>
+                    <a class="action-link" id="manageStaffLink">Manage →</a>
+                </div>
+                <div class="user-list" id="staffList">
+                    <!-- injected -->
+                </div>
+
+                <div style="margin-top: 1.8rem; border-top: 1px solid rgba(184,134,11,0.12); padding-top: 1.2rem;">
+                    <div class="panel-header" style="margin-bottom: 0.8rem;">
+                        <h3>📋 Menu Overview</h3>
+                        <a class="action-link" id="manageMenuLink">Edit menu →</a>
+                    </div>
+                    <div class="menu-preview" id="menuPreview">
+                        <!-- injected -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: Reservations + Sales -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>📅 Today's Reservations</h3>
+                    <span class="badge" id="resBadge">0</span>
+                    <a class="action-link" id="manageResLink">View all →</a>
+                </div>
+                <div class="reservation-list" id="reservationList">
+                    <!-- injected -->
+                </div>
+
+                <div style="margin-top: 1.8rem; border-top: 1px solid rgba(184,134,11,0.12); padding-top: 1.2rem;">
+                    <div class="panel-header" style="margin-bottom: 0.8rem;">
+                        <h3>📊 Sales Snapshot</h3>
+                        <span class="badge">last 3 days</span>
+                    </div>
+                    <div class="sales-grid" id="salesGrid">
+                        <!-- injected -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ─── DATA ────────────────────────────────────────────────
+
+        // Staff
+        let staff = [
+          { id: 1, name: 'Marco Rossi', role: 'Waiter', active: true, initials: 'MR' },
+          { id: 2, name: 'Luca Bianchi', role: 'Chef', active: true, initials: 'LB' },
+          { id: 3, name: 'Elena Verdi', role: 'Bartender', active: true, initials: 'EV' },
+          { id: 4, name: 'Sofia Neri', role: 'Waiter', active: false, initials: 'SN' },
+          { id: 5, name: 'Alessandro Gialli', role: 'Chef', active: true, initials: 'AG' }
+        ];
+
+        // Menu
+        let menuItems = [
+          { name: 'Burrata con Prosciutto', category: 'Antipasti', price: 185 },
+          { name: 'Pappardelle al Cinghiale', category: 'Primi', price: 225 },
+          { name: 'Bistecca Fiorentina', category: 'Secondi', price: 445 },
+          { name: 'Tiramisù della Casa', category: 'Dolci', price: 95 },
+          { name: 'Prosecco Superiore', category: 'Vini', price: 160 },
+          { name: 'Aperol Spritz', category: 'Cocktails', price: 105 }
+        ];
+
+        // Reservations (today)
+        let reservations = [
+          { name: 'Gabriella M.', guests: 2, time: '18:30', table: 4 },
+          { name: 'James & Lindiwe', guests: 4, time: '19:00', table: 7 },
+          { name: 'Marco R.', guests: 1, time: '20:15', table: 2 },
+          { name: 'The Johnson Family', guests: 6, time: '19:45', table: 10 }
+        ];
+
+        // Sales data (last 3 days)
+        let salesData = [
+          { day: 'Today', amount: 4850, orders: 18 },
+          { day: 'Yesterday', amount: 3200, orders: 13 },
+          { day: '2 days ago', amount: 4100, orders: 15 }
+        ];
+
+        // ─── DOM REFS ─────────────────────────────────────────────
+        const staffList = document.getElementById('staffList');
+        const staffBadge = document.getElementById('staffBadge');
+        const menuPreview = document.getElementById('menuPreview');
+        const reservationList = document.getElementById('reservationList');
+        const resBadge = document.getElementById('resBadge');
+        const salesGrid = document.getElementById('salesGrid');
+
+        const totalStaffEl = document.getElementById('totalStaff');
+        const totalMenuItemsEl = document.getElementById('totalMenuItems');
+        const todayReservationsEl = document.getElementById('todayReservations');
+        const todayRevenueEl = document.getElementById('todayRevenue');
+        const todayOrdersEl = document.getElementById('todayOrders');
+
+        // ─── TOAST ────────────────────────────────────────────────
+        function showToast(msg, duration = 2800) {
+          const t = document.getElementById('toast');
+          t.textContent = msg;
+          t.classList.add('show');
+          clearTimeout(t._timeout);
+          t._timeout = setTimeout(() => t.classList.remove('show'), duration);
+        }
+
+        // ─── RENDER ───────────────────────────────────────────────
+
+        function renderStats() {
+          const activeStaff = staff.filter(s => s.active).length;
+          totalStaffEl.textContent = staff.length;
+          totalMenuItemsEl.textContent = menuItems.length;
+          todayReservationsEl.textContent = reservations.length;
+          const todaySales = salesData[0];
+          todayRevenueEl.textContent = `R ${todaySales.amount}`;
+          todayOrdersEl.textContent = `${todaySales.orders} orders`;
+          staffBadge.textContent = `${activeStaff} active`;
+          resBadge.textContent = reservations.length;
+        }
+
+        function renderStaff() {
+          if (staff.length === 0) {
+            staffList.innerHTML = `<div style="color: var(--text-muted); font-weight: 300; padding: 0.5rem 0;">No staff.</div>`;
+            return;
+          }
+          let html = '';
+          staff.forEach(s => {
+            html += `
+              <div class="user-item">
+                <div class="user-info">
+                  <div class="user-avatar">${s.initials}</div>
+                  <span class="user-name">${s.name}</span>
+                  <span class="user-role">${s.role}</span>
+                </div>
+                <span class="user-status ${s.active ? '' : 'inactive'}">${s.active ? '● Online' : '○ Offline'}</span>
+              </div>
+            `;
+          });
+          staffList.innerHTML = html;
+        }
+
+        function renderMenuPreview() {
+          if (menuItems.length === 0) {
+            menuPreview.innerHTML = `<div style="color: var(--text-muted); font-weight: 300; padding: 0.5rem 0;">No menu items.</div>`;
+            return;
+          }
+          // show first 6 items
+          const items = menuItems.slice(0, 6);
+          let html = '';
+          items.forEach(item => {
+            html += `
+              <div class="menu-preview-item">
+                <span><span class="item-cat">${item.category}</span> ${item.name}</span>
+                <span class="item-price">R ${item.price}</span>
+              </div>
+            `;
+          });
+          menuPreview.innerHTML = html;
+        }
+
+        function renderReservations() {
+          if (reservations.length === 0) {
+            reservationList.innerHTML = `<div style="color: var(--text-muted); font-weight: 300; padding: 0.5rem 0;">No reservations today.</div>`;
+            return;
+          }
+          let html = '';
+          reservations.forEach(r => {
+            html += `
+              <div class="reservation-item">
+                <div class="res-info">
+                  <span class="res-name">${r.name}</span>
+                  <span class="res-detail">${r.guests} guests · Table ${r.table}</span>
+                </div>
+                <span class="res-time">${r.time}</span>
+              </div>
+            `;
+          });
+          reservationList.innerHTML = html;
+        }
+
+        function renderSales() {
+          let html = '';
+          salesData.forEach((day, idx) => {
+            const highlight = idx === 0 ? 'highlight' : '';
+            html += `
+              <div class="sales-day ${highlight}">
+                <div class="day-label">${day.day}</div>
+                <div class="day-amount">R ${day.amount}</div>
+                <div class="day-orders">${day.orders} orders</div>
+              </div>
+            `;
+          });
+          salesGrid.innerHTML = html;
+        }
+
+        function renderAll() {
+          renderStats();
+          renderStaff();
+          renderMenuPreview();
+          renderReservations();
+          renderSales();
+        }
+
+        // ─── ACTIONS ─────────────────────────────────────────────
+
+        // Reset
+        document.getElementById('resetAdminBtn').addEventListener('click', () => {
+          // reset to initial state
+          staff = [
+            { id: 1, name: 'Marco Rossi', role: 'Waiter', active: true, initials: 'MR' },
+            { id: 2, name: 'Luca Bianchi', role: 'Chef', active: true, initials: 'LB' },
+            { id: 3, name: 'Elena Verdi', role: 'Bartender', active: true, initials: 'EV' },
+            { id: 4, name: 'Sofia Neri', role: 'Waiter', active: false, initials: 'SN' },
+            { id: 5, name: 'Alessandro Gialli', role: 'Chef', active: true, initials: 'AG' }
+          ];
+          menuItems = [
+            { name: 'Burrata con Prosciutto', category: 'Antipasti', price: 185 },
+            { name: 'Pappardelle al Cinghiale', category: 'Primi', price: 225 },
+            { name: 'Bistecca Fiorentina', category: 'Secondi', price: 445 },
+            { name: 'Tiramisù della Casa', category: 'Dolci', price: 95 },
+            { name: 'Prosecco Superiore', category: 'Vini', price: 160 },
+            { name: 'Aperol Spritz', category: 'Cocktails', price: 105 }
+          ];
+          reservations = [
+            { name: 'Gabriella M.', guests: 2, time: '18:30', table: 4 },
+            { name: 'James & Lindiwe', guests: 4, time: '19:00', table: 7 },
+            { name: 'Marco R.', guests: 1, time: '20:15', table: 2 },
+            { name: 'The Johnson Family', guests: 6, time: '19:45', table: 10 }
+          ];
+          salesData = [
+            { day: 'Today', amount: 4850, orders: 18 },
+            { day: 'Yesterday', amount: 3200, orders: 13 },
+            { day: '2 days ago', amount: 4100, orders: 15 }
+          ];
+          renderAll();
+          showToast('🔄 Admin data reset to default.');
+        });
+
+        // Add test data
+        document.getElementById('addDummyDataBtn').addEventListener('click', () => {
+          const newStaff = { id: Date.now(), name: 'Test Staff', role: 'Manager', active: true, initials: 'TS' };
+          staff.push(newStaff);
+          const newMenuItem = { name: 'Test Dish', category: 'Special', price: 199 };
+          menuItems.push(newMenuItem);
+          const newRes = { name: 'Test Reservation', guests: 3, time: '21:00', table: 12 };
+          reservations.push(newRes);
+          // update sales
+          salesData[0].amount += 500;
+          salesData[0].orders += 2;
+          renderAll();
+          showToast('➕ Added test data.');
+        });
+
+        // "Manage" links (just toast for demo)
+        document.getElementById('manageStaffLink').addEventListener('click', () => showToast('👥 Staff management panel (demo)'));
+        document.getElementById('manageMenuLink').addEventListener('click', () => showToast('📋 Menu editor (demo)'));
+        document.getElementById('manageResLink').addEventListener('click', () => showToast('📅 Full reservations view (demo)'));
+
+        // ─── INIT ─────────────────────────────────────────────────
+        renderAll();
+    </script>
+
+</body>
+</html>

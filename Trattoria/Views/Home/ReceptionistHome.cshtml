@@ -1,0 +1,844 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trattoria Bella · Receptionist Homepage</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --cream: #F5F0E8;
+            --warm-white: #FAF7F2;
+            --gold: #B8860B;
+            --gold-light: #D4A820;
+            --brown: #3D2B1F;
+            --brown-mid: #6B4226;
+            --red: #8B1A1A;
+            --text: #2A1F17;
+            --text-muted: #7A6558;
+            --shadow: 0 8px 24px rgba(0,0,0,0.08);
+            --radius: 14px;
+        }
+
+        body {
+            font-family: 'Jost', sans-serif;
+            background: #f2ede6;
+            color: var(--text);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        .receptionist-dashboard {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        /* ----- HEADER ----- */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--brown);
+        }
+
+            .brand span {
+                color: var(--gold);
+            }
+
+        .receptionist-badge {
+            background: var(--brown);
+            color: var(--cream);
+            padding: 0.4rem 1.4rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-weight: 400;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 0.5rem 1.4rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Jost', sans-serif;
+        }
+
+            .btn-outline:hover {
+                background: var(--gold);
+                color: white;
+            }
+
+        .btn-primary-sm {
+            background: var(--red);
+            border: none;
+            color: white;
+            padding: 0.5rem 1.6rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Jost', sans-serif;
+        }
+
+            .btn-primary-sm:hover {
+                background: var(--brown);
+            }
+
+        /* ----- STATS ROW ----- */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--warm-white);
+            padding: 1.2rem 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--gold);
+        }
+
+            .stat-card .label {
+                font-size: 0.65rem;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--text-muted);
+                font-weight: 400;
+            }
+
+            .stat-card .value {
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 2rem;
+                font-weight: 400;
+                color: var(--brown);
+                line-height: 1.2;
+            }
+
+            .stat-card .sub {
+                font-size: 0.7rem;
+                color: var(--text-muted);
+                font-weight: 300;
+            }
+
+        /* ----- MAIN GRID ----- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        /* ----- PANEL BASE ----- */
+        .panel {
+            background: var(--warm-white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.8rem;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+            .panel-header h3 {
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 1.4rem;
+                font-weight: 400;
+                color: var(--brown);
+            }
+
+            .panel-header .badge {
+                font-size: 0.65rem;
+                background: var(--cream);
+                padding: 0.2rem 1rem;
+                border-radius: 40px;
+                color: var(--text-muted);
+            }
+
+            .panel-header .action-link {
+                font-size: 0.7rem;
+                color: var(--gold);
+                text-decoration: none;
+                letter-spacing: 0.05em;
+                cursor: pointer;
+            }
+
+                .panel-header .action-link:hover {
+                    text-decoration: underline;
+                }
+
+        /* ----- RESERVATION LIST ----- */
+        .reservation-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            max-height: 420px;
+            overflow-y: auto;
+            padding-right: 0.3rem;
+        }
+
+            .reservation-list::-webkit-scrollbar {
+                width: 4px;
+            }
+
+            .reservation-list::-webkit-scrollbar-thumb {
+                background: var(--gold-light);
+                border-radius: 10px;
+            }
+
+        .reservation-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7rem 1rem;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid var(--gold);
+            transition: 0.15s;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+            .reservation-card:hover {
+                box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            }
+
+            .reservation-card .res-info {
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+                min-width: 120px;
+            }
+
+            .reservation-card .res-name {
+                font-weight: 500;
+                font-size: 0.9rem;
+            }
+
+            .reservation-card .res-detail {
+                font-size: 0.7rem;
+                color: var(--text-muted);
+            }
+
+            .reservation-card .res-meta {
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+                flex-wrap: wrap;
+            }
+
+            .reservation-card .res-time {
+                font-weight: 500;
+                font-size: 0.8rem;
+                color: var(--brown);
+                background: var(--cream);
+                padding: 0.15rem 0.7rem;
+                border-radius: 30px;
+            }
+
+            .reservation-card .res-status {
+                font-size: 0.6rem;
+                text-transform: uppercase;
+                letter-spacing: 0.06em;
+                padding: 0.15rem 0.7rem;
+                border-radius: 30px;
+            }
+
+                .reservation-card .res-status.confirmed {
+                    background: #dce8d8;
+                    color: #1e4a1e;
+                }
+
+                .reservation-card .res-status.seated {
+                    background: #f5e0c8;
+                    color: #a0672a;
+                }
+
+                .reservation-card .res-status.waiting {
+                    background: #f0d8d8;
+                    color: #8b1a1a;
+                }
+
+                .reservation-card .res-status.completed {
+                    background: #e8e0d8;
+                    color: var(--text-muted);
+                }
+
+            .reservation-card .res-actions {
+                display: flex;
+                gap: 0.4rem;
+            }
+
+                .reservation-card .res-actions button {
+                    border: none;
+                    border-radius: 30px;
+                    padding: 0.2rem 0.8rem;
+                    font-size: 0.6rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.06em;
+                    cursor: pointer;
+                    font-family: 'Jost', sans-serif;
+                    transition: 0.15s;
+                }
+
+        .btn-seat {
+            background: var(--gold);
+            color: white;
+        }
+
+            .btn-seat:hover {
+                background: var(--gold-light);
+            }
+
+        .btn-complete {
+            background: #2a5a2a;
+            color: white;
+        }
+
+            .btn-complete:hover {
+                background: #1e421e;
+            }
+
+        .btn-cancel-res {
+            background: #e8d8d8;
+            color: #6a3a3a;
+        }
+
+            .btn-cancel-res:hover {
+                background: #dcc8c8;
+            }
+
+        /* ----- TABLE MAP (mini) ----- */
+        .table-grid-mini {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0.6rem;
+            margin-top: 0.5rem;
+        }
+
+        .table-mini {
+            padding: 0.6rem 0.3rem;
+            text-align: center;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid rgba(184,134,11,0.12);
+            font-size: 0.7rem;
+            transition: 0.15s;
+        }
+
+            .table-mini .t-nr {
+                font-weight: 600;
+                font-size: 0.8rem;
+                color: var(--brown);
+            }
+
+            .table-mini .t-status {
+                font-size: 0.55rem;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+            }
+
+            .table-mini.available {
+                border-color: #b8d0b8;
+                background: #f2f8f2;
+            }
+
+                .table-mini.available .t-status {
+                    color: #2a5a2a;
+                }
+
+            .table-mini.occupied {
+                border-color: #d4b8a0;
+                background: #f8f0e8;
+            }
+
+                .table-mini.occupied .t-status {
+                    color: #a0672a;
+                }
+
+            .table-mini.reserved {
+                border-color: #b8c8d4;
+                background: #eef2f8;
+            }
+
+                .table-mini.reserved .t-status {
+                    color: #2a5a7a;
+                }
+
+        /* ----- QUICK ACTIONS (walk-in) ----- */
+        .quick-actions {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+            .quick-actions button {
+                flex: 1;
+                min-width: 100px;
+                padding: 0.7rem 1rem;
+                border: none;
+                border-radius: 40px;
+                font-family: 'Jost', sans-serif;
+                font-size: 0.7rem;
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                cursor: pointer;
+                transition: 0.2s;
+            }
+
+        .btn-walkin {
+            background: var(--gold);
+            color: white;
+        }
+
+            .btn-walkin:hover {
+                background: var(--gold-light);
+            }
+
+        .btn-cancel-all {
+            background: #e8d8d8;
+            color: #6a3a3a;
+        }
+
+            .btn-cancel-all:hover {
+                background: #dcc8c8;
+            }
+
+        /* ----- TOAST ----- */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--brown);
+            color: var(--cream);
+            padding: 0.8rem 1.6rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            transform: translateX(130%);
+            transition: transform 0.35s ease;
+            z-index: 999;
+        }
+
+            .toast.show {
+                transform: translateX(0);
+            }
+
+      
+
+
+            .reservation-card .res-meta {
+                justify-content: space-between;
+            }
+
+        .table-grid-mini {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        }
+    </style>
+</head>
+<body>
+
+    <div class="receptionist-dashboard">
+
+        <!-- HEADER -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <div class="brand">Trattoria <span>Bella</span></div>
+                <span class="receptionist-badge">📋 Receptionist · Chiara</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn-outline" id="resetReceptionBtn">🔄 Reset</button>
+                <button class="btn-primary-sm" id="addDummyResBtn">➕ Add reservation</button>
+            </div>
+        </header>
+
+        <!-- STATS -->
+        <div class="stats-row">
+            <div class="stat-card"><div class="label">Total reservations</div><div class="value" id="totalRes">0</div></div>
+            <div class="stat-card"><div class="label">Seated</div><div class="value" id="seatedCount">0</div></div>
+            <div class="stat-card"><div class="label">Waiting / Confirmed</div><div class="value" id="waitingCount">0</div></div>
+            <div class="stat-card"><div class="label">Available tables</div><div class="value" id="availableTables">0</div><div class="sub" id="occupiedTables">0 occupied</div></div>
+        </div>
+
+        <!-- GRID -->
+        <div class="dashboard-grid">
+
+            <!-- LEFT: Reservations -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>📅 Reservations</h3>
+                    <span class="badge" id="resBadge">0</span>
+                    <a class="action-link" id="viewAllResLink">View all →</a>
+                </div>
+                <div class="reservation-list" id="reservationList">
+                    <!-- injected -->
+                </div>
+
+                <!-- Quick actions -->
+                <div class="quick-actions">
+                    <button class="btn-walkin" id="walkinBtn">🚶 Walk-in guest</button>
+                    <button class="btn-cancel-all" id="cancelAllResBtn">✕ Cancel all</button>
+                </div>
+            </div>
+
+            <!-- RIGHT: Table Map -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>🪑 Table Map</h3>
+                    <span class="badge" id="tableBadge">12 tables</span>
+                    <a class="action-link" id="viewAllTablesLink">Full view →</a>
+                </div>
+                <div class="table-grid-mini" id="tableGridMini">
+                    <!-- injected -->
+                </div>
+
+                <div style="margin-top: 1.5rem; border-top: 1px solid rgba(184,134,11,0.12); padding-top: 1rem;">
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.7rem; color: var(--text-muted);">
+                        <span>🟢 Available</span>
+                        <span>🟠 Occupied</span>
+                        <span>🔵 Reserved</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ─── DATA ────────────────────────────────────────────────
+
+        // Tables: 12 tables, status: 'available', 'occupied', 'reserved'
+        let tables = [];
+        const tableCount = 12;
+
+        function initTables() {
+          tables = [];
+          for (let i = 1; i <= tableCount; i++) {
+            let status = 'available';
+            // seed some occupied/reserved for demo
+            if (i === 2 || i === 5 || i === 8) status = 'occupied';
+            else if (i === 3 || i === 9) status = 'reserved';
+            tables.push({ id: i, status });
+          }
+        }
+        initTables();
+
+        // Reservations: each has tableId, name, guests, time, status: 'confirmed' | 'seated' | 'waiting' | 'completed'
+        let reservations = [];
+        let resIdCounter = 1000;
+
+        function generateReservations() {
+          reservations = [];
+          const names = ['Gabriella M.', 'James & Lindiwe', 'Marco R.', 'The Johnsons', 'Sophia L.', 'David & Emma', 'Antonio G.', 'Lisa W.'];
+          const times = ['18:00', '18:30', '19:00', '19:15', '19:30', '19:45', '20:00', '20:15', '20:30', '21:00'];
+          const statuses = ['confirmed', 'confirmed', 'seated', 'waiting', 'completed'];
+
+          // assign to specific tables
+          const tableAssign = [1, 2, 3, 4, 5, 6, 7, 8];
+          tableAssign.forEach((t, idx) => {
+            if (idx < names.length) {
+              const status = statuses[idx % statuses.length];
+              // update table status based on reservation
+              if (status === 'seated') tables[t-1].status = 'occupied';
+              else if (status === 'confirmed' || status === 'waiting') {
+                // only set reserved if table isn't already occupied
+                if (tables[t-1].status !== 'occupied') tables[t-1].status = 'reserved';
+              }
+              reservations.push({
+                id: resIdCounter++,
+                tableId: t,
+                name: names[idx % names.length],
+                guests: Math.floor(Math.random() * 4) + 2,
+                time: times[idx % times.length],
+                status: status
+              });
+            }
+          });
+          // ensure at least one waiting and one seated
+          if (!reservations.some(r => r.status === 'waiting')) {
+            reservations[0].status = 'waiting';
+          }
+          if (!reservations.some(r => r.status === 'seated')) {
+            reservations[1].status = 'seated';
+          }
+        }
+        generateReservations();
+
+        // ─── DOM REFS ─────────────────────────────────────────────
+        const reservationList = document.getElementById('reservationList');
+        const tableGridMini = document.getElementById('tableGridMini');
+        const resBadge = document.getElementById('resBadge');
+        const tableBadge = document.getElementById('tableBadge');
+
+        const totalResEl = document.getElementById('totalRes');
+        const seatedCountEl = document.getElementById('seatedCount');
+        const waitingCountEl = document.getElementById('waitingCount');
+        const availableTablesEl = document.getElementById('availableTables');
+        const occupiedTablesEl = document.getElementById('occupiedTables');
+
+        // ─── TOAST ────────────────────────────────────────────────
+        function showToast(msg, duration = 2800) {
+          const t = document.getElementById('toast');
+          t.textContent = msg;
+          t.classList.add('show');
+          clearTimeout(t._timeout);
+          t._timeout = setTimeout(() => t.classList.remove('show'), duration);
+        }
+
+        // ─── RENDER ───────────────────────────────────────────────
+
+        function renderStats() {
+          const total = reservations.length;
+          const seated = reservations.filter(r => r.status === 'seated').length;
+          const waiting = reservations.filter(r => r.status === 'waiting' || r.status === 'confirmed').length;
+          const avail = tables.filter(t => t.status === 'available').length;
+          const occ = tables.filter(t => t.status === 'occupied').length;
+
+          totalResEl.textContent = total;
+          seatedCountEl.textContent = seated;
+          waitingCountEl.textContent = waiting;
+          availableTablesEl.textContent = avail;
+          occupiedTablesEl.textContent = `${occ} occupied`;
+          resBadge.textContent = total;
+          tableBadge.textContent = `${tables.length} tables`;
+        }
+
+        function renderReservations() {
+          if (reservations.length === 0) {
+            reservationList.innerHTML = `<div style="color: var(--text-muted); font-weight: 300; padding: 1rem 0; text-align: center;">No reservations.</div>`;
+            return;
+          }
+
+          // sort by time
+          const sorted = [...reservations].sort((a, b) => a.time.localeCompare(b.time));
+
+          let html = '';
+          sorted.forEach(r => {
+            const statusMap = {
+              confirmed: '✅ Confirmed',
+              seated: '🪑 Seated',
+              waiting: '⏳ Waiting',
+              completed: '✓ Done'
+            };
+            const statusClass = r.status;
+
+            html += `
+              <div class="reservation-card" data-res-id="${r.id}">
+                <div class="res-info">
+                  <span class="res-name">${r.name}</span>
+                  <span class="res-detail">${r.guests} guests · Table ${r.tableId}</span>
+                </div>
+                <div class="res-meta">
+                  <span class="res-time">${r.time}</span>
+                  <span class="res-status ${statusClass}">${statusMap[r.status] || r.status}</span>
+                  <div class="res-actions">
+                    ${r.status === 'confirmed' || r.status === 'waiting' ? `<button class="btn-seat" data-action="seat" data-id="${r.id}">Seat</button>` : ''}
+                    ${r.status === 'seated' ? `<button class="btn-complete" data-action="complete" data-id="${r.id}">Done</button>` : ''}
+                    ${r.status !== 'completed' ? `<button class="btn-cancel-res" data-action="cancel" data-id="${r.id}">✕</button>` : ''}
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+          reservationList.innerHTML = html;
+          attachResActions();
+        }
+
+        function renderTableMap() {
+          let html = '';
+          tables.forEach(t => {
+            const statusLabel = { available: '🟢 Avail', occupied: '🟠 Occupied', reserved: '🔵 Reserved' };
+            html += `
+              <div class="table-mini ${t.status}">
+                <div class="t-nr">#${t.id}</div>
+                <div class="t-status">${statusLabel[t.status]}</div>
+              </div>
+            `;
+          });
+          tableGridMini.innerHTML = html;
+        }
+
+        function renderAll() {
+          renderStats();
+          renderReservations();
+          renderTableMap();
+        }
+
+        // ─── RESERVATION ACTIONS ──────────────────────────────────
+        function attachResActions() {
+          document.querySelectorAll('[data-action]').forEach(btn => {
+            btn.removeEventListener('click', handleResAction);
+            btn.addEventListener('click', handleResAction);
+          });
+        }
+
+        function handleResAction(e) {
+          const btn = e.currentTarget;
+          const action = btn.dataset.action;
+          const id = parseInt(btn.dataset.id, 10);
+          const res = reservations.find(r => r.id === id);
+          if (!res) return;
+
+          switch (action) {
+            case 'seat': {
+              // find available table
+              const availTable = tables.find(t => t.status === 'available');
+              if (!availTable) {
+                showToast('⚠️ No available tables right now.');
+                return;
+              }
+              // move reservation to that table
+              const oldTable = tables.find(t => t.id === res.tableId);
+              if (oldTable && oldTable.status === 'reserved') oldTable.status = 'available';
+              availTable.status = 'occupied';
+              res.tableId = availTable.id;
+              res.status = 'seated';
+              showToast(`🪑 ${res.name} seated at Table ${availTable.id}`);
+              break;
+            }
+            case 'complete': {
+              res.status = 'completed';
+              const table = tables.find(t => t.id === res.tableId);
+              if (table) table.status = 'available';
+              showToast(`✅ ${res.name} completed. Table ${res.tableId} freed.`);
+              break;
+            }
+            case 'cancel': {
+              const table = tables.find(t => t.id === res.tableId);
+              if (table && (table.status === 'reserved' || table.status === 'occupied')) {
+                table.status = 'available';
+              }
+              reservations = reservations.filter(r => r.id !== id);
+              showToast(`✕ Reservation for ${res.name} cancelled.`);
+              break;
+            }
+            default: return;
+          }
+          renderAll();
+        }
+
+        // ─── QUICK ACTIONS ────────────────────────────────────────
+
+        // Walk-in guest
+        document.getElementById('walkinBtn').addEventListener('click', () => {
+          const availTable = tables.find(t => t.status === 'available');
+          if (!availTable) {
+            showToast('⚠️ No available tables for walk-in.');
+            return;
+          }
+          const newRes = {
+            id: resIdCounter++,
+            tableId: availTable.id,
+            name: `Walk-in ${Math.floor(Math.random() * 100)}`,
+            guests: Math.floor(Math.random() * 3) + 2,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            status: 'seated'
+          };
+          availTable.status = 'occupied';
+          reservations.push(newRes);
+          renderAll();
+          showToast(`🚶 Walk-in seated at Table ${availTable.id}`);
+        });
+
+        // Cancel all reservations
+        document.getElementById('cancelAllResBtn').addEventListener('click', () => {
+          if (reservations.length === 0) {
+            showToast('No reservations to cancel.');
+            return;
+          }
+          // free all tables
+          tables.forEach(t => t.status = 'available');
+          reservations = [];
+          renderAll();
+          showToast('✕ All reservations cancelled. Tables cleared.');
+        });
+
+        // ─── RESET ─────────────────────────────────────────────────
+        document.getElementById('resetReceptionBtn').addEventListener('click', () => {
+          initTables();
+          generateReservations();
+          renderAll();
+          showToast('🔄 Reception reset to demo state.');
+        });
+
+        // ─── DUMMY RESERVATION ────────────────────────────────────
+        document.getElementById('addDummyResBtn').addEventListener('click', () => {
+          const availTable = tables.find(t => t.status === 'available');
+          if (!availTable) {
+            showToast('⚠️ No available tables for new reservation.');
+            return;
+          }
+          const names = ['Anna K.', 'Peter S.', 'Maria F.', 'Thomas R.', 'Claudia P.', 'Lucas M.'];
+          const newRes = {
+            id: resIdCounter++,
+            tableId: availTable.id,
+            name: names[Math.floor(Math.random() * names.length)],
+            guests: Math.floor(Math.random() * 4) + 2,
+            time: ['18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00'][Math.floor(Math.random() * 7)],
+            status: 'confirmed'
+          };
+          availTable.status = 'reserved';
+          reservations.push(newRes);
+          renderAll();
+          showToast(`➕ New reservation: ${newRes.name} at Table ${availTable.id}`);
+        });
+
+        // ─── "VIEW ALL" LINKS (demo) ─────────────────────────────
+        document.getElementById('viewAllResLink').addEventListener('click', () => showToast('📅 Full reservations calendar (demo)'));
+        document.getElementById('viewAllTablesLink').addEventListener('click', () => showToast('🪑 Full table management view (demo)'));
+
+        // ─── INIT ─────────────────────────────────────────────────
+        renderAll();
+    </script>
+
+</body>
+</html>

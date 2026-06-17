@@ -25,7 +25,26 @@ namespace Trattoria.Controllers
         {
             return View();
         }
-
+        public IActionResult AdminHome()
+        {
+            return View();
+        }
+        public IActionResult ChefsHome()
+        {
+            return View();
+        }
+        public IActionResult BartenderHome()
+        {
+            return View();
+        }
+        public IActionResult WaiterHome()
+        {
+            return View();
+        }
+        public IActionResult ReceptionistHome()
+        {
+            return View();
+        }
         public IActionResult Privacy()
         {
             return View();

@@ -1,0 +1,747 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trattoria Bella · Waiter View</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --cream: #F5F0E8;
+      --warm-white: #FAF7F2;
+      --gold: #B8860B;
+      --gold-light: #D4A820;
+      --brown: #3D2B1F;
+      --brown-mid: #6B4226;
+      --red: #8B1A1A;
+      --text: #2A1F17;
+      --text-muted: #7A6558;
+      --shadow: 0 8px 24px rgba(0,0,0,0.08);
+      --radius: 12px;
+    }
+
+    body {
+      font-family: 'Jost', sans-serif;
+      background: #f2ede6;
+      color: var(--text);
+      padding: 2rem;
+      min-height: 100vh;
+    }
+
+    /* ----- LAYOUT ----- */
+    .waiter-dashboard {
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    /* header */
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--brown);
+    }
+    .brand span { color: var(--gold); }
+
+    .waiter-badge {
+      background: var(--brown);
+      color: var(--cream);
+      padding: 0.4rem 1.2rem;
+      border-radius: 40px;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 0.5rem 1.4rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: 'Jost', sans-serif;
+    }
+    .btn-outline:hover {
+      background: var(--gold);
+      color: white;
+    }
+
+    .btn-primary-sm {
+      background: var(--red);
+      border: none;
+      color: white;
+      padding: 0.5rem 1.6rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: 0.2s;
+      font-family: 'Jost', sans-serif;
+    }
+    .btn-primary-sm:hover {
+      background: var(--brown);
+    }
+
+    /* ----- STATS ROW ----- */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background: var(--warm-white);
+      padding: 1.2rem 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border-left: 4px solid var(--gold);
+    }
+    .stat-card .label {
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    .stat-card .value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 400;
+      color: var(--brown);
+      line-height: 1.2;
+    }
+
+    /* ----- MAIN GRID: tables + order panel ----- */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2.2fr 1.2fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    /* ----- TABLE GRID ----- */
+    .tables-section {
+      background: var(--warm-white);
+      padding: 1.8rem 1.8rem 2rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .section-header h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: var(--brown);
+    }
+    .section-header .sub {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    .table-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1rem;
+    }
+
+    .table-card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 1rem 0.8rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border: 1px solid rgba(184,134,11,0.15);
+      text-align: center;
+      cursor: pointer;
+      transition: 0.2s;
+      position: relative;
+    }
+    .table-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+      border-color: var(--gold-light);
+    }
+    .table-card .table-nr {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--brown);
+      letter-spacing: 0.04em;
+    }
+    .table-card .table-status {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.2rem 0.6rem;
+      border-radius: 40px;
+      display: inline-block;
+      margin-top: 0.3rem;
+      background: #e6e0d8;
+      color: var(--text-muted);
+    }
+    .table-card .table-status.occupied {
+      background: #d4c5b0;
+      color: var(--brown);
+    }
+    .table-card .table-status.reserved {
+      background: #f0e0c8;
+      color: var(--brown-mid);
+    }
+    .table-card .table-status.available {
+      background: #dce8d8;
+      color: #2a5a2a;
+    }
+    .table-card .guest-count {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+    .table-card .order-badge {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      background: var(--red);
+      color: white;
+      font-size: 0.6rem;
+      border-radius: 30px;
+      padding: 0.1rem 0.6rem;
+      font-weight: 500;
+    }
+
+    /* ----- ORDER PANEL ----- */
+    .order-panel {
+      background: var(--warm-white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.8rem;
+      position: sticky;
+      top: 2rem;
+    }
+
+    .order-panel h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: var(--brown);
+      border-bottom: 1px solid rgba(184,134,11,0.2);
+      padding-bottom: 0.7rem;
+      margin-bottom: 1.2rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    .order-panel h3 span {
+      font-size: 0.7rem;
+      font-family: 'Jost', sans-serif;
+      font-weight: 300;
+      color: var(--text-muted);
+    }
+
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid rgba(0,0,0,0.04);
+      font-size: 0.9rem;
+    }
+    .order-item .item-name {
+      font-weight: 400;
+    }
+    .order-item .item-qty {
+      color: var(--text-muted);
+      margin-right: 0.8rem;
+    }
+    .order-item .item-price {
+      font-weight: 500;
+      color: var(--brown);
+    }
+
+    .order-total {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+      font-size: 1.1rem;
+      padding: 1rem 0 0.5rem;
+      border-top: 2px solid rgba(184,134,11,0.2);
+      margin-top: 0.5rem;
+    }
+
+    .order-actions {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .order-actions button {
+      flex: 1;
+      min-width: 80px;
+      padding: 0.6rem 0.8rem;
+      border: none;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: 'Jost', sans-serif;
+      transition: 0.2s;
+    }
+    .btn-mark-ready {
+      background: var(--gold);
+      color: white;
+    }
+    .btn-mark-ready:hover {
+      background: var(--gold-light);
+    }
+    .btn-serve {
+      background: #2a5a2a;
+      color: white;
+    }
+    .btn-serve:hover {
+      background: #1e421e;
+    }
+    .btn-clear {
+      background: #ccc;
+      color: #333;
+    }
+    .btn-clear:hover {
+      background: #bbb;
+    }
+
+    .empty-state {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 1.2rem 0;
+      text-align: center;
+      font-weight: 300;
+    }
+
+    /* ----- TOAST ----- */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--brown);
+      color: var(--cream);
+      padding: 0.8rem 1.6rem;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      transform: translateX(130%);
+      transition: transform 0.35s ease;
+      z-index: 999;
+    }
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    /* responsive */
+  
+  </style>
+</head>
+<body>
+
+<div class="waiter-dashboard">
+
+  <!-- HEADER -->
+  <header class="dashboard-header">
+    <div class="header-left">
+      <div class="brand">Trattoria <span>Bella</span></div>
+      <span class="waiter-badge">👨‍🍳 Waiter · Marco</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn-outline" id="resetTablesBtn">🔄 Reset floor</button>
+      <button class="btn-primary-sm" id="newOrderBtn">➕ New order</button>
+    </div>
+  </header>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="label">Total tables</div><div class="value" id="totalTables">12</div></div>
+    <div class="stat-card"><div class="label">Occupied</div><div class="value" id="occupiedCount">3</div></div>
+    <div class="stat-card"><div class="label">Reserved</div><div class="value" id="reservedCount">1</div></div>
+    <div class="stat-card"><div class="label">Available</div><div class="value" id="availableCount">8</div></div>
+  </div>
+
+  <!-- GRID -->
+  <div class="dashboard-grid">
+
+    <!-- TABLES -->
+    <section class="tables-section">
+      <div class="section-header">
+        <h3>🍽️ Dining Room</h3>
+        <span class="sub">tap a table to view / edit order</span>
+      </div>
+      <div class="table-grid" id="tableGrid">
+        <!-- tables injected by JS -->
+      </div>
+    </section>
+
+    <!-- ORDER PANEL -->
+    <aside class="order-panel" id="orderPanel">
+      <h3>📋 Order <span id="tableLabel">— select a table</span></h3>
+      <div id="orderContent">
+        <div class="empty-state">Tap a table to see its order.</div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ─── DATA ────────────────────────────────────────────────
+  const menuItems = [
+    { name: 'Burrata con Prosciutto', price: 185 },
+    { name: 'Carpaccio di Manzo', price: 165 },
+    { name: 'Bruschetta al Pomodoro', price: 95 },
+    { name: 'Polpo alla Griglia', price: 210 },
+    { name: 'Pappardelle al Cinghiale', price: 225 },
+    { name: 'Risotto ai Funghi Porcini', price: 245 },
+    { name: 'Spaghetti alle Vongole', price: 235 },
+    { name: 'Gnocchi alla Sorrentina', price: 195 },
+    { name: 'Bistecca Fiorentina', price: 445 },
+    { name: 'Branzino al Forno', price: 320 },
+    { name: 'Pollo alla Cacciatora', price: 275 },
+    { name: 'Saltimbocca alla Romana', price: 295 },
+    { name: 'Tiramisù della Casa', price: 95 },
+    { name: 'Panna Cotta al Limone', price: 85 },
+    { name: 'Prosecco Superiore', price: 160 },
+    { name: 'Chianti Classico', price: 195 },
+    { name: 'Aperol Spritz', price: 105 },
+    { name: 'Negroni', price: 120 }
+  ];
+
+  // helper to pick random items
+  function randomItems(count) {
+    const shuffled = [...menuItems].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count).map(item => ({
+      ...item,
+      qty: Math.floor(Math.random() * 2) + 1
+    }));
+  }
+
+  // initial tables
+  let tables = [];
+  const tableCount = 12;
+
+  function initTables() {
+    tables = [];
+    for (let i = 1; i <= tableCount; i++) {
+      let status = 'available';
+      let order = [];
+      let guests = 0;
+      const r = Math.random();
+      if (r < 0.25) {
+        status = 'occupied';
+        guests = Math.floor(Math.random() * 4) + 2;
+        order = randomItems(Math.floor(Math.random() * 4) + 1);
+      } else if (r < 0.35) {
+        status = 'reserved';
+        guests = Math.floor(Math.random() * 4) + 2;
+        order = []; // reserved but no order yet
+      } else {
+        status = 'available';
+        guests = 0;
+        order = [];
+      }
+      tables.push({ id: i, status, order, guests });
+    }
+    // ensure at least one occupied and one reserved for demo
+    tables[0].status = 'occupied';
+    tables[0].guests = 4;
+    tables[0].order = randomItems(3);
+    tables[1].status = 'reserved';
+    tables[1].guests = 2;
+    tables[1].order = [];
+    tables[2].status = 'occupied';
+    tables[2].guests = 3;
+    tables[2].order = randomItems(2);
+  }
+  initTables();
+
+  // ─── STATE ────────────────────────────────────────────────
+  let selectedTableId = null;
+
+  // ─── DOM REFS ─────────────────────────────────────────────
+  const tableGrid = document.getElementById('tableGrid');
+  const orderContent = document.getElementById('orderContent');
+  const tableLabel = document.getElementById('tableLabel');
+  const totalTablesEl = document.getElementById('totalTables');
+  const occupiedCountEl = document.getElementById('occupiedCount');
+  const reservedCountEl = document.getElementById('reservedCount');
+  const availableCountEl = document.getElementById('availableCount');
+
+  // ─── TOAST ────────────────────────────────────────────────
+  function showToast(msg, duration = 3000) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timeout);
+    t._timeout = setTimeout(() => t.classList.remove('show'), duration);
+  }
+
+  // ─── RENDER ───────────────────────────────────────────────
+  function renderStats() {
+    const occupied = tables.filter(t => t.status === 'occupied').length;
+    const reserved = tables.filter(t => t.status === 'reserved').length;
+    const available = tables.filter(t => t.status === 'available').length;
+    totalTablesEl.textContent = tables.length;
+    occupiedCountEl.textContent = occupied;
+    reservedCountEl.textContent = reserved;
+    availableCountEl.textContent = available;
+  }
+
+  function renderTables() {
+    tableGrid.innerHTML = '';
+    tables.forEach(table => {
+      const card = document.createElement('div');
+      card.className = 'table-card';
+      const statusMap = {
+        available: '🟢 Available',
+        occupied: '🟠 Occupied',
+        reserved: '🔵 Reserved'
+      };
+      const statusClass = table.status;
+      const hasOrder = table.order && table.order.length > 0;
+      card.innerHTML = `
+        <div class="table-nr">Table ${table.id}</div>
+        <div class="table-status ${statusClass}">${statusMap[table.status]}</div>
+        ${table.guests ? `<div class="guest-count">👥 ${table.guests} guests</div>` : ''}
+        ${hasOrder ? `<div class="order-badge">${table.order.reduce((sum, i) => sum + i.qty, 0)} items</div>` : ''}
+      `;
+      card.addEventListener('click', () => selectTable(table.id));
+      if (selectedTableId === table.id) {
+        card.style.borderColor = 'var(--gold)';
+        card.style.boxShadow = '0 0 0 2px var(--gold-light)';
+      } else {
+        card.style.borderColor = 'rgba(184,134,11,0.15)';
+        card.style.boxShadow = 'none';
+      }
+      tableGrid.appendChild(card);
+    });
+    renderStats();
+  }
+
+  function selectTable(id) {
+    selectedTableId = id;
+    renderTables();
+    renderOrderPanel(id);
+  }
+
+  function renderOrderPanel(tableId) {
+    const table = tables.find(t => t.id === tableId);
+    if (!table) {
+      orderContent.innerHTML = `<div class="empty-state">Table not found.</div>`;
+      tableLabel.textContent = '—';
+      return;
+    }
+    tableLabel.textContent = `Table ${table.id} · ${table.status}`;
+
+    if (table.status === 'available') {
+      orderContent.innerHTML = `
+        <div class="empty-state">🍽️ Table is available.<br><small style="font-size:0.7rem;">Tap "New order" to start serving.</small></div>
+        <div class="order-actions">
+          <button class="btn-mark-ready" data-action="newOrder" data-id="${table.id}">➕ Start order</button>
+        </div>
+      `;
+      attachOrderActions();
+      return;
+    }
+
+    if (table.status === 'reserved') {
+      orderContent.innerHTML = `
+        <div class="empty-state">🔵 Reserved for ${table.guests} guests.<br><small style="font-size:0.7rem;">Order will be taken upon arrival.</small></div>
+        <div class="order-actions">
+          <button class="btn-mark-ready" data-action="seatTable" data-id="${table.id}">🪑 Seat & take order</button>
+          <button class="btn-clear" data-action="clearTable" data-id="${table.id}">❌ Cancel reservation</button>
+        </div>
+      `;
+      attachOrderActions();
+      return;
+    }
+
+    // occupied – show order
+    if (!table.order || table.order.length === 0) {
+      orderContent.innerHTML = `
+        <div class="empty-state">No items ordered yet.</div>
+        <div class="order-actions">
+          <button class="btn-mark-ready" data-action="addItems" data-id="${table.id}">➕ Add items</button>
+          <button class="btn-clear" data-action="clearTable" data-id="${table.id}">🧹 Clear table</button>
+        </div>
+      `;
+      attachOrderActions();
+      return;
+    }
+
+    let html = '';
+    let total = 0;
+    table.order.forEach(item => {
+      const subtotal = item.price * item.qty;
+      total += subtotal;
+      html += `
+        <div class="order-item">
+          <span><span class="item-qty">${item.qty}×</span> <span class="item-name">${item.name}</span></span>
+          <span class="item-price">R ${subtotal}</span>
+        </div>
+      `;
+    });
+    html += `<div class="order-total"><span>Total</span><span>R ${total}</span></div>`;
+
+    html += `
+      <div class="order-actions">
+        <button class="btn-mark-ready" data-action="addItems" data-id="${table.id}">➕ Add item</button>
+        <button class="btn-serve" data-action="markServed" data-id="${table.id}">✅ Mark served</button>
+        <button class="btn-clear" data-action="clearTable" data-id="${table.id}">🧹 Clear table</button>
+      </div>
+    `;
+    orderContent.innerHTML = html;
+    attachOrderActions();
+  }
+
+  // ─── ACTION HANDLERS ─────────────────────────────────────
+  function attachOrderActions() {
+    document.querySelectorAll('[data-action]').forEach(btn => {
+      btn.removeEventListener('click', handleAction);
+      btn.addEventListener('click', handleAction);
+    });
+  }
+
+  function handleAction(e) {
+    const btn = e.currentTarget;
+    const action = btn.dataset.action;
+    const id = parseInt(btn.dataset.id, 10);
+    const table = tables.find(t => t.id === id);
+    if (!table) return;
+
+    switch (action) {
+      case 'newOrder':
+        // change status to occupied, add 2 random items
+        table.status = 'occupied';
+        table.guests = 2;
+        table.order = randomItems(2);
+        showToast(`🆕 Order started for Table ${id}`);
+        break;
+
+      case 'seatTable':
+        table.status = 'occupied';
+        table.order = randomItems(2);
+        showToast(`🪑 Table ${id} seated, order taken.`);
+        break;
+
+      case 'addItems': {
+        const newItems = randomItems(Math.floor(Math.random() * 2) + 1);
+        // avoid duplicates just for demo – push
+        newItems.forEach(item => {
+          const existing = table.order.find(i => i.name === item.name);
+          if (existing) existing.qty += item.qty;
+          else table.order.push(item);
+        });
+        showToast(`➕ Added ${newItems.length} item(s) to Table ${id}`);
+        break;
+      }
+
+      case 'markServed':
+        showToast(`✅ Order served for Table ${id}. Buon appetito!`);
+        // keep order, but you could clear after serve – we keep for demo
+        break;
+
+      case 'clearTable':
+        table.status = 'available';
+        table.guests = 0;
+        table.order = [];
+        selectedTableId = null;
+        showToast(`🧹 Table ${id} cleared and available.`);
+        break;
+
+      default: return;
+    }
+    // re-render everything
+    renderTables();
+    if (selectedTableId) renderOrderPanel(selectedTableId);
+    else orderContent.innerHTML = `<div class="empty-state">Tap a table to see its order.</div>`;
+  }
+
+  // ─── RESET FLOOR ─────────────────────────────────────────
+  document.getElementById('resetTablesBtn').addEventListener('click', () => {
+    initTables();
+    selectedTableId = null;
+    renderTables();
+    orderContent.innerHTML = `<div class="empty-state">Tap a table to see its order.</div>`;
+    tableLabel.textContent = '— select a table';
+    showToast('🔄 Floor reset to demo state.');
+  });
+
+  // ─── NEW ORDER (from header) ─────────────────────────────
+  document.getElementById('newOrderBtn').addEventListener('click', () => {
+    // find first available table
+    const avail = tables.find(t => t.status === 'available');
+    if (!avail) {
+      showToast('⚠️ No available tables right now.');
+      return;
+    }
+    avail.status = 'occupied';
+    avail.guests = 2;
+    avail.order = randomItems(2);
+    selectedTableId = avail.id;
+    renderTables();
+    renderOrderPanel(avail.id);
+    showToast(`🆕 New order started at Table ${avail.id}`);
+  });
+
+  // ─── INIT ─────────────────────────────────────────────────
+  renderTables();
+  // select first occupied for demo
+  const firstOcc = tables.find(t => t.status === 'occupied');
+  if (firstOcc) {
+    selectedTableId = firstOcc.id;
+    renderTables();
+    renderOrderPanel(firstOcc.id);
+  } else {
+    orderContent.innerHTML = `<div class="empty-state">Tap a table to see its order.</div>`;
+  }
+</script>
+
+</body>
+</html>
