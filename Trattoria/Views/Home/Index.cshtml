@@ -6,626 +6,903 @@
     <title>Trattoria Bella — Authentic Italian Cuisine</title>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        :root {
-          --cream: #F5F0E8;
-          --warm-white: #FAF7F2;
-          --gold: #B8860B;
-          --gold-light: #D4A820;
-          --brown: #3D2B1F;
-          --brown-mid: #6B4226;
-          --red: #8B1A1A;
-          --text: #2A1F17;
-          --text-muted: #7A6558;
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
         }
 
-        html { scroll-behavior: smooth; }
+        :root {
+            --cream: #F5F0E8;
+            --warm-white: #FAF7F2;
+            --gold: #B8860B;
+            --gold-light: #D4A820;
+            --brown: #3D2B1F;
+            --brown-mid: #6B4226;
+            --red: #8B1A1A;
+            --text: #2A1F17;
+            --text-muted: #7A6558;
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
 
         body {
-          font-family: 'Jost', sans-serif;
-          background: var(--warm-white);
-          color: var(--text);
-          overflow-x: hidden;
+            font-family: 'Jost',sans-serif;
+            background: var(--warm-white);
+            color: var(--text);
+            overflow-x: hidden
         }
 
         /* NAV */
         nav {
-          position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-          display: flex; justify-content: space-between; align-items: center;
-          padding: 1.5rem 4rem;
-          background: rgba(250, 247, 242, 0.92);
-          backdrop-filter: blur(8px);
-          border-bottom: 1px solid rgba(184, 134, 11, 0.2);
-          transition: padding 0.3s;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 4rem;
+            background: rgba(250,247,242,0.92);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(184,134,11,0.2)
         }
 
         .nav-logo {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 1.6rem;
-          font-weight: 600;
-          color: var(--brown);
-          letter-spacing: 0.04em;
+            font-family: 'Cormorant Garamond',serif;
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: var(--brown);
+            letter-spacing: .04em
         }
 
-        .nav-logo span { color: var(--gold); }
+            .nav-logo span {
+                color: var(--gold)
+            }
 
         .nav-links {
-          display: flex; gap: 2.5rem; list-style: none;
+            display: flex;
+            gap: 2.5rem;
+            list-style: none
         }
 
-        .nav-links a {
-          font-size: 0.78rem;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          color: var(--text-muted);
-          text-decoration: none;
-          transition: color 0.2s;
+            .nav-links a {
+                font-size: .78rem;
+                letter-spacing: .14em;
+                text-transform: uppercase;
+                color: var(--text-muted);
+                text-decoration: none;
+                transition: color .2s
+            }
+
+                .nav-links a:hover {
+                    color: var(--gold)
+                }
+
+        .nav-login {
+            font-size: .75rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: .55rem 1.4rem;
+            background: transparent;
+            cursor: pointer;
+            font-family: 'Jost',sans-serif;
+            transition: all .25s
         }
 
-        .nav-links a:hover { color: var(--gold); }
-
-        .nav-reserve {
-          font-size: 0.75rem;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          border: 1px solid var(--gold);
-          color: var(--gold);
-          padding: 0.55rem 1.4rem;
-          text-decoration: none;
-          transition: all 0.25s;
-        }
-
-        .nav-reserve:hover {
-          background: var(--gold);
-          color: white;
-        }
+            .nav-login:hover {
+                background: var(--gold);
+                color: white
+            }
 
         /* HERO */
         .hero {
-          min-height: 100vh;
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          padding-top: 80px;
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding-top: 80px
         }
 
         .hero-text {
-          display: flex; flex-direction: column; justify-content: center;
-          padding: 6rem 4rem 6rem 6rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 6rem 4rem 6rem 6rem
         }
 
         .hero-tag {
-          font-size: 0.72rem;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          color: var(--gold);
-          margin-bottom: 1.5rem;
+            font-size: .72rem;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 1.5rem
         }
 
         .hero-title {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: clamp(3rem, 5vw, 5rem);
-          font-weight: 300;
-          line-height: 1.1;
-          color: var(--brown);
-          margin-bottom: 2rem;
+            font-family: 'Cormorant Garamond',serif;
+            font-size: clamp(3rem,5vw,5rem);
+            font-weight: 300;
+            line-height: 1.1;
+            color: var(--brown);
+            margin-bottom: 2rem
         }
 
-        .hero-title em {
-          font-style: italic;
-          color: var(--red);
-        }
+            .hero-title em {
+                font-style: italic;
+                color: var(--red)
+            }
 
         .hero-desc {
-          font-size: 1rem;
-          line-height: 1.8;
-          color: var(--text-muted);
-          max-width: 420px;
-          margin-bottom: 2.5rem;
-          font-weight: 300;
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--text-muted);
+            max-width: 420px;
+            margin-bottom: 2.5rem;
+            font-weight: 300
         }
 
-        .hero-actions { display: flex; gap: 1rem; align-items: center; }
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center
+        }
 
         .btn-primary {
-          background: var(--red);
-          color: white;
-          padding: 0.9rem 2.2rem;
-          text-decoration: none;
-          font-size: 0.78rem;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          transition: background 0.25s;
+            background: var(--red);
+            color: white;
+            padding: .9rem 2.2rem;
+            text-decoration: none;
+            font-size: .78rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            transition: background .25s;
+            border: none;
+            cursor: pointer;
+            font-family: 'Jost',sans-serif
         }
 
-        .btn-primary:hover { background: var(--brown); }
+            .btn-primary:hover {
+                background: var(--brown)
+            }
 
         .btn-secondary {
-          color: var(--text-muted);
-          font-size: 0.78rem;
-          letter-spacing: 0.1em;
-          text-decoration: none;
-          display: flex; align-items: center; gap: 0.5rem;
-          transition: color 0.2s;
+            color: var(--text-muted);
+            font-size: .78rem;
+            letter-spacing: .1em;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            transition: color .2s
         }
 
-        .btn-secondary:hover { color: var(--gold); }
+            .btn-secondary:hover {
+                color: var(--gold)
+            }
 
         .hero-image {
-          background: var(--cream);
-          position: relative;
-          overflow: hidden;
+            background: var(--cream);
+            position: relative;
+            overflow: hidden
         }
 
         .hero-image-inner {
-          width: 100%; height: 100%;
-          background: #E8E0D0;
-          display: flex; align-items: center; justify-content: center;
-          overflow: hidden;
+            width: 100%;
+            height: 100%;
+            background: #E8E0D0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden
         }
 
         .hero-photo {
-          width: 100%; height: 100%;
-          object-fit: cover;
-          object-position: center;
-          transition: transform 0.6s ease;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .6s ease
         }
-        .hero-photo:hover { transform: scale(1.03); }
+
+            .hero-photo:hover {
+                transform: scale(1.03)
+            }
 
         .hero-badge {
-          position: absolute; bottom: 3rem; left: -1.5rem;
-          background: var(--brown);
-          color: var(--cream);
-          padding: 1.2rem 2rem;
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 0.9rem;
-          font-style: italic;
-          font-weight: 300;
-          letter-spacing: 0.05em;
-          box-shadow: 4px 4px 0 rgba(184,134,11,0.3);
+            position: absolute;
+            bottom: 3rem;
+            left: -1.5rem;
+            background: var(--brown);
+            color: var(--cream);
+            padding: 1.2rem 2rem;
+            font-family: 'Cormorant Garamond',serif;
+            font-size: .9rem;
+            font-style: italic;
+            font-weight: 300;
+            letter-spacing: .05em;
+            box-shadow: 4px 4px 0 rgba(184,134,11,.3)
         }
 
-        /* DIVIDER */
-        .divider {
-          display: flex; align-items: center; gap: 1.5rem;
-          padding: 0 6rem;
-          margin: 1rem 0;
-        }
-        .divider-line { flex: 1; height: 1px; background: rgba(184,134,11,0.25); }
-        .divider-icon { color: var(--gold); font-size: 1rem; }
 
-        /* ABOUT STRIP */
+        /* ABOUT */
         .about-strip {
-          background: var(--brown);
-          color: var(--cream);
-          padding: 4rem 6rem;
-          display: grid;
-          grid-template-columns: 1fr 1fr 1fr;
-          gap: 3rem;
-          align-items: start;
+            background: var(--brown);
+            color: var(--cream);
+            padding: 4rem 6rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 3rem;
+            align-items: start
         }
 
-        .about-stat { text-align: center; }
+        .about-stat {
+            text-align: center
+        }
 
         .about-stat-num {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 3.5rem;
-          font-weight: 300;
-          color: var(--gold-light);
-          display: block;
-          line-height: 1;
-          margin-bottom: 0.4rem;
+            font-family: 'Cormorant Garamond',serif;
+            font-size: 3.5rem;
+            font-weight: 300;
+            color: var(--gold-light);
+            display: block;
+            line-height: 1;
+            margin-bottom: .4rem
         }
 
         .about-stat-label {
-          font-size: 0.75rem;
-          letter-spacing: 0.15em;
-          text-transform: uppercase;
-          color: rgba(245,240,232,0.6);
+            font-size: .75rem;
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            color: rgba(245,240,232,.6)
         }
 
-        /* MENU SECTION */
-        .section { padding: 6rem; }
+        /* MENU */
+        .section {
+            padding: 6rem
+        }
 
         .section-header {
-          display: grid;
-          grid-template-columns: 1fr auto 1fr;
-          align-items: center;
-          gap: 2rem;
-          margin-bottom: 4rem;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 4rem
         }
 
-        .section-header-line { height: 1px; background: rgba(184,134,11,0.3); }
+        .section-header-line {
+            height: 1px;
+            background: rgba(184,134,11,.3)
+        }
 
-        .section-header-center { text-align: center; }
+        .section-header-center {
+            text-align: center
+        }
 
         .section-tag {
-          font-size: 0.7rem;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          color: var(--gold);
-          margin-bottom: 0.5rem;
+            font-size: .7rem;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: .5rem
         }
 
         .section-title {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 2.6rem;
-          font-weight: 300;
-          color: var(--brown);
-          line-height: 1.2;
+            font-family: 'Cormorant Garamond',serif;
+            font-size: 2.6rem;
+            font-weight: 300;
+            color: var(--brown);
+            line-height: 1.2
         }
 
         .menu-tabs {
-          display: flex; justify-content: center; gap: 0;
-          margin-bottom: 3rem;
-          border-bottom: 1px solid rgba(184,134,11,0.2);
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+            border-bottom: 1px solid rgba(184,134,11,.2);
+            flex-wrap: wrap
         }
 
         .menu-tab {
-          padding: 0.7rem 2rem;
-          font-size: 0.75rem;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          border: none;
-          background: none;
-          cursor: pointer;
-          color: var(--text-muted);
-          border-bottom: 2px solid transparent;
-          margin-bottom: -1px;
-          transition: all 0.2s;
-          font-family: 'Jost', sans-serif;
+            padding: .7rem 2rem;
+            font-size: .75rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            transition: all .2s;
+            font-family: 'Jost',sans-serif
         }
 
-        .menu-tab.active {
-          color: var(--red);
-          border-bottom-color: var(--red);
-        }
+            .menu-tab.active {
+                color: var(--red);
+                border-bottom-color: var(--red)
+            }
 
-        .menu-tab:hover { color: var(--brown); }
+            .menu-tab:hover {
+                color: var(--brown)
+            }
 
         .menu-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr
         }
 
         .menu-item {
-          padding: 1.4rem 2rem;
-          border-bottom: 1px solid rgba(184,134,11,0.12);
-          display: flex;
-          justify-content: space-between;
-          align-items: start;
-          gap: 1.5rem;
-          transition: background 0.2s;
+            padding: 1.4rem 2rem;
+            border-bottom: 1px solid rgba(184,134,11,.12);
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 1.5rem;
+            transition: background .2s
         }
 
-        .menu-item:hover { background: rgba(245,240,232,0.6); }
+            .menu-item:hover {
+                background: rgba(245,240,232,.6)
+            }
 
-        .menu-item-info { flex: 1; }
+        .menu-item-info {
+            flex: 1
+        }
 
         .menu-item-name {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 1.15rem;
-          font-weight: 600;
-          color: var(--brown);
-          margin-bottom: 0.25rem;
+            font-family: 'Cormorant Garamond',serif;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--brown);
+            margin-bottom: .25rem
         }
 
         .menu-item-desc {
-          font-size: 0.8rem;
-          color: var(--text-muted);
-          line-height: 1.5;
-          font-weight: 300;
+            font-size: .8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+            font-weight: 300
         }
 
         .menu-item-price {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 1rem;
-          color: var(--gold);
-          font-weight: 600;
-          white-space: nowrap;
-          padding-top: 0.1rem;
+            font-family: 'Cormorant Garamond',serif;
+            font-size: 1rem;
+            color: var(--gold);
+            font-weight: 600;
+            white-space: nowrap;
+            padding-top: .1rem
         }
 
         .menu-category {
-          display: none;
+            display: none
         }
 
-        .menu-category.active { display: contents; }
+            .menu-category.active {
+                display: contents
+            }
 
-        /* SIGNATURE DISH */
+        /* SIGNATURE */
         .signature {
-          background: var(--cream);
-          padding: 6rem;
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 5rem;
-          align-items: center;
+            background: var(--cream);
+            padding: 6rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: center
         }
 
         .signature-visual {
-          background: var(--warm-white);
-          aspect-ratio: 1;
-          display: flex; align-items: center; justify-content: center;
-          position: relative;
+            background: var(--warm-white);
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative
         }
 
-        .signature-visual::before {
-          content: '';
-          position: absolute; inset: 1.5rem;
-          border: 1px solid rgba(184,134,11,0.25);
-        }
+            .signature-visual::before {
+                content: '';
+                position: absolute;
+                inset: 1.5rem;
+                border: 1px solid rgba(184,134,11,.25)
+            }
 
         .signature-tag {
-          font-size: 0.7rem;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          color: var(--gold);
-          margin-bottom: 1rem;
+            font-size: .7rem;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 1rem
         }
 
         .signature-title {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 2.8rem;
-          font-weight: 300;
-          color: var(--brown);
-          line-height: 1.15;
-          margin-bottom: 1.5rem;
+            font-family: 'Cormorant Garamond',serif;
+            font-size: 2.8rem;
+            font-weight: 300;
+            color: var(--brown);
+            line-height: 1.15;
+            margin-bottom: 1.5rem
         }
 
         .signature-desc {
-          font-size: 0.95rem;
-          line-height: 1.85;
-          color: var(--text-muted);
-          margin-bottom: 2rem;
-          font-weight: 300;
+            font-size: .95rem;
+            line-height: 1.85;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-weight: 300
         }
 
         .ingredients {
-          display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem
         }
 
         .ingredient-tag {
-          font-size: 0.7rem;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          color: var(--brown-mid);
-          border: 1px solid rgba(107,66,38,0.3);
-          padding: 0.35rem 0.9rem;
+            font-size: .7rem;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--brown-mid);
+            border: 1px solid rgba(107,66,38,.3);
+            padding: .35rem .9rem
         }
 
         /* TESTIMONIALS */
         .testimonials {
-          padding: 6rem;
-          background: var(--warm-white);
-          text-align: center;
+            padding: 6rem;
+            background: var(--warm-white);
+            text-align: center
         }
 
         .quotes-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr 1fr;
-          gap: 2rem;
-          margin-top: 3rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2rem;
+            margin-top: 3rem
         }
 
         .quote-card {
-          background: var(--cream);
-          padding: 2.5rem 2rem;
-          position: relative;
-          text-align: left;
+            background: var(--cream);
+            padding: 2.5rem 2rem;
+            position: relative;
+            text-align: left
         }
 
         .quote-mark {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 5rem;
-          line-height: 1;
-          color: rgba(184,134,11,0.2);
-          position: absolute;
-          top: 0.5rem; left: 1.2rem;
-          font-weight: 300;
+            font-family: 'Cormorant Garamond',serif;
+            font-size: 5rem;
+            line-height: 1;
+            color: rgba(184,134,11,.2);
+            position: absolute;
+            top: .5rem;
+            left: 1.2rem;
+            font-weight: 300
         }
 
         .quote-text {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 1.05rem;
-          font-style: italic;
-          font-weight: 300;
-          line-height: 1.75;
-          color: var(--brown);
-          margin-top: 1.5rem;
-          margin-bottom: 1.5rem;
+            font-family: 'Cormorant Garamond',serif;
+            font-size: 1.05rem;
+            font-style: italic;
+            font-weight: 300;
+            line-height: 1.75;
+            color: var(--brown);
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem
         }
 
         .quote-author {
-          font-size: 0.72rem;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-          color: var(--gold);
+            font-size: .72rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--gold)
         }
 
         .stars {
-          display: flex; gap: 3px; margin-bottom: 0.5rem;
+            display: flex;
+            gap: 3px;
+            margin-bottom: .5rem
         }
 
-        .star { color: var(--gold-light); font-size: 0.9rem; }
+        .star {
+            color: var(--gold-light);
+            font-size: .9rem
+        }
 
         /* RESERVATION */
         .reservation {
-          background: var(--brown);
-          padding: 7rem 6rem;
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 6rem;
-          align-items: center;
-          color: var(--cream);
+            background: var(--brown);
+            padding: 7rem 6rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6rem;
+            align-items: center;
+            color: var(--cream)
         }
 
         .reservation-title {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 3rem;
-          font-weight: 300;
-          color: var(--cream);
-          line-height: 1.15;
-          margin-bottom: 1rem;
+            font-family: 'Cormorant Garamond',serif;
+            font-size: 3rem;
+            font-weight: 300;
+            color: var(--cream);
+            line-height: 1.15;
+            margin-bottom: 1rem
         }
 
         .reservation-desc {
-          font-size: 0.9rem;
-          line-height: 1.8;
-          color: rgba(245,240,232,0.65);
-          margin-bottom: 2rem;
-          font-weight: 300;
+            font-size: .9rem;
+            line-height: 1.8;
+            color: rgba(245,240,232,.65);
+            margin-bottom: 2rem;
+            font-weight: 300
         }
 
-        .info-block { margin-bottom: 1.2rem; }
+        .info-block {
+            margin-bottom: 1.2rem
+        }
 
         .info-label {
-          font-size: 0.65rem;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          color: var(--gold-light);
-          margin-bottom: 0.25rem;
+            font-size: .65rem;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--gold-light);
+            margin-bottom: .25rem
         }
 
         .info-value {
-          font-size: 0.95rem;
-          color: var(--cream);
-          font-weight: 300;
+            font-size: .95rem;
+            color: var(--cream);
+            font-weight: 300
         }
 
-        .res-form { display: flex; flex-direction: column; gap: 1rem; }
+        .res-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem
+        }
 
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem
+        }
 
-        .form-field { display: flex; flex-direction: column; gap: 0.4rem; }
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: .4rem
+        }
 
         .form-label {
-          font-size: 0.65rem;
-          letter-spacing: 0.15em;
-          text-transform: uppercase;
-          color: rgba(245,240,232,0.55);
+            font-size: .65rem;
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            color: rgba(245,240,232,.55)
         }
 
         .form-input, .form-select {
-          background: rgba(255,255,255,0.07);
-          border: 1px solid rgba(184,134,11,0.3);
-          color: var(--cream);
-          padding: 0.75rem 1rem;
-          font-family: 'Jost', sans-serif;
-          font-size: 0.9rem;
-          font-weight: 300;
-          outline: none;
-          transition: border-color 0.2s;
-          appearance: none;
+            background: rgba(255,255,255,.07);
+            border: 1px solid rgba(184,134,11,.3);
+            color: var(--cream);
+            padding: .75rem 1rem;
+            font-family: 'Jost',sans-serif;
+            font-size: .9rem;
+            font-weight: 300;
+            outline: none;
+            transition: border-color .2s;
+            appearance: none
         }
 
-        .form-input::placeholder { color: rgba(245,240,232,0.3); }
+            .form-input::placeholder {
+                color: rgba(245,240,232,.3)
+            }
 
-        .form-input:focus, .form-select:focus {
-          border-color: var(--gold-light);
-        }
+            .form-input:focus, .form-select:focus {
+                border-color: var(--gold-light)
+            }
 
-        .form-select option { background: var(--brown); }
+            .form-select option {
+                background: var(--brown)
+            }
 
         .btn-reserve {
-          margin-top: 0.5rem;
-          background: var(--gold);
-          color: var(--brown);
-          padding: 1rem 2rem;
-          border: none;
-          font-family: 'Jost', sans-serif;
-          font-size: 0.78rem;
-          letter-spacing: 0.15em;
-          text-transform: uppercase;
-          cursor: pointer;
-          font-weight: 500;
-          transition: background 0.25s;
+            margin-top: .5rem;
+            background: var(--gold);
+            color: var(--brown);
+            padding: 1rem 2rem;
+            border: none;
+            font-family: 'Jost',sans-serif;
+            font-size: .78rem;
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background .25s
         }
 
-        .btn-reserve:hover { background: var(--gold-light); }
+            .btn-reserve:hover {
+                background: var(--gold-light)
+            }
 
         /* FOOTER */
         footer {
-          background: #1A1208;
-          color: rgba(245,240,232,0.5);
-          padding: 3rem 6rem;
-          display: grid;
-          grid-template-columns: 2fr 1fr 1fr 1fr;
-          gap: 3rem;
+            background: #1A1208;
+            color: rgba(245,240,232,.5);
+            padding: 3rem 6rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem
         }
 
         .footer-brand {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 1.4rem;
-          font-weight: 600;
-          color: var(--cream);
-          margin-bottom: 0.8rem;
+            font-family: 'Cormorant Garamond',serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--cream);
+            margin-bottom: .8rem
         }
 
-        .footer-brand span { color: var(--gold); }
+            .footer-brand span {
+                color: var(--gold)
+            }
 
         .footer-tagline {
-          font-size: 0.8rem;
-          line-height: 1.7;
-          color: rgba(245,240,232,0.4);
-          font-weight: 300;
-          max-width: 220px;
+            font-size: .8rem;
+            line-height: 1.7;
+            color: rgba(245,240,232,.4);
+            font-weight: 300;
+            max-width: 220px
         }
 
         .footer-heading {
-          font-size: 0.65rem;
-          letter-spacing: 0.18em;
-          text-transform: uppercase;
-          color: var(--gold-light);
-          margin-bottom: 1.2rem;
+            font-size: .65rem;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: var(--gold-light);
+            margin-bottom: 1.2rem
         }
 
-        .footer-links { list-style: none; }
-
-        .footer-links li {
-          margin-bottom: 0.6rem;
+        .footer-links {
+            list-style: none
         }
 
-        .footer-links a {
-          text-decoration: none;
-          font-size: 0.82rem;
-          color: rgba(245,240,232,0.45);
-          transition: color 0.2s;
-          font-weight: 300;
-        }
+            .footer-links li {
+                margin-bottom: .6rem
+            }
 
-        .footer-links a:hover { color: var(--gold-light); }
+            .footer-links a {
+                text-decoration: none;
+                font-size: .82rem;
+                color: rgba(245,240,232,.45);
+                transition: color .2s;
+                font-weight: 300
+            }
+
+                .footer-links a:hover {
+                    color: var(--gold-light)
+                }
 
         .footer-bottom {
-          background: #110D05;
-          padding: 1.2rem 6rem;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          font-size: 0.72rem;
-          color: rgba(245,240,232,0.25);
+            background: #110D05;
+            padding: 1.2rem 6rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: .72rem;
+            color: rgba(245,240,232,.25)
         }
-
-        
-
-        .hero-tag { animation: fadeUp 0.8s ease both 0.2s; }
-        .hero-title { animation: fadeUp 0.8s ease both 0.4s; }
-        .hero-desc { animation: fadeUp 0.8s ease both 0.55s; }
-        .hero-actions { animation: fadeUp 0.8s ease both 0.7s; }
 
         /* TOAST */
         .toast {
-          position: fixed; bottom: 2rem; right: 2rem;
-          background: var(--brown);
-          color: var(--cream);
-          padding: 1rem 1.5rem;
-          font-size: 0.85rem;
-          border-left: 3px solid var(--gold);
-          transform: translateX(120%);
-          transition: transform 0.4s;
-          z-index: 200;
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--brown);
+            color: var(--cream);
+            padding: 1rem 1.5rem;
+            font-size: .85rem;
+            border-left: 3px solid var(--gold);
+            transform: translateX(130%);
+            transition: transform .4s ease;
+            z-index: 9999
         }
-        .toast.show { transform: translateX(0); }
+
+            .toast.show {
+                transform: translateX(0)
+            }
+
+        /* MODAL */
+        #loginModal {
+            position: fixed;
+            inset: 0;
+            z-index: 9000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0);
+            display: none;
+        }
+
+            #loginModal.open {
+                display: flex;
+                background: rgba(0,0,0,0.55);
+                backdrop-filter: blur(4px);
+                -webkit-backdrop-filter: blur(4px);
+            }
+
+        .modal-box {
+            background: #FAF7F2;
+            width: 90%;
+            max-width: 440px;
+            border-radius: 4px;
+            padding: 2.8rem 3rem 2.4rem;
+            position: relative;
+            box-shadow: 0 24px 48px rgba(0,0,0,.3);
+            transform: translateY(-24px);
+            opacity: 0;
+            transition: transform .3s ease, opacity .3s ease;
+        }
+
+        #loginModal.open .modal-box {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: .9rem;
+            right: 1rem;
+            width: 2rem;
+            height: 2rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            line-height: 1;
+            color: #7A6558;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color .2s;
+        }
+
+            .modal-close-btn:hover {
+                color: #3D2B1F
+            }
+
+        .modal-heading {
+            font-family: 'Cormorant Garamond',serif;
+            font-size: 2rem;
+            font-weight: 300;
+            color: #3D2B1F;
+            margin-bottom: .35rem;
+        }
+
+        .modal-sub {
+            font-size: .88rem;
+            color: #7A6558;
+            margin-bottom: 1.8rem;
+            font-weight: 300;
+        }
+
+        .mf {
+            display: flex;
+            flex-direction: column;
+            gap: .35rem;
+            margin-bottom: 1rem
+        }
+
+        .ml {
+            font-size: .65rem;
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            color: #7A6558
+        }
+
+        .mi {
+            background: #fff;
+            border: 1px solid rgba(184,134,11,.28);
+            color: #2A1F17;
+            padding: .75rem 1rem;
+            font-family: 'Jost',sans-serif;
+            font-size: .92rem;
+            font-weight: 300;
+            outline: none;
+            border-radius: 2px;
+            transition: border-color .2s, box-shadow .2s;
+            width: 100%;
+        }
+
+            .mi:focus {
+                border-color: #B8860B;
+                box-shadow: 0 0 0 3px rgba(184,134,11,.12)
+            }
+
+            .mi::placeholder {
+                color: rgba(42,31,23,.3)
+            }
+
+        .modal-error {
+            font-size: .8rem;
+            color: #8B1A1A;
+            min-height: 1.2rem;
+            margin-bottom: .5rem;
+            display: none;
+        }
+
+            .modal-error.visible {
+                display: block
+            }
+
+        .modal-submit {
+            width: 100%;
+            background: #8B1A1A;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            padding: 1rem;
+            font-family: 'Jost',sans-serif;
+            font-size: .78rem;
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            font-weight: 500;
+            transition: background .25s;
+            margin-top: .25rem;
+        }
+
+            .modal-submit:hover {
+                background: #3D2B1F
+            }
+
+            .modal-submit:disabled {
+                background: #bbb;
+                cursor: not-allowed
+            }
+
+        .modal-footer {
+            margin-top: 1.1rem;
+            font-size: .8rem;
+            text-align: center;
+            color: #7A6558
+        }
+
+            .modal-footer a {
+                color: #B8860B;
+                text-decoration: none
+            }
+
+                .modal-footer a:hover {
+                    text-decoration: underline
+                }
+
+        .modal-divider {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            margin: 1.2rem 0
+        }
+
+            .modal-divider::before, .modal-divider::after {
+                content: '';
+                flex: 1;
+                height: 1px;
+                background: rgba(184,134,11,.2)
+            }
+
+            .modal-divider span {
+                font-size: .68rem;
+                letter-spacing: .1em;
+                text-transform: uppercase;
+                color: #7A6558
+            }
+
+        body.no-scroll {
+            overflow: hidden
+        }
     </style>
 </head>
 <body>
@@ -638,16 +915,14 @@
             <li><a href="#about">Our Story</a></li>
             <li><a href="#reservation">Reserve</a></li>
         </ul>
-        <a href="#reservation" class="nav-reserve">Book a Table</a>
+        <button class="nav-login" id="openLoginBtn">Login</button>
     </nav>
 
     <!-- HERO -->
     <section class="hero">
         <div class="hero-text">
             <p class="hero-tag">Since 1987 · Florence, Tuscany</p>
-            <h1 class="hero-title">
-                Where Italy<br>finds its<br><em>truest voice</em>
-            </h1>
+            <h1 class="hero-title">Where Italy<br>finds its<br><em>truest voice</em></h1>
             <p class="hero-desc">Hand-rolled pasta, wood-fired meats, and recipes carried across generations. Every dish is a letter from home.</p>
             <div class="hero-actions">
                 <a href="#menu" class="btn-primary">Explore Menu</a>
@@ -656,7 +931,7 @@
         </div>
         <div class="hero-image">
             <div class="hero-image-inner">
-                <img class="hero-photo" src="~/img/grandmas-lasagna-hero-02-FT-RECIPE1222-e0117c061ce74af8b2dfae19d08c91a5.webp" alt="Grandma's lasagna"> <!-- IMG SRC -->
+                <img class="hero-photo" src="img/grandmas-lasagna-hero-02-FT-RECIPE1222-e0117c061ce74af8b2dfae19d08c91a5.webp" alt="Grandma's lasagna">
             </div>
             <div class="hero-badge">La nostra passione è la cucina</div>
         </div>
@@ -664,18 +939,9 @@
 
     <!-- STATS -->
     <div class="about-strip" id="about">
-        <div class="about-stat">
-            <span class="about-stat-num">37</span>
-            <span class="about-stat-label">Years of Tradition</span>
-        </div>
-        <div class="about-stat">
-            <span class="about-stat-num">12</span>
-            <span class="about-stat-label">Seasonal Ingredients</span>
-        </div>
-        <div class="about-stat">
-            <span class="about-stat-num">3</span>
-            <span class="about-stat-label">Generations of Family Recipes</span>
-        </div>
+        <div class="about-stat"><span class="about-stat-num">37</span><span class="about-stat-label">Years of Tradition</span></div>
+        <div class="about-stat"><span class="about-stat-num">12</span><span class="about-stat-label">Seasonal Ingredients</span></div>
+        <div class="about-stat"><span class="about-stat-num">3</span><span class="about-stat-label">Generations of Family Recipes</span></div>
     </div>
 
     <!-- MENU -->
@@ -688,217 +954,87 @@
             </div>
             <div class="section-header-line"></div>
         </div>
-
         <div class="menu-tabs">
-            <button class="menu-tab active" onclick="switchTab(event, 'antipasti')">Antipasti</button>
-            <button class="menu-tab" onclick="switchTab(event, 'primi')">Primi Piatti</button>
-            <button class="menu-tab" onclick="switchTab(event, 'secondi')">Secondi</button>
-            <button class="menu-tab" onclick="switchTab(event, 'dolci')">Dolci</button>
+            <button class="menu-tab active" data-tab="antipasti">Appetizers</button>
+            <button class="menu-tab" data-tab="primi">First Courses</button>
+            <button class="menu-tab" data-tab="secondi">Second Courses</button>
+            <button class="menu-tab" data-tab="dolci">Desserts</button>
+            <button class="menu-tab" data-tab="wine">Wine & Drinks</button>
         </div>
-
         <div class="menu-grid">
             <div class="menu-category active" id="antipasti">
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Burrata con Prosciutto</div>
-                        <div class="menu-item-desc">Creamy burrata, San Daniele prosciutto, truffle honey, toasted pine nuts</div>
-                    </div>
-                    <div class="menu-item-price">R 185</div>
-                </div>
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Carpaccio di Manzo</div>
-                        <div class="menu-item-desc">Thin-sliced beef, rocket, capers, Parmesan shavings, lemon oil</div>
-                    </div>
-                    <div class="menu-item-price">R 165</div>
-                </div>
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Bruschetta al Pomodoro</div>
-                        <div class="menu-item-desc">Wood-fired sourdough, vine tomatoes, basil, aged balsamic, garlic</div>
-                    </div>
-                    <div class="menu-item-price">R 95</div>
-                </div>
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Polpo alla Griglia</div>
-                        <div class="menu-item-desc">Grilled octopus, chickpea purée, smoked paprika oil, olives</div>
-                    </div>
-                    <div class="menu-item-price">R 210</div>
-                </div>
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Zuppa di Pomodoro</div>
-                        <div class="menu-item-desc">Slow-roasted tomato soup, basil cream, crispy capers, torn ciabatta</div>
-                    </div>
-                    <div class="menu-item-price">R 105</div>
-                </div>
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Affettati Misti</div>
-                        <div class="menu-item-desc">Selection of cured Italian meats, pickled vegetables, grissini, mostarda</div>
-                    </div>
-                    <div class="menu-item-price">R 195</div>
-                </div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Burrata con Prosciutto</div><div class="menu-item-desc">Creamy burrata, San Daniele prosciutto, truffle honey, toasted pine nuts</div></div><div class="menu-item-price">R 185</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Carpaccio di Manzo</div><div class="menu-item-desc">Thin-sliced beef, rocket, capers, Parmesan shavings, lemon oil</div></div><div class="menu-item-price">R 165</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Bruschetta al Pomodoro</div><div class="menu-item-desc">Wood-fired sourdough, vine tomatoes, basil, aged balsamic, garlic</div></div><div class="menu-item-price">R 95</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Polpo alla Griglia</div><div class="menu-item-desc">Grilled octopus, chickpea purée, smoked paprika oil, olives</div></div><div class="menu-item-price">R 210</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Zuppa di Pomodoro</div><div class="menu-item-desc">Slow-roasted tomato soup, basil cream, crispy capers, torn ciabatta</div></div><div class="menu-item-price">R 105</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Affettati Misti</div><div class="menu-item-desc">Selection of cured Italian meats, pickled vegetables, grissini, mostarda</div></div><div class="menu-item-price">R 195</div></div>
             </div>
-
-            <div class="menu-category" id="primi" style="display:none">
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Pappardelle al Cinghiale</div>
-                        <div class="menu-item-desc">Hand-rolled pappardelle, slow-braised wild boar ragù, rosemary, red wine</div>
-                    </div>
-                    <div class="menu-item-price">R 225</div>
-                </div>
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Risotto ai Funghi Porcini</div>
-                        <div class="menu-item-desc">Carnaroli risotto, porcini mushrooms, Parmesan, white truffle oil</div>
-                    </div>
-                    <div class="menu-item-price">R 245</div>
-                </div>
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Spaghetti alle Vongole</div>
-                        <div class="menu-item-desc">Spaghetti, West Coast clams, white wine, garlic, parsley, chilli</div>
-                    </div>
-                    <div class="menu-item-price">R 235</div>
-                </div>
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Gnocchi alla Sorrentina</div>
-                        <div class="menu-item-desc">Potato gnocchi, San Marzano tomatoes, fresh mozzarella, basil</div>
-                    </div>
-                    <div class="menu-item-price">R 195</div>
-                </div>
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Tagliatelle al Tartufo</div>
-                        <div class="menu-item-desc">Egg tagliatelle, black truffle, butter, aged Parmesan, lemon zest</div>
-                    </div>
-                    <div class="menu-item-price">R 285</div>
-                </div>
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Lasagne della Nonna</div>
-                        <div class="menu-item-desc">Grandmother's recipe, Bolognese, béchamel, handmade pasta sheets</div>
-                    </div>
-                    <div class="menu-item-price">R 210</div>
-                </div>
+            <div class="menu-category" id="primi">
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Pappardelle al Cinghiale</div><div class="menu-item-desc">Hand-rolled pappardelle, slow-braised wild boar ragù, rosemary, red wine</div></div><div class="menu-item-price">R 225</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Risotto ai Funghi Porcini</div><div class="menu-item-desc">Carnaroli risotto, porcini mushrooms, Parmesan, white truffle oil</div></div><div class="menu-item-price">R 245</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Spaghetti alle Vongole</div><div class="menu-item-desc">Spaghetti, West Coast clams, white wine, garlic, parsley, chilli</div></div><div class="menu-item-price">R 235</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Gnocchi alla Sorrentina</div><div class="menu-item-desc">Potato gnocchi, San Marzano tomatoes, fresh mozzarella, basil</div></div><div class="menu-item-price">R 195</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Tagliatelle al Tartufo</div><div class="menu-item-desc">Egg tagliatelle, black truffle, butter, aged Parmesan, lemon zest</div></div><div class="menu-item-price">R 285</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Lasagne della Nonna</div><div class="menu-item-desc">Grandmother's recipe, Bolognese, béchamel, handmade pasta sheets</div></div><div class="menu-item-price">R 210</div></div>
             </div>
-
-            <div class="menu-category" id="secondi" style="display:none">
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Bistecca Fiorentina</div>
-                        <div class="menu-item-desc">T-bone steak, rosemary salt, lemon, roasted garlic, green beans (600g)</div>
-                    </div>
-                    <div class="menu-item-price">R 445</div>
-                </div>
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Branzino al Forno</div>
-                        <div class="menu-item-desc">Whole baked sea bass, capers, olives, cherry tomatoes, white wine</div>
-                    </div>
-                    <div class="menu-item-price">R 320</div>
-                </div>
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Pollo alla Cacciatora</div>
-                        <div class="menu-item-desc">Free-range chicken, hunter-style sauce, mushrooms, olives, polenta</div>
-                    </div>
-                    <div class="menu-item-price">R 275</div>
-                </div>
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Saltimbocca alla Romana</div>
-                        <div class="menu-item-desc">Veal cutlets, prosciutto, sage, white wine, butter sauce</div>
-                    </div>
-                    <div class="menu-item-price">R 295</div>
-                </div>
+            <div class="menu-category" id="secondi">
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Bistecca Fiorentina</div><div class="menu-item-desc">T-bone steak, rosemary salt, lemon, roasted garlic, green beans (600g)</div></div><div class="menu-item-price">R 445</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Branzino al Forno</div><div class="menu-item-desc">Whole baked sea bass, capers, olives, cherry tomatoes, white wine</div></div><div class="menu-item-price">R 320</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Pollo alla Cacciatora</div><div class="menu-item-desc">Free-range chicken, hunter-style sauce, mushrooms, olives, polenta</div></div><div class="menu-item-price">R 275</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Saltimbocca alla Romana</div><div class="menu-item-desc">Veal cutlets, prosciutto, sage, white wine, butter sauce</div></div><div class="menu-item-price">R 295</div></div>
             </div>
-
-            <div class="menu-category" id="dolci" style="display:none">
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Tiramisù della Casa</div>
-                        <div class="menu-item-desc">Mascarpone cream, Savoiardi, espresso, Marsala wine, dark cocoa</div>
-                    </div>
-                    <div class="menu-item-price">R 95</div>
-                </div>
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Panna Cotta al Limone</div>
-                        <div class="menu-item-desc">Amalfi lemon panna cotta, strawberry compote, candied zest</div>
-                    </div>
-                    <div class="menu-item-price">R 85</div>
-                </div>
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Torta al Cioccolato</div>
-                        <div class="menu-item-desc">Warm dark chocolate fondant, hazelnut gelato, praline crumble</div>
-                    </div>
-                    <div class="menu-item-price">R 105</div>
-                </div>
-                <div class="menu-item">
-                    <div class="menu-item-info">
-                        <div class="menu-item-name">Cannoli Siciliani</div>
-                        <div class="menu-item-desc">Crispy pastry shells, ricotta cream, pistachio, candied orange peel</div>
-                    </div>
-                    <div class="menu-item-price">R 90</div>
-                </div>
+            <div class="menu-category" id="dolci">
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Tiramisù della Casa</div><div class="menu-item-desc">Mascarpone cream, Savoiardi, espresso, Marsala wine, dark cocoa</div></div><div class="menu-item-price">R 95</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Panna Cotta al Limone</div><div class="menu-item-desc">Amalfi lemon panna cotta, strawberry compote, candied zest</div></div><div class="menu-item-price">R 85</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Torta al Cioccolato</div><div class="menu-item-desc">Warm dark chocolate fondant, hazelnut gelato, praline crumble</div></div><div class="menu-item-price">R 105</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Cannoli Siciliani</div><div class="menu-item-desc">Crispy pastry shells, ricotta cream, pistachio, candied orange peel</div></div><div class="menu-item-price">R 90</div></div>
+            </div>
+            <!-- NEW WINE & DRINKS CATEGORY -->
+            <div class="menu-category" id="wine">
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Prosecco Superiore</div><div class="menu-item-desc">Valdobbiadene DOCG, crisp & floral, notes of green apple & honeysuckle</div></div><div class="menu-item-price">R 160</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Pinot Grigio</div><div class="menu-item-desc">Alto Adige, light & zesty with pear, white peach and a hint of almond</div></div><div class="menu-item-price">R 140</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Chianti Classico</div><div class="menu-item-desc">Riserva, Sangiovese, black cherry, leather & dried herbs, velvety tannins</div></div><div class="menu-item-price">R 195</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Barolo</div><div class="menu-item-desc">DOCG, Nebbiolo, robust & elegant – truffle, tar & roses, long finish</div></div><div class="menu-item-price">R 280</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Aperol Spritz</div><div class="menu-item-desc">Aperol, Prosecco, soda water, orange slice – the perfect Italian aperitivo</div></div><div class="menu-item-price">R 105</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Negroni</div><div class="menu-item-desc">Campari, London Dry Gin, Sweet Vermouth – bold, bitter & iconic</div></div><div class="menu-item-price">R 120</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Lemonade & Lime</div><div class="menu-item-desc">Freshly squeezed, served with mint & sparkling water</div></div><div class="menu-item-price">R 65</div></div>
+                <div class="menu-item"><div class="menu-item-info"><div class="menu-item-name">Italian Soda</div><div class="menu-item-desc">Choose from blood orange, peach or pomegranate, with soda & ice</div></div><div class="menu-item-price">R 55</div></div>
             </div>
         </div>
     </section>
 
-
     <!-- GALLERY -->
-    <section style="padding: 5rem 6rem; background: var(--cream);">
+    <section style="padding:5rem 6rem;background:var(--cream)">
         <div class="section-header">
             <div class="section-header-line"></div>
-            <div class="section-header-center">
-                <p class="section-tag">Dalla Nostra Cucina</p>
-                <h2 class="section-title">From Our Kitchen</h2>
-            </div>
+            <div class="section-header-center"><p class="section-tag">Dalla Nostra Cucina</p><h2 class="section-title">From Our Kitchen</h2></div>
             <div class="section-header-line"></div>
         </div>
-        <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: auto auto; gap: 1rem;">
-            <div style="grid-row: 1 / 3; overflow:hidden; position:relative;">
-                <img src="/img/Beef-Braciole-1200px-Inside-the-Rustic-Kitchen-2-1025x1536.jpg" alt="Braciole" style="width:100%;height:100%;object-fit:cover;min-height:450px;display:block;transition:transform 0.5s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
-                <div style="position:absolute;bottom:0;left:0;right:0;padding:1.2rem 1.5rem;background:linear-gradient(transparent,rgba(30,15,5,0.75));">
-                    <p style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:#F5F0E8;font-style:italic;font-weight:300;">Braciole al Sugo</p>
-                    <p style="font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(245,240,232,0.6);">Secondi</p>
-                </div>
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr;grid-template-rows:auto auto;gap:1rem">
+            <div style="grid-row:1/3;overflow:hidden;position:relative">
+                <img src="img/Beef-Braciole-1200px-Inside-the-Rustic-Kitchen-2-1025x1536.jpg" alt="Braciole" style="width:100%;height:100%;object-fit:cover;min-height:450px;display:block;transition:transform .5s" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+                <div style="position:absolute;bottom:0;left:0;right:0;padding:1.2rem 1.5rem;background:linear-gradient(transparent,rgba(30,15,5,.75))"><p style="font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:#F5F0E8;font-style:italic;font-weight:300">Braciole al Sugo</p><p style="font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,240,232,.6)">Secondi</p></div>
             </div>
-            <div style="overflow:hidden;position:relative;">
-                <img src="/img/Chicken-Vesuvio-6.jpg" alt="Chicken Vesuvio" style="width:100%;height:100%;object-fit:cover;min-height:215px;display:block;transition:transform 0.5s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
-                <div style="position:absolute;bottom:0;left:0;right:0;padding:1rem 1.2rem;background:linear-gradient(transparent,rgba(30,15,5,0.75));">
-                    <p style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:#F5F0E8;font-style:italic;font-weight:300;">Pollo al Vesuvio</p>
-                    <p style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(245,240,232,0.6);">Secondi</p>
-                </div>
+            <div style="overflow:hidden;position:relative">
+                <img src="img/Chicken-Vesuvio-6.jpg" alt="Chicken Vesuvio" style="width:100%;height:100%;object-fit:cover;min-height:215px;display:block;transition:transform .5s" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+                <div style="position:absolute;bottom:0;left:0;right:0;padding:1rem 1.2rem;background:linear-gradient(transparent,rgba(30,15,5,.75))"><p style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:#F5F0E8;font-style:italic;font-weight:300">Pollo al Vesuvio</p><p style="font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,240,232,.6)">Secondi</p></div>
             </div>
-            <div style="overflow:hidden;position:relative;">
-                <img src="/img/Penne-Arrabbiata-1-2.jpg" alt="Penne Arrabbiata" style="width:100%;height:100%;object-fit:cover;min-height:215px;display:block;transition:transform 0.5s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
-                <div style="position:absolute;bottom:0;left:0;right:0;padding:1rem 1.2rem;background:linear-gradient(transparent,rgba(30,15,5,0.75));">
-                    <p style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:#F5F0E8;font-style:italic;font-weight:300;">Penne all'Arrabbiata</p>
-                    <p style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(245,240,232,0.6);">Primi</p>
-                </div>
+            <div style="overflow:hidden;position:relative">
+                <img src="img/Penne-Arrabbiata-1-2.jpg" alt="Penne Arrabbiata" style="width:100%;height:100%;object-fit:cover;min-height:215px;display:block;transition:transform .5s" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+                <div style="position:absolute;bottom:0;left:0;right:0;padding:1rem 1.2rem;background:linear-gradient(transparent,rgba(30,15,5,.75))"><p style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:#F5F0E8;font-style:italic;font-weight:300">Penne all'Arrabbiata</p><p style="font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,240,232,.6)">Primi</p></div>
             </div>
-            <div style="grid-column: 2 / 4; overflow:hidden;position:relative;">
-                <img src="/img/lasagnes-de-la-nonna-my-little-italy-recettes-scaled.jpeg" alt="Lasagne della Nonna" style="width:100%;height:100%;object-fit:cover;min-height:215px;display:block;transition:transform 0.5s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
-                <div style="position:absolute;bottom:0;left:0;right:0;padding:1rem 1.2rem;background:linear-gradient(transparent,rgba(30,15,5,0.75));">
-                    <p style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:#F5F0E8;font-style:italic;font-weight:300;">Lasagne della Nonna</p>
-                    <p style="font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(245,240,232,0.6);">Primi</p>
-                </div>
+            <div style="grid-column:2/4;overflow:hidden;position:relative">
+                <img src="img/lasagnes-de-la-nonna-my-little-italy-recettes-scaled.jpeg" alt="Lasagne della Nonna" style="width:100%;height:100%;object-fit:cover;min-height:215px;display:block;transition:transform .5s" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+                <div style="position:absolute;bottom:0;left:0;right:0;padding:1rem 1.2rem;background:linear-gradient(transparent,rgba(30,15,5,.75))"><p style="font-family:'Cormorant Garamond',serif;font-size:1rem;color:#F5F0E8;font-style:italic;font-weight:300">Lasagne della Nonna</p><p style="font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:rgba(245,240,232,.6)">Primi</p></div>
             </div>
         </div>
     </section>
 
     <!-- SIGNATURE -->
     <section class="signature">
-        <div class="signature-visual" style="overflow:hidden; padding:0;">
-            <img src="/img/Agnolotti del Plin.jpg" alt="Agnolotti del Plin">
-
+        <div class="signature-visual" style="overflow:hidden;padding:0">
+            <img src="img/Agnolotti del Plin.jpg" alt="Agnolotti del Plin" style="width:100%;height:100%;object-fit:cover">
         </div>
         <div>
             <p class="signature-tag">Chef's Signature</p>
@@ -918,31 +1054,13 @@
     <section class="testimonials">
         <div class="section-header">
             <div class="section-header-line"></div>
-            <div class="section-header-center">
-                <p class="section-tag">Gli Ospiti Parlano</p>
-                <h2 class="section-title">Voices from Our Table</h2>
-            </div>
+            <div class="section-header-center"><p class="section-tag">Gli Ospiti Parlano</p><h2 class="section-title">Voices from Our Table</h2></div>
             <div class="section-header-line"></div>
         </div>
         <div class="quotes-grid">
-            <div class="quote-card">
-                <span class="quote-mark">"</span>
-                <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
-                <p class="quote-text">The pappardelle with wild boar ragù was the finest pasta I've had outside of Tuscany. The warmth and soul of this place is something you simply cannot replicate.</p>
-                <p class="quote-author">— Gabriella M., Cape Town</p>
-            </div>
-            <div class="quote-card">
-                <span class="quote-mark">"</span>
-                <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
-                <p class="quote-text">Trattoria Bella has become our family's special occasion restaurant. The staff remember your name, your preferences, and they treat you like you've come home.</p>
-                <p class="quote-author">— James & Lindiwe T., Stellenbosch</p>
-            </div>
-            <div class="quote-card">
-                <span class="quote-mark">"</span>
-                <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
-                <p class="quote-text">The tiramisù brought me to tears — not from emotion, but because I knew every other tiramisù I've had before had been a lie. This is the real thing.</p>
-                <p class="quote-author">— Marco R., Italian Consul</p>
-            </div>
+            <div class="quote-card"><span class="quote-mark">"</span><div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div><p class="quote-text">The pappardelle with wild boar ragù was the finest pasta I've had outside of Tuscany. The warmth and soul of this place is something you simply cannot replicate.</p><p class="quote-author">— Gabriella M., Cape Town</p></div>
+            <div class="quote-card"><span class="quote-mark">"</span><div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div><p class="quote-text">Trattoria Bella has become our family's special occasion restaurant. The staff remember your name, your preferences, and they treat you like you've come home.</p><p class="quote-author">— James & Lindiwe T., Stellenbosch</p></div>
+            <div class="quote-card"><span class="quote-mark">"</span><div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div><p class="quote-text">The tiramisù brought me to tears — not from emotion, but because I knew every other tiramisù I've had before had been a lie. This is the real thing.</p><p class="quote-author">— Marco R., Italian Consul</p></div>
         </div>
     </section>
 
@@ -951,41 +1069,19 @@
         <div>
             <p class="reservation-title">Reserve<br>Your Evening</p>
             <p class="reservation-desc">We welcome you to experience Italian hospitality at its most genuine. For large parties or special occasions, please contact us directly.</p>
-            <div class="info-block">
-                <p class="info-label">Location</p>
-                <p class="info-value">12 Via della Luna, De Waterkant, Cape Town</p>
-            </div>
-            <div class="info-block">
-                <p class="info-label">Hours</p>
-                <p class="info-value">Tue – Sat: 12:00 – 15:00 & 18:00 – 22:30</p>
-                <p class="info-value">Sunday Lunch: 12:00 – 16:00</p>
-            </div>
-            <div class="info-block">
-                <p class="info-label">Telephone</p>
-                <p class="info-value">+27 21 555 0187</p>
-            </div>
+            <div class="info-block"><p class="info-label">Location</p><p class="info-value">12 Via della Luna, De Waterkant, Cape Town</p></div>
+            <div class="info-block"><p class="info-label">Hours</p><p class="info-value">Tue – Sat: 12:00 – 15:00 & 18:00 – 22:30</p><p class="info-value">Sunday Lunch: 12:00 – 16:00</p></div>
+            <div class="info-block"><p class="info-label">Telephone</p><p class="info-value">+27 21 555 0187</p></div>
         </div>
         <div>
             <div class="res-form">
                 <div class="form-row">
-                    <div class="form-field">
-                        <label class="form-label">First Name</label>
-                        <input class="form-input" type="text" placeholder="Marco">
-                    </div>
-                    <div class="form-field">
-                        <label class="form-label">Last Name</label>
-                        <input class="form-input" type="text" placeholder="Rossi">
-                    </div>
+                    <div class="form-field"><label class="form-label">First Name</label><input class="form-input" type="text" placeholder="Marco"></div>
+                    <div class="form-field"><label class="form-label">Last Name</label><input class="form-input" type="text" placeholder="Rossi"></div>
                 </div>
-                <div class="form-field">
-                    <label class="form-label">Email</label>
-                    <input class="form-input" type="email" placeholder="marco@example.com">
-                </div>
+                <div class="form-field"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="marco@example.com"></div>
                 <div class="form-row">
-                    <div class="form-field">
-                        <label class="form-label">Date</label>
-                        <input class="form-input" type="date">
-                    </div>
+                    <div class="form-field"><label class="form-label">Date</label><input class="form-input" type="date"></div>
                     <div class="form-field">
                         <label class="form-label">Time</label>
                         <select class="form-select">
@@ -1016,68 +1112,116 @@
                         <option>10+ guests (contact us)</option>
                     </select>
                 </div>
-                <div class="form-field">
-                    <label class="form-label">Special Requests</label>
-                    <input class="form-input" type="text" placeholder="Allergies, anniversaries, dietary needs…">
-                </div>
-                <button class="btn-reserve" onclick="submitReservation()">Confirm Reservation</button>
+                <div class="form-field"><label class="form-label">Special Requests</label><input class="form-input" type="text" placeholder="Allergies, anniversaries, dietary needs…"></div>
+                <button class="btn-reserve" id="reserveBtn">Confirm Reservation</button>
             </div>
         </div>
     </section>
 
     <!-- FOOTER -->
     <footer>
-        <div>
-            <div class="footer-brand">Trattoria <span>Bella</span></div>
-            <p class="footer-tagline">Authentic Italian cuisine crafted with passion, tradition, and the finest ingredients — brought to Cape Town's heart.</p>
-        </div>
-        <div>
-            <p class="footer-heading">Navigate</p>
-            <ul class="footer-links">
-                <li><a href="#menu">Menu</a></li>
-                <li><a href="#about">Our Story</a></li>
-                <li><a href="#reservation">Reservations</a></li>
-            </ul>
-        </div>
-        <div>
-            <p class="footer-heading">Experience</p>
-            <ul class="footer-links">
-                <li><a href="#">Private Dining</a></li>
-                <li><a href="#">Wine Cellar</a></li>
-                <li><a href="#">Cooking Classes</a></li>
-                <li><a href="#">Gift Vouchers</a></li>
-            </ul>
-        </div>
-        <div>
-            <p class="footer-heading">Connect</p>
-            <ul class="footer-links">
-                <li><a href="#">Instagram</a></li>
-                <li><a href="#">Facebook</a></li>
-                <li><a href="#">TripAdvisor</a></li>
-                <li><a href="#">+27 21 555 0187</a></li>
-            </ul>
-        </div>
+        <div><div class="footer-brand">Trattoria <span>Bella</span></div><p class="footer-tagline">Authentic Italian cuisine crafted with passion, tradition, and the finest ingredients — brought to Cape Town's heart.</p></div>
+        <div><p class="footer-heading">Navigate</p><ul class="footer-links"><li><a href="#menu">Menu</a></li><li><a href="#about">Our Story</a></li><li><a href="#reservation">Reservations</a></li></ul></div>
+        <div><p class="footer-heading">Experience</p><ul class="footer-links"><li><a href="#">Private Dining</a></li><li><a href="#">Wine Cellar</a></li><li><a href="#">Cooking Classes</a></li><li><a href="#">Gift Vouchers</a></li></ul></div>
+        <div><p class="footer-heading">Connect</p><ul class="footer-links"><li><a href="#">Instagram</a></li><li><a href="#">Facebook</a></li><li><a href="#">TripAdvisor</a></li><li><a href="#">+27 21 555 0187</a></li></ul></div>
     </footer>
-    <div class="footer-bottom">
-        <span>© 2026 Trattoria Bella. All rights reserved.</span>
-        <span>Made with amore in Cape Town</span>
+    <div class="footer-bottom"><span>© 2026 Trattoria Bella. All rights reserved.</span><span>Made with amore in Cape Town</span></div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <!-- MODAL -->
+    <div id="loginModal" role="dialog" aria-modal="true" aria-labelledby="modalHeading">
+        <div class="modal-box" id="modalBox">
+            <button class="modal-close-btn" id="modalCloseBtn" aria-label="Close login">&times;</button>
+            <h2 class="modal-heading" id="modalHeading">Welcome Back</h2>
+            <p class="modal-sub">Sign in to manage your reservations and favourites.</p>
+            <div class="mf">
+                <label class="ml" for="mEmail">Email address</label>
+                <input class="mi" id="mEmail" type="email" placeholder="you@example.com" autocomplete="email">
+            </div>
+            <div class="mf">
+                <label class="ml" for="mPassword">Password</label>
+                <input class="mi" id="mPassword" type="password" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            <div class="modal-error" id="modalError">Please enter both your email and password.</div>
+            <button class="modal-submit" id="modalSubmit">Sign In</button>
+            <p class="modal-footer">Don't have an account? <a href="#">Create one</a> &nbsp;·&nbsp; <a href="#">Forgot password?</a></p>
+        </div>
     </div>
 
-    <div class="toast" id="toast">Grazie! Your reservation has been received. We'll confirm by email shortly.</div>
-
     <script>
-        function switchTab(e, category) {
-          document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
-          e.target.classList.add('active');
-          document.querySelectorAll('.menu-category').forEach(c => c.style.display = 'none');
-          document.getElementById(category).style.display = 'contents';
+        // ─── Helpers ───────────────────────────────────────────────
+        function showToast(msg, duration) {
+          var t = document.getElementById('toast');
+          t.textContent = msg;
+          t.classList.add('show');
+          setTimeout(function(){ t.classList.remove('show'); }, duration || 4500);
         }
 
-        function submitReservation() {
-          const toast = document.getElementById('toast');
-          toast.classList.add('show');
-          setTimeout(() => toast.classList.remove('show'), 4500);
+        // ─── Menu tabs ─────────────────────────────────────────────
+        document.querySelectorAll('.menu-tab').forEach(function(btn) {
+          btn.addEventListener('click', function() {
+            document.querySelectorAll('.menu-tab').forEach(function(b){ b.classList.remove('active'); });
+            btn.classList.add('active');
+            var target = btn.getAttribute('data-tab');
+            document.querySelectorAll('.menu-category').forEach(function(c){ c.classList.remove('active'); });
+            document.getElementById(target).classList.add('active');
+          });
+        });
+
+        // ─── Reservation ───────────────────────────────────────────
+        document.getElementById('reserveBtn').addEventListener('click', function() {
+          showToast("Grazie! Your reservation has been received. We'll confirm by email shortly.");
+        });
+
+        // ─── Modal ─────────────────────────────────────────────────
+        var modal    = document.getElementById('loginModal');
+        var errorEl  = document.getElementById('modalError');
+
+        function openModal() {
+          modal.classList.add('open');
+          document.body.classList.add('no-scroll');
+          setTimeout(function(){ document.getElementById('mEmail').focus(); }, 60);
         }
+
+        function closeModal() {
+          modal.classList.remove('open');
+          document.body.classList.remove('no-scroll');
+          errorEl.classList.remove('visible');
+        }
+
+        document.getElementById('openLoginBtn').addEventListener('click', openModal);
+        document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+        modal.addEventListener('click', function(e) {
+          if (e.target === modal) closeModal();
+        });
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+        });
+
+        document.getElementById('modalSubmit').addEventListener('click', function() {
+          var email = document.getElementById('mEmail').value.trim();
+          var pass  = document.getElementById('mPassword').value;
+          if (!email || !pass) {
+            errorEl.classList.add('visible');
+            return;
+          }
+          errorEl.classList.remove('visible');
+          closeModal();
+          showToast('Benvenuto! You are now signed in.', 4000);
+        });
+
+        ['mEmail','mPassword'].forEach(function(id) {
+          document.getElementById(id).addEventListener('input', function() {
+            errorEl.classList.remove('visible');
+          });
+        });
+        ['mEmail','mPassword'].forEach(function(id) {
+          document.getElementById(id).addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') document.getElementById('modalSubmit').click();
+          });
+        });
     </script>
 </body>
 </html>
