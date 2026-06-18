@@ -24,6 +24,150 @@ namespace Trattoria.Controllers
         public IActionResult Index()
         {
             return View();
+
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Index(IndexViewModel index)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = _dbContext.Users.SingleOrDefault(u => u.Username == index.Username && u.Password == index.Password);
+                if (user != null)
+                {
+                    if (user.Role == "Admin")
+                    {
+                        int UserID = _dbContext.Users.FirstOrDefault(p => p.Username == index.Username)?.UserID ?? 0;
+
+
+                        var User = _dbContext.Users
+                                       .Where(a => a.UserID == UserID)
+                                       .Select(a => new Users
+                                       {
+                                           UserID = a.UserID,
+                                           Name = a.Name,
+                                           Surname = a.Surname,
+                                           Username = a.Username
+                                       })
+                                       .SingleOrDefault();
+
+                        if (user == null)
+                        {
+                            return NotFound();
+                        }
+
+                        // Store user data in session
+                     
+
+
+                        return RedirectToAction("AdminHome", new { UserID });
+
+                    }
+                    else if (user.Role == "Waiter")
+                    {
+                        if (ModelState.IsValid)
+                        {
+                            int UserID = _dbContext.Users.FirstOrDefault(p => p.Username == index.Username)?.UserID ?? 0;
+                            var User = _dbContext.Users.Where(a => a.UserID == UserID)
+                                                       .Select(a => new Users
+                                                       {
+                                                           UserID = a.UserID,
+                                                           Name = a.Name,
+                                                           Surname = a.Surname,
+                                                           Username = a.Username
+                                                       })
+                                                       .SingleOrDefault();
+
+                                    if (user == null)
+                                    {
+                                        return NotFound();
+                                    }
+
+                                    // Store user data in session
+                                   
+
+
+                                    return RedirectToAction("WaiterHome");
+                                }
+                            }
+                    else if (user.Role == "Chefs")
+                    {
+                        if (ModelState.IsValid)
+                        {
+                            int UserID = _dbContext.Users.FirstOrDefault(p => p.Username == index.Username)?.UserID ?? 0;
+                            var User = _dbContext.Users.Where(a => a.UserID == UserID)
+                                                       .Select(a => new Users
+                                                       {
+                                                           UserID = a.UserID,
+                                                           Name = a.Name,
+                                                           Surname = a.Surname,
+                                                           Username = a.Username
+                                                       })
+                                                       .SingleOrDefault();
+
+                            if (user == null)
+                            {
+                                return NotFound();
+                            }
+
+                          
+
+
+                            return RedirectToAction("ChefsHome");
+                        }
+                    }
+                    else if (user.Role == "Bartender")
+                    {
+                        if (ModelState.IsValid)
+                        {
+                            int UserID = _dbContext.Users.FirstOrDefault(p => p.Username == index.Username)?.UserID ?? 0;
+                            var User = _dbContext.Users.Where(a => a.UserID == UserID)
+                                                       .Select(a => new Users
+                                                       {
+                                                           UserID = a.UserID,
+                                                           Name = a.Name,
+                                                           Surname = a.Surname,
+                                                           Username = a.Username
+                                                       })
+                                                       .SingleOrDefault();
+
+                            if (user == null)
+                            {
+                                return NotFound();
+                            }
+
+                         
+                            return RedirectToAction("BartenderHome");
+                        }
+                    }
+                    else if (user.Role == "Receptionist")
+                    {
+                        if (ModelState.IsValid)
+                        {
+                            int UserID = _dbContext.Users.FirstOrDefault(p => p.Username == index.Username)?.UserID ?? 0;
+                            var User = _dbContext.Users.Where(a => a.UserID == UserID)
+                                                       .Select(a => new Users
+                                                       {
+                                                           UserID = a.UserID,
+                                                           Name = a.Name,
+                                                           Surname = a.Surname,
+                                                           Username = a.Username
+                                                       })
+                                                       .SingleOrDefault();
+
+                            if (user == null)
+                            {
+                                return NotFound();
+                            }
+
+                        
+
+                            return RedirectToAction("ReceptionistHome");
+                        }
+                    }
+                }
+            }
+            return View(index);
         }
         public IActionResult AdminHome()
         {

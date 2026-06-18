@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@model Trattoria.ViewModels.IndexViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -903,6 +907,37 @@
         body.no-scroll {
             overflow: hidden
         }
+
+        /* Validation styles */
+        .field-validation-error {
+            color: #8B1A1A;
+            font-size: .75rem;
+            display: block;
+            margin-top: .25rem;
+        }
+
+        .input-validation-error {
+            border-color: #8B1A1A !important;
+        }
+
+        .validation-summary-errors {
+            background: rgba(139,26,26,0.1);
+            border-left: 3px solid #8B1A1A;
+            padding: .75rem 1rem;
+            margin-bottom: 1rem;
+            border-radius: 2px;
+        }
+
+            .validation-summary-errors ul {
+                list-style: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            .validation-summary-errors li {
+                color: #8B1A1A;
+                font-size: .8rem;
+            }
     </style>
 </head>
 <body>
@@ -1130,25 +1165,44 @@
     <!-- TOAST -->
     <div class="toast" id="toast"></div>
 
-    <!-- MODAL -->
+    <!-- MODAL - Updated with form integration -->
     <div id="loginModal" role="dialog" aria-modal="true" aria-labelledby="modalHeading">
         <div class="modal-box" id="modalBox">
             <button class="modal-close-btn" id="modalCloseBtn" aria-label="Close login">&times;</button>
             <h2 class="modal-heading" id="modalHeading">Welcome Back</h2>
             <p class="modal-sub">Sign in to manage your reservations and favourites.</p>
-            <div class="mf">
-                <label class="ml" for="mEmail">Email address</label>
-                <input class="mi" id="mEmail" type="email" placeholder="you@example.com" autocomplete="email">
-            </div>
-            <div class="mf">
-                <label class="ml" for="mPassword">Password</label>
-                <input class="mi" id="mPassword" type="password" placeholder="••••••••" autocomplete="current-password">
-            </div>
-            <div class="modal-error" id="modalError">Please enter both your email and password.</div>
-            <button class="modal-submit" id="modalSubmit">Sign In</button>
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="validation-summary-errors">
+                    @Html.ValidationSummary()
+                </div>
+            }
+
+            <form id="loginForm" asp-action="Index" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="mf">
+                    <label class="ml" asp-for="Username">Username</label>
+                    <input class="mi" asp-for="Username" type="text" placeholder="Usernamem" autocomplete="email">
+                    <span asp-validation-for="Username" class="field-validation-error"></span>
+                </div>
+                <div class="mf">
+                    <label class="ml" asp-for="Password">Password</label>
+                    <input class="mi" asp-for="Password" type="password" placeholder="••••••••" autocomplete="current-password">
+                    <span asp-validation-for="Password" class="field-validation-error"></span>
+                </div>
+                <div class="modal-error" id="modalError">Please enter both your email and password.</div>
+                <button type="submit" class="modal-submit" id="modalSubmit">Sign In</button>
+            </form>
+
             <p class="modal-footer">Don't have an account? <a href="#">Create one</a> &nbsp;·&nbsp; <a href="#">Forgot password?</a></p>
         </div>
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
 
     <script>
         // ─── Helpers ───────────────────────────────────────────────
@@ -1178,11 +1232,12 @@
         // ─── Modal ─────────────────────────────────────────────────
         var modal    = document.getElementById('loginModal');
         var errorEl  = document.getElementById('modalError');
+        var form     = document.getElementById('loginForm');
 
         function openModal() {
           modal.classList.add('open');
           document.body.classList.add('no-scroll');
-          setTimeout(function(){ document.getElementById('mEmail').focus(); }, 60);
+          setTimeout(function(){ document.getElementById('Username').focus(); }, 60);
         }
 
         function closeModal() {
@@ -1200,28 +1255,35 @@
           if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
         });
 
-        document.getElementById('modalSubmit').addEventListener('click', function() {
-          var email = document.getElementById('mEmail').value.trim();
-          var pass  = document.getElementById('mPassword').value;
-          if (!email || !pass) {
+        // Form validation before submit
+        form.addEventListener('submit', function(e) {
+          var username = document.getElementById('Username').value.trim();
+          var password = document.getElementById('Password').value;
+          if (!username || !password) {
+            e.preventDefault();
+            errorEl.textContent = 'Please enter both your email and password.';
             errorEl.classList.add('visible');
-            return;
+          } else {
+            errorEl.classList.remove('visible');
           }
-          errorEl.classList.remove('visible');
-          closeModal();
-          showToast('Benvenuto! You are now signed in.', 4000);
         });
 
-        ['mEmail','mPassword'].forEach(function(id) {
+        // Clear error on input
+        ['Username','Password'].forEach(function(id) {
           document.getElementById(id).addEventListener('input', function() {
             errorEl.classList.remove('visible');
           });
         });
-        ['mEmail','mPassword'].forEach(function(id) {
-          document.getElementById(id).addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') document.getElementById('modalSubmit').click();
-          });
-        });
+
+        // Show modal with error if form submission failed
+        @if (!ViewData.ModelState.IsValid)
+        {
+                <text>
+                openModal();
+                errorEl.textContent = 'Invalid username or password. Please try again.';
+                errorEl.classList.add('visible');
+                </text>
+        }
     </script>
 </body>
 </html>
