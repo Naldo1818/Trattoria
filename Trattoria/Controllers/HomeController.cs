@@ -143,13 +143,28 @@ namespace Trattoria.Controllers
                 );
 
             // Build table display items
-            var tableItems = allTables.Select(t => new TableDisplayItem
+            var tableItems = allTables.Select(t =>
             {
-                TableID = t.TableID,
-                TableType = t.Type,
-                Capacity = t.Capacity,
-                IsAvailable = t.IsAvailable,
-                ActiveOrder = orderMap.TryGetValue(t.TableID, out var ord) ? ord : null
+                var hasActiveOrder = orderMap.TryGetValue(t.TableID, out var ord);
+                var item = new TableDisplayItem
+                {
+                    TableID = t.TableID,
+                    TableType = t.Type,
+                    Capacity = t.Capacity,
+                    IsAvailable = t.IsAvailable,
+                    ActiveOrder = hasActiveOrder ? ord : null
+                };
+
+                // Check if table is "Seated" (reserved but customer arrived)
+                var hasSeatedReservation = _dbContext.Reservations
+                    .Any(r => r.TablesID == t.TableID && r.Status == "Seated");
+
+                if (hasSeatedReservation && !hasActiveOrder)
+                {
+                    item.CustomStatus = "seated";
+                }
+
+                return item;
             }).ToList();
 
             var vm = new WaiterHomeViewModel
@@ -159,7 +174,7 @@ namespace Trattoria.Controllers
                 TotalTables = allTables.Count,
                 OccupiedCount = allTables.Count(t => !t.IsAvailable),
                 AvailableCount = allTables.Count(t => t.IsAvailable),
-                ReservedCount = _dbContext.Reservations.Count(r => r.Status == "Confirmed" || r.Status == "Waiting"),
+                ReservedCount = _dbContext.Reservations.Count(r => r.Status == "Confirmed" || r.Status == "Waiting" || r.Status == "Seated"),
                 SelectedTableID = selectedTableID,
                 WaiterName = waiterName,
                 WaiterID = waiterID
@@ -202,6 +217,14 @@ namespace Trattoria.Controllers
             };
 
             table.IsAvailable = false;
+
+            // If there's a "Seated" reservation, update its status
+            var seatedReservation = _dbContext.Reservations
+                .FirstOrDefault(r => r.TablesID == tableID && r.Status == "Seated");
+            if (seatedReservation != null)
+            {
+                seatedReservation.Status = "Occupied"; // Or "Completed" - whatever your flow requires
+            }
 
             _dbContext.Orders.Add(order);
             _dbContext.SaveChanges();
@@ -338,6 +361,14 @@ namespace Trattoria.Controllers
         {
             var table = _dbContext.Tables.Find(tableID);
             if (table != null) table.IsAvailable = true;
+
+            // If there's a "Seated" reservation, revert it to "Confirmed" or cancel it
+            var seatedReservation = _dbContext.Reservations
+                .FirstOrDefault(r => r.TablesID == tableID && r.Status == "Seated");
+            if (seatedReservation != null)
+            {
+                seatedReservation.Status = "Confirmed"; // Or "Cancelled" - depending on your flow
+            }
 
             // Cancel any pending orders on this table
             var openOrders = _dbContext.Orders

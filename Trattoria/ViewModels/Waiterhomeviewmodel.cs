@@ -37,9 +37,21 @@ namespace Trattoria.ViewModels
         public string TableType { get; set; } = string.Empty;
         public int Capacity { get; set; }
         public bool IsAvailable { get; set; }
+        public string? CustomStatus { get; set; } // For "Seated" status
 
         // Derived status label
-        public string Status => IsAvailable ? "available" : (ActiveOrder != null ? "occupied" : "reserved");
+        public string Status
+        {
+            get
+            {
+                // If custom status is set (like "Seated"), use it
+                if (!string.IsNullOrEmpty(CustomStatus))
+                    return CustomStatus;
+
+                // Otherwise derive from availability and order
+                return IsAvailable ? "available" : (ActiveOrder != null ? "occupied" : "reserved");
+            }
+        }
 
         // Active (unpaid) order on this table, if any
         public OrderDisplayItem? ActiveOrder { get; set; }

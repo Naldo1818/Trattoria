@@ -260,6 +260,11 @@
                 color: #2a4a7a;
             }
 
+            .table-status-badge.seated {
+                background: #e8d8f0;
+                color: #5a2a7a;
+            }
+
         .table-card .guest-count {
             font-size: 0.65rem;
             color: var(--text-muted);
@@ -796,7 +801,9 @@
                         {
                             "available" => "🟢 Available",
                             "occupied" => "🟠 Occupied",
-                            _ => "🔵 Reserved"
+                            "reserved" => "🔵 Reserved",
+                            "seated" => "🟣 Seated",
+                            _ => "⚪ " + t.Status
                         };
                         <a asp-action="WaiterHome" asp-route-selectedTableID="@t.TableID"
                            class="table-card @(isSelected ? "selected" : "")">
@@ -816,6 +823,7 @@
                     <span>🟢 Available</span>
                     <span>🟠 Occupied</span>
                     <span>🔵 Reserved</span>
+                    <span>🟣 Seated</span>
                 </div>
             </section>
 
