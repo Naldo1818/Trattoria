@@ -85,6 +85,275 @@ namespace Trattoria.Controllers
         {
             return View();
         }
+        // ── Waiter ───────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// GET: Waiter dashboard — shows all tables with their active orders.
+        /// Optional selectedTableID highlights a table and shows its order panel.
+        /// </summary>
+        [HttpGet]
+        public IActionResult WaiterHome(int? selectedTableID = null)
+        {
+            var waiterID = HttpContext.Session.GetInt32("UserID") ?? 0;
+            var waiterName = HttpContext.Session.GetString("UserName") ?? "Waiter";
+
+            // All tables
+            var allTables = _dbContext.Tables.OrderBy(t => t.TableID).ToList();
+
+            // All active (unpaid) orders keyed by TableID
+            var activeOrders = (
+                from o in _dbContext.Orders
+                where !o.IsPaid && o.Status != "Closed"
+                join od in _dbContext.OrderDetails on o.OrderID equals od.OrderID into odj
+                from od in odj.DefaultIfEmpty()
+                join m in _dbContext.MenuItems on od.MenuItemID equals m.MenuItemID into mj
+                from m in mj.DefaultIfEmpty()
+                select new { o, od, m }
+            ).ToList();
+
+            // Group order lines per order
+            var orderMap = activeOrders
+                .GroupBy(x => x.o.OrderID)
+                .ToDictionary(
+                    g => g.First().o.TablesID,
+                    g =>
+                    {
+                        var first = g.First().o;
+                        return new OrderDisplayItem
+                        {
+                            OrderID = first.OrderID,
+                            OrderTime = first.OrderTime,
+                            Status = first.Status,
+                            TotalAmount = first.TotalAmount,
+                            IsPaid = first.IsPaid,
+                            PaymentMethod = first.PaymentMethod ?? string.Empty,
+                            Lines = g
+                                .Where(x => x.od != null && x.m != null)
+                                .Select(x => new OrderLineItem
+                                {
+                                    OrderDetailsID = x.od.OrderDetailsID,
+                                    MenuItemID = x.od.MenuItemID,
+                                    ItemName = x.m.Name,
+                                    ItemType = x.m.Type,
+                                    Quantity = x.od.Quantity,
+                                    Price = x.od.Price
+                                }).ToList()
+                        };
+                    }
+                );
+
+            // Build table display items
+            var tableItems = allTables.Select(t => new TableDisplayItem
+            {
+                TableID = t.TableID,
+                TableType = t.Type,
+                Capacity = t.Capacity,
+                IsAvailable = t.IsAvailable,
+                ActiveOrder = orderMap.TryGetValue(t.TableID, out var ord) ? ord : null
+            }).ToList();
+
+            var vm = new WaiterHomeViewModel
+            {
+                Tables = tableItems,
+                MenuItems = _dbContext.MenuItems.OrderBy(m => m.Type).ThenBy(m => m.Name).ToList(),
+                TotalTables = allTables.Count,
+                OccupiedCount = allTables.Count(t => !t.IsAvailable),
+                AvailableCount = allTables.Count(t => t.IsAvailable),
+                ReservedCount = _dbContext.Reservations.Count(r => r.Status == "Confirmed" || r.Status == "Waiting"),
+                SelectedTableID = selectedTableID,
+                WaiterName = waiterName,
+                WaiterID = waiterID
+            };
+
+            return View(vm);
+        }
+
+        /// <summary>
+        /// POST: Start a new order on a table (sets table occupied).
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult StartOrder(int tableID)
+        {
+            var table = _dbContext.Tables.Find(tableID);
+            if (table == null) return NotFound();
+
+            var waiterID = HttpContext.Session.GetInt32("UserID") ?? 0;
+
+            // Check no active order already exists
+            var existing = _dbContext.Orders
+                .FirstOrDefault(o => o.TablesID == tableID && !o.IsPaid && o.Status != "Closed");
+            if (existing != null)
+            {
+                TempData["ToastMessage"] = "⚠️ Table already has an active order.";
+                return RedirectToAction("WaiterHome", new { selectedTableID = tableID });
+            }
+
+            var order = new Orders
+            {
+                UserID = waiterID,
+                TablesID = tableID,
+                OrderTime = DateTime.Now,
+                Status = "Pending",
+                TotalAmount = 0,
+                TipAmount = 0,
+                PaymentMethod = string.Empty,
+                IsPaid = false
+            };
+
+            table.IsAvailable = false;
+
+            _dbContext.Orders.Add(order);
+            _dbContext.SaveChanges();
+
+            TempData["ToastMessage"] = $"🆕 Order started for Table {tableID}.";
+            return RedirectToAction("WaiterHome", new { selectedTableID = tableID });
+        }
+
+        /// <summary>
+        /// POST: Add a menu item to an existing active order.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AddOrderItem(int orderID, int menuItemID, int quantity = 1)
+        {
+            var order = _dbContext.Orders.Find(orderID);
+            var menuItem = _dbContext.MenuItems.Find(menuItemID);
+            if (order == null || menuItem == null) return NotFound();
+
+            // Check if item already on order — increase qty
+            var existing = _dbContext.OrderDetails
+                .FirstOrDefault(od => od.OrderID == orderID && od.MenuItemID == menuItemID);
+
+            if (existing != null)
+            {
+                existing.Quantity += quantity;
+            }
+            else
+            {
+                _dbContext.OrderDetails.Add(new OrderDetails
+                {
+                    OrderID = orderID,
+                    MenuItemID = menuItemID,
+                    Quantity = quantity,
+                    Price = menuItem.Price
+                });
+            }
+
+            // Recalculate total
+            _dbContext.SaveChanges();
+            var lines = _dbContext.OrderDetails
+                .Where(od => od.OrderID == orderID)
+                .Join(_dbContext.MenuItems, od => od.MenuItemID, m => m.MenuItemID,
+                      (od, m) => od.Price * od.Quantity)
+                .Sum();
+            order.TotalAmount = lines;
+            _dbContext.SaveChanges();
+
+            TempData["ToastMessage"] = $"➕ {menuItem.Name} added to order.";
+            return RedirectToAction("WaiterHome", new { selectedTableID = order.TablesID });
+        }
+
+        /// <summary>
+        /// POST: Remove one line item from an order.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult RemoveOrderItem(int orderDetailsID, int tableID)
+        {
+            var line = _dbContext.OrderDetails.Find(orderDetailsID);
+            if (line == null) return NotFound();
+
+            var orderID = line.OrderID;
+            _dbContext.OrderDetails.Remove(line);
+            _dbContext.SaveChanges();
+
+            // Recalculate total
+            var total = _dbContext.OrderDetails
+                .Where(od => od.OrderID == orderID)
+                .Join(_dbContext.MenuItems, od => od.MenuItemID, m => m.MenuItemID,
+                      (od, m) => od.Price * od.Quantity)
+                .Sum();
+            var order = _dbContext.Orders.Find(orderID);
+            if (order != null) { order.TotalAmount = total; _dbContext.SaveChanges(); }
+
+            TempData["ToastMessage"] = "🗑️ Item removed from order.";
+            return RedirectToAction("WaiterHome", new { selectedTableID = tableID });
+        }
+
+        /// <summary>
+        /// POST: Update order status (Pending → In Progress → Ready → Served).
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult UpdateOrderStatus(int orderID, string newStatus, int tableID)
+        {
+            var order = _dbContext.Orders.Find(orderID);
+            if (order == null) return NotFound();
+
+            order.Status = newStatus;
+            _dbContext.SaveChanges();
+
+            var emoji = newStatus switch
+            {
+                "In Progress" => "🔥",
+                "Ready" => "🔔",
+                "Served" => "✅",
+                _ => "📋"
+            };
+            TempData["ToastMessage"] = $"{emoji} Order marked as {newStatus} for Table {tableID}.";
+            return RedirectToAction("WaiterHome", new { selectedTableID = tableID });
+        }
+
+        /// <summary>
+        /// POST: Close an order — mark paid, free the table.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CloseOrder(int orderID, int tableID, string paymentMethod, decimal tipAmount = 0)
+        {
+            var order = _dbContext.Orders.Find(orderID);
+            if (order == null) return NotFound();
+
+            order.IsPaid = true;
+            order.Status = "Closed";
+            order.PaymentMethod = paymentMethod;
+            order.TipAmount = tipAmount;
+
+            var table = _dbContext.Tables.Find(tableID);
+            if (table != null) table.IsAvailable = true;
+
+            _dbContext.SaveChanges();
+
+            TempData["ToastMessage"] = $"💳 Table {tableID} paid ({paymentMethod}). Table cleared.";
+            return RedirectToAction("WaiterHome");
+        }
+
+        /// <summary>
+        /// POST: Clear a table without payment (e.g. reservation cancelled, no-show).
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ClearTable(int tableID)
+        {
+            var table = _dbContext.Tables.Find(tableID);
+            if (table != null) table.IsAvailable = true;
+
+            // Cancel any pending orders on this table
+            var openOrders = _dbContext.Orders
+                .Where(o => o.TablesID == tableID && !o.IsPaid && o.Status != "Closed")
+                .ToList();
+            foreach (var o in openOrders)
+            {
+                o.Status = "Closed";
+                o.IsPaid = false; // not paid — just voided
+            }
+
+            _dbContext.SaveChanges();
+
+            TempData["ToastMessage"] = $"🧹 Table {tableID} cleared.";
+            return RedirectToAction("WaiterHome");
+        }
 
         // ── Receptionist ─────────────────────────────────────────────────────────
 
@@ -296,6 +565,8 @@ namespace Trattoria.Controllers
             TempData["ToastMessage"] = $"🚶 Walk-in ({guests} guests) seated at Table {table.TableID}.";
             return RedirectToAction("ReceptionistHome");
         }
+
+       
 
         // ── Misc ─────────────────────────────────────────────────────────────────
 

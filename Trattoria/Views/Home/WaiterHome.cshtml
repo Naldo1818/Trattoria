@@ -1,747 +1,1111 @@
-﻿<!DOCTYPE html>
+﻿@model Trattoria.ViewModels.WaiterHomeViewModel
+@{
+    ViewData["Title"] = "Waiter Dashboard · Trattoria Bella";
+    Layout = null;
+    var selected = Model.SelectedTable;
+    var order = selected?.ActiveOrder;
+    var menuGroups = Model.MenuItems.GroupBy(m => m.Type).OrderBy(g => g.Key).ToList();
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trattoria Bella · Waiter View</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    :root {
-      --cream: #F5F0E8;
-      --warm-white: #FAF7F2;
-      --gold: #B8860B;
-      --gold-light: #D4A820;
-      --brown: #3D2B1F;
-      --brown-mid: #6B4226;
-      --red: #8B1A1A;
-      --text: #2A1F17;
-      --text-muted: #7A6558;
-      --shadow: 0 8px 24px rgba(0,0,0,0.08);
-      --radius: 12px;
-    }
+        :root {
+            --cream: #F5F0E8;
+            --warm-white: #FAF7F2;
+            --gold: #B8860B;
+            --gold-light: #D4A820;
+            --brown: #3D2B1F;
+            --brown-mid: #6B4226;
+            --red: #8B1A1A;
+            --text: #2A1F17;
+            --text-muted: #7A6558;
+            --shadow: 0 8px 24px rgba(0,0,0,0.08);
+            --radius: 12px;
+        }
 
-    body {
-      font-family: 'Jost', sans-serif;
-      background: #f2ede6;
-      color: var(--text);
-      padding: 2rem;
-      min-height: 100vh;
-    }
+        body {
+            font-family: 'Jost', sans-serif;
+            background: #f2ede6;
+            color: var(--text);
+            padding: 2rem;
+            min-height: 100vh;
+        }
 
-    /* ----- LAYOUT ----- */
-    .waiter-dashboard {
-      max-width: 1440px;
-      margin: 0 auto;
-    }
+        .waiter-dashboard {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
 
-    /* header */
-    .dashboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
+        /* Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
 
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-    }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
 
-    .brand {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2rem;
-      font-weight: 600;
-      color: var(--brown);
-    }
-    .brand span { color: var(--gold); }
+        .brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--brown);
+        }
 
-    .waiter-badge {
-      background: var(--brown);
-      color: var(--cream);
-      padding: 0.4rem 1.2rem;
-      border-radius: 40px;
-      font-size: 0.75rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-weight: 400;
-    }
+            .brand span {
+                color: var(--gold);
+            }
 
-    .header-actions {
-      display: flex;
-      gap: 0.8rem;
-      align-items: center;
-    }
+        .waiter-badge {
+            background: var(--brown);
+            color: var(--cream);
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-weight: 400;
+        }
 
-    .btn-outline {
-      background: transparent;
-      border: 1px solid var(--gold);
-      color: var(--gold);
-      padding: 0.5rem 1.4rem;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: 0.2s;
-      font-family: 'Jost', sans-serif;
-    }
-    .btn-outline:hover {
-      background: var(--gold);
-      color: white;
-    }
+        .header-actions {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+        }
 
-    .btn-primary-sm {
-      background: var(--red);
-      border: none;
-      color: white;
-      padding: 0.5rem 1.6rem;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: 0.2s;
-      font-family: 'Jost', sans-serif;
-    }
-    .btn-primary-sm:hover {
-      background: var(--brown);
-    }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 0.5rem 1.4rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Jost', sans-serif;
+            text-decoration: none;
+            display: inline-block;
+        }
 
-    /* ----- STATS ROW ----- */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 1.2rem;
-      margin-bottom: 2.5rem;
-    }
+            .btn-outline:hover {
+                background: var(--gold);
+                color: white;
+            }
 
-    .stat-card {
-      background: var(--warm-white);
-      padding: 1.2rem 1.5rem;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      border-left: 4px solid var(--gold);
-    }
-    .stat-card .label {
-      font-size: 0.65rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      font-weight: 400;
-    }
-    .stat-card .value {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2rem;
-      font-weight: 400;
-      color: var(--brown);
-      line-height: 1.2;
-    }
+        /* Stats */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 2.5rem;
+        }
 
-    /* ----- MAIN GRID: tables + order panel ----- */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 2.2fr 1.2fr;
-      gap: 2rem;
-      align-items: start;
-    }
+        .stat-card {
+            background: var(--warm-white);
+            padding: 1.2rem 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--gold);
+        }
 
-    /* ----- TABLE GRID ----- */
-    .tables-section {
-      background: var(--warm-white);
-      padding: 1.8rem 1.8rem 2rem;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
+            .stat-card .label {
+                font-size: 0.65rem;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--text-muted);
+                font-weight: 400;
+            }
 
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-    .section-header h3 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.6rem;
-      font-weight: 400;
-      color: var(--brown);
-    }
-    .section-header .sub {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      letter-spacing: 0.05em;
-    }
+            .stat-card .value {
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 2rem;
+                font-weight: 400;
+                color: var(--brown);
+                line-height: 1.2;
+            }
 
-    .table-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 1rem;
-    }
+        /* Main grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2.2fr 1.2fr;
+            gap: 2rem;
+            align-items: start;
+        }
 
-    .table-card {
-      background: white;
-      border-radius: var(--radius);
-      padding: 1rem 0.8rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      border: 1px solid rgba(184,134,11,0.15);
-      text-align: center;
-      cursor: pointer;
-      transition: 0.2s;
-      position: relative;
-    }
-    .table-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 16px rgba(0,0,0,0.06);
-      border-color: var(--gold-light);
-    }
-    .table-card .table-nr {
-      font-weight: 600;
-      font-size: 1rem;
-      color: var(--brown);
-      letter-spacing: 0.04em;
-    }
-    .table-card .table-status {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      padding: 0.2rem 0.6rem;
-      border-radius: 40px;
-      display: inline-block;
-      margin-top: 0.3rem;
-      background: #e6e0d8;
-      color: var(--text-muted);
-    }
-    .table-card .table-status.occupied {
-      background: #d4c5b0;
-      color: var(--brown);
-    }
-    .table-card .table-status.reserved {
-      background: #f0e0c8;
-      color: var(--brown-mid);
-    }
-    .table-card .table-status.available {
-      background: #dce8d8;
-      color: #2a5a2a;
-    }
-    .table-card .guest-count {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      margin-top: 0.2rem;
-    }
-    .table-card .order-badge {
-      position: absolute;
-      top: -6px;
-      right: -6px;
-      background: var(--red);
-      color: white;
-      font-size: 0.6rem;
-      border-radius: 30px;
-      padding: 0.1rem 0.6rem;
-      font-weight: 500;
-    }
+        @@media (max-width: 960px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
 
-    /* ----- ORDER PANEL ----- */
-    .order-panel {
-      background: var(--warm-white);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 1.8rem;
-      position: sticky;
-      top: 2rem;
-    }
+        /* Tables section */
+        .tables-section {
+            background: var(--warm-white);
+            padding: 1.8rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
 
-    .order-panel h3 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.4rem;
-      font-weight: 400;
-      color: var(--brown);
-      border-bottom: 1px solid rgba(184,134,11,0.2);
-      padding-bottom: 0.7rem;
-      margin-bottom: 1.2rem;
-      display: flex;
-      justify-content: space-between;
-    }
-    .order-panel h3 span {
-      font-size: 0.7rem;
-      font-family: 'Jost', sans-serif;
-      font-weight: 300;
-      color: var(--text-muted);
-    }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
 
-    .order-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.6rem 0;
-      border-bottom: 1px solid rgba(0,0,0,0.04);
-      font-size: 0.9rem;
-    }
-    .order-item .item-name {
-      font-weight: 400;
-    }
-    .order-item .item-qty {
-      color: var(--text-muted);
-      margin-right: 0.8rem;
-    }
-    .order-item .item-price {
-      font-weight: 500;
-      color: var(--brown);
-    }
+            .section-header h3 {
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 1.6rem;
+                font-weight: 400;
+                color: var(--brown);
+            }
 
-    .order-total {
-      display: flex;
-      justify-content: space-between;
-      font-weight: 600;
-      font-size: 1.1rem;
-      padding: 1rem 0 0.5rem;
-      border-top: 2px solid rgba(184,134,11,0.2);
-      margin-top: 0.5rem;
-    }
+            .section-header .sub {
+                font-size: 0.7rem;
+                color: var(--text-muted);
+                letter-spacing: 0.05em;
+            }
 
-    .order-actions {
-      display: flex;
-      gap: 0.6rem;
-      margin-top: 1.5rem;
-      flex-wrap: wrap;
-    }
-    .order-actions button {
-      flex: 1;
-      min-width: 80px;
-      padding: 0.6rem 0.8rem;
-      border: none;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      cursor: pointer;
-      font-family: 'Jost', sans-serif;
-      transition: 0.2s;
-    }
-    .btn-mark-ready {
-      background: var(--gold);
-      color: white;
-    }
-    .btn-mark-ready:hover {
-      background: var(--gold-light);
-    }
-    .btn-serve {
-      background: #2a5a2a;
-      color: white;
-    }
-    .btn-serve:hover {
-      background: #1e421e;
-    }
-    .btn-clear {
-      background: #ccc;
-      color: #333;
-    }
-    .btn-clear:hover {
-      background: #bbb;
-    }
+        /* Table cards */
+        .table-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+        }
 
-    .empty-state {
-      color: var(--text-muted);
-      font-style: italic;
-      padding: 1.2rem 0;
-      text-align: center;
-      font-weight: 300;
-    }
+        .table-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1rem 0.8rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 2px solid rgba(184,134,11,0.15);
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            position: relative;
+            text-decoration: none;
+            display: block;
+            color: inherit;
+        }
 
-    /* ----- TOAST ----- */
-    .toast {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: var(--brown);
-      color: var(--cream);
-      padding: 0.8rem 1.6rem;
-      border-radius: 40px;
-      font-size: 0.85rem;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-      transform: translateX(130%);
-      transition: transform 0.35s ease;
-      z-index: 999;
-    }
-    .toast.show {
-      transform: translateX(0);
-    }
+            .table-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+                border-color: var(--gold-light);
+            }
 
-    /* responsive */
-  
-  </style>
+            .table-card.selected {
+                border-color: var(--gold);
+                box-shadow: 0 0 0 3px rgba(184,134,11,0.2);
+            }
+
+            .table-card .table-nr {
+                font-weight: 600;
+                font-size: 1rem;
+                color: var(--brown);
+                letter-spacing: 0.04em;
+            }
+
+            .table-card .table-type {
+                font-size: 0.6rem;
+                color: var(--text-muted);
+                margin-top: 0.1rem;
+            }
+
+        .table-status-badge {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.2rem 0.6rem;
+            border-radius: 40px;
+            display: inline-block;
+            margin-top: 0.35rem;
+        }
+
+            .table-status-badge.available {
+                background: #dce8d8;
+                color: #2a5a2a;
+            }
+
+            .table-status-badge.occupied {
+                background: #f0e0c8;
+                color: var(--brown-mid);
+            }
+
+            .table-status-badge.reserved {
+                background: #d8e0f0;
+                color: #2a4a7a;
+            }
+
+        .table-card .guest-count {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        .order-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--red);
+            color: white;
+            font-size: 0.6rem;
+            border-radius: 30px;
+            padding: 0.1rem 0.55rem;
+            font-weight: 500;
+        }
+
+        /* Order panel */
+        .order-panel {
+            background: var(--warm-white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.8rem;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .order-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            border-bottom: 1px solid rgba(184,134,11,0.2);
+            padding-bottom: 0.7rem;
+            margin-bottom: 1.2rem;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+            .order-panel-header h3 {
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 1.4rem;
+                font-weight: 400;
+                color: var(--brown);
+            }
+
+            .order-panel-header .table-sub {
+                font-size: 0.7rem;
+                color: var(--text-muted);
+                font-weight: 300;
+            }
+
+        /* Status pill */
+        .status-pill {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            display: inline-block;
+            margin-bottom: 0.8rem;
+        }
+
+            .status-pill.pending {
+                background: #f0e8d8;
+                color: #8a6020;
+            }
+
+            .status-pill.in-progress {
+                background: #f8e0c8;
+                color: #8a4020;
+            }
+
+            .status-pill.ready {
+                background: #d8ecd8;
+                color: #2a5a2a;
+            }
+
+            .status-pill.served {
+                background: #d8e8d8;
+                color: #1e4a1e;
+            }
+
+            .status-pill.closed {
+                background: #e0e0d8;
+                color: var(--text-muted);
+            }
+
+        /* Order lines */
+        .order-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.55rem 0;
+            border-bottom: 1px solid rgba(0,0,0,0.04);
+            font-size: 0.88rem;
+            gap: 0.5rem;
+        }
+
+            .order-line .line-left {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                flex: 1;
+            }
+
+            .order-line .qty {
+                color: var(--text-muted);
+                font-size: 0.8rem;
+                min-width: 22px;
+            }
+
+            .order-line .item-name {
+                font-weight: 400;
+            }
+
+            .order-line .line-right {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .order-line .price {
+                font-weight: 500;
+                color: var(--brown);
+                white-space: nowrap;
+            }
+
+        .btn-remove-line {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #c8a0a0;
+            font-size: 0.75rem;
+            padding: 0.1rem 0.3rem;
+            border-radius: 4px;
+            transition: 0.15s;
+        }
+
+            .btn-remove-line:hover {
+                color: var(--red);
+                background: #f8eded;
+            }
+
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 1.05rem;
+            padding: 0.9rem 0 0.4rem;
+            border-top: 2px solid rgba(184,134,11,0.2);
+            margin-top: 0.4rem;
+        }
+
+        /* Order action buttons */
+        .order-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+            .order-actions button {
+                flex: 1;
+                min-width: 70px;
+                padding: 0.55rem 0.6rem;
+                border: none;
+                border-radius: 40px;
+                font-size: 0.65rem;
+                letter-spacing: 0.07em;
+                text-transform: uppercase;
+                cursor: pointer;
+                font-family: 'Jost', sans-serif;
+                transition: 0.2s;
+            }
+
+        .btn-add-items {
+            background: var(--gold);
+            color: white;
+        }
+
+            .btn-add-items:hover {
+                background: var(--gold-light);
+            }
+
+        .btn-in-progress {
+            background: #d48020;
+            color: white;
+        }
+
+            .btn-in-progress:hover {
+                background: #b86818;
+            }
+
+        .btn-served {
+            background: #1e5a1e;
+            color: white;
+        }
+
+            .btn-served:hover {
+                background: #153e15;
+            }
+
+        .btn-close-order {
+            background: var(--brown);
+            color: var(--cream);
+        }
+
+            .btn-close-order:hover {
+                background: var(--brown-mid);
+            }
+
+        .btn-clear-table {
+            background: #e8d8d8;
+            color: #6a3a3a;
+        }
+
+            .btn-clear-table:hover {
+                background: #dcc8c8;
+            }
+
+        /* Empty state */
+        .empty-state {
+            color: var(--text-muted);
+            font-weight: 300;
+            padding: 1.2rem 0;
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 1.4rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(184,134,11,0.1);
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(61,43,31,0.45);
+            backdrop-filter: blur(3px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+            .modal-overlay.open {
+                opacity: 1;
+                pointer-events: all;
+            }
+
+        .modal {
+            background: var(--warm-white);
+            border-radius: var(--radius);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+            padding: 2rem 2.2rem;
+            width: 100%;
+            max-width: 540px;
+            transform: translateY(20px);
+            transition: transform 0.25s ease;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.open .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.4rem;
+        }
+
+            .modal-header h3 {
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 1.4rem;
+                font-weight: 400;
+                color: var(--brown);
+            }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+            .modal-close:hover {
+                color: var(--red);
+            }
+
+        /* Menu items in modal */
+        .menu-group-label {
+            font-size: 0.65rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin: 1rem 0 0.5rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid rgba(184,134,11,0.15);
+        }
+
+        .menu-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0.6rem;
+            border-radius: 8px;
+            transition: 0.15s;
+            gap: 0.5rem;
+        }
+
+            .menu-item-row:hover {
+                background: var(--cream);
+            }
+
+            .menu-item-row .mi-name {
+                font-size: 0.88rem;
+                flex: 1;
+            }
+
+            .menu-item-row .mi-price {
+                font-size: 0.8rem;
+                color: var(--brown);
+                font-weight: 500;
+                white-space: nowrap;
+            }
+
+        .mi-qty {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .qty-btn {
+            background: var(--cream);
+            border: 1px solid rgba(184,134,11,0.25);
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.15s;
+        }
+
+            .qty-btn:hover {
+                background: var(--gold);
+                color: white;
+                border-color: var(--gold);
+            }
+
+        .qty-display {
+            font-size: 0.8rem;
+            min-width: 18px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .btn-add-line {
+            background: var(--gold);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 0.25rem 0.8rem;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            cursor: pointer;
+            font-family: 'Jost', sans-serif;
+            transition: 0.15s;
+        }
+
+            .btn-add-line:hover {
+                background: var(--gold-light);
+            }
+
+        /* Close order modal form */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            margin-bottom: 1rem;
+        }
+
+            .form-group label {
+                font-size: 0.65rem;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                color: var(--text-muted);
+            }
+
+            .form-group select, .form-group input {
+                border: 1px solid rgba(184,134,11,0.25);
+                border-radius: 8px;
+                padding: 0.55rem 0.8rem;
+                font-family: 'Jost', sans-serif;
+                font-size: 0.85rem;
+                color: var(--text);
+                background: white;
+                outline: none;
+                width: 100%;
+            }
+
+                .form-group select:focus, .form-group input:focus {
+                    border-color: var(--gold);
+                }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.7rem;
+            margin-top: 1.4rem;
+        }
+
+        .btn-modal-cancel {
+            background: var(--cream);
+            border: none;
+            color: var(--text-muted);
+            padding: 0.6rem 1.4rem;
+            border-radius: 40px;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+        }
+
+        .btn-modal-submit {
+            background: var(--red);
+            border: none;
+            color: white;
+            padding: 0.6rem 1.8rem;
+            border-radius: 40px;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+        }
+
+            .btn-modal-submit:hover {
+                background: var(--brown);
+            }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--brown);
+            color: var(--cream);
+            padding: 0.8rem 1.6rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            transform: translateX(130%);
+            transition: transform 0.35s ease;
+            z-index: 1100;
+        }
+
+            .toast.show {
+                transform: translateX(0);
+            }
+    </style>
 </head>
 <body>
 
-<div class="waiter-dashboard">
+    <div class="waiter-dashboard">
 
-  <!-- HEADER -->
-  <header class="dashboard-header">
-    <div class="header-left">
-      <div class="brand">Trattoria <span>Bella</span></div>
-      <span class="waiter-badge">👨‍🍳 Waiter · Marco</span>
+        <!-- HEADER -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <div class="brand">Trattoria <span>Bella</span></div>
+                <span class="waiter-badge">👨‍🍳 Waiter · @Model.WaiterName</span>
+            </div>
+            <div class="header-actions">
+                <a asp-action="WaiterHome" class="btn-outline">🔄 Refresh</a>
+            </div>
+        </header>
+
+        <!-- STATS -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="label">Total Tables</div>
+                <div class="value">@Model.TotalTables</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Occupied</div>
+                <div class="value">@Model.OccupiedCount</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Reserved</div>
+                <div class="value">@Model.ReservedCount</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Available</div>
+                <div class="value">@Model.AvailableCount</div>
+            </div>
+        </div>
+
+        <!-- MAIN GRID -->
+        <div class="dashboard-grid">
+
+            <!-- LEFT: Table Grid -->
+            <section class="tables-section">
+                <div class="section-header">
+                    <h3>🍽️ Dining Room</h3>
+                    <span class="sub">tap a table to view / manage order</span>
+                </div>
+
+                <div class="table-grid">
+                    @foreach (var t in Model.Tables)
+                    {
+                        var isSelected = Model.SelectedTableID == t.TableID;
+                        var statusLabel = t.Status switch
+                        {
+                            "available" => "🟢 Available",
+                            "occupied" => "🟠 Occupied",
+                            _ => "🔵 Reserved"
+                        };
+                        <a asp-action="WaiterHome" asp-route-selectedTableID="@t.TableID"
+                           class="table-card @(isSelected ? "selected" : "")">
+                            <div class="table-nr">Table @t.TableID</div>
+                            <div class="table-type">@t.TableType</div>
+                            <span class="table-status-badge @t.Status">@statusLabel</span>
+                            <div class="guest-count">Cap. @t.Capacity</div>
+                            @if (t.HasOrder)
+                            {
+                                <div class="order-badge">@t.TotalItems</div>
+                            }
+                        </a>
+                    }
+                </div>
+
+                <div class="legend">
+                    <span>🟢 Available</span>
+                    <span>🟠 Occupied</span>
+                    <span>🔵 Reserved</span>
+                </div>
+            </section>
+
+            <!-- RIGHT: Order Panel -->
+            <aside class="order-panel">
+                @if (selected == null)
+                {
+                    <div class="order-panel-header">
+                        <h3>📋 Order</h3>
+                        <span class="table-sub">— select a table</span>
+                    </div>
+                    <div class="empty-state">Tap a table to see its order.</div>
+                }
+                else
+                {
+                    <div class="order-panel-header">
+                        <h3>📋 Table @selected.TableID</h3>
+                        <span class="table-sub">@selected.TableType · Cap. @selected.Capacity</span>
+                    </div>
+
+                    @* ── AVAILABLE ── *@
+                    @if (selected.Status == "available")
+                    {
+                        <div class="empty-state">🍽️ Table is available.</div>
+                        <div class="order-actions" style="margin-top:1rem;">
+                            <form method="post" asp-action="StartOrder" style="flex:1;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="tableID" value="@selected.TableID" />
+                                <button type="submit" class="btn-add-items" style="width:100%;">➕ Start Order</button>
+                            </form>
+                        </div>
+                    }
+
+                    @* ── RESERVED, NO ORDER YET ── *@
+                    else if (selected.Status == "reserved" && order == null)
+                    {
+                        <div class="empty-state">🔵 Reserved — order on arrival.</div>
+                        <div class="order-actions" style="margin-top:1rem;">
+                            <form method="post" asp-action="StartOrder" style="flex:1;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="tableID" value="@selected.TableID" />
+                                <button type="submit" class="btn-add-items" style="width:100%;">🪑 Seat &amp; Start Order</button>
+                            </form>
+                            <form method="post" asp-action="ClearTable">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="tableID" value="@selected.TableID" />
+                                <button type="submit" class="btn-clear-table">❌ Cancel</button>
+                            </form>
+                        </div>
+                    }
+
+                    @* ── OCCUPIED WITH ACTIVE ORDER ── *@
+                    else if (order != null)
+                    {
+                        <span class="status-pill @order.StatusCssClass">@order.StatusLabel</span>
+
+                        @if (!order.Lines.Any())
+                        {
+                            <div class="empty-state">No items yet — add from menu.</div>
+                        }
+                        else
+                        {
+                            foreach (var line in order.Lines)
+                            {
+                                <div class="order-line">
+                                    <div class="line-left">
+                                        <span class="qty">@line.Quantity×</span>
+                                        <span class="item-name">@line.ItemName</span>
+                                    </div>
+                                    <div class="line-right">
+                                        <span class="price">R @line.Subtotal.ToString("N2")</span>
+                                        @if (order.CanAddItems)
+                                        {
+                                            <form method="post" asp-action="RemoveOrderItem" style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="orderDetailsID" value="@line.OrderDetailsID" />
+                                                <input type="hidden" name="tableID" value="@selected.TableID" />
+                                                <button type="submit" class="btn-remove-line" title="Remove">✕</button>
+                                            </form>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            <div class="order-total">
+                                <span>Total</span>
+                                <span>R @order.ComputedTotal.ToString("N2")</span>
+                            </div>
+                        }
+
+                        <div class="order-actions">
+                            @if (order.CanAddItems)
+                            {
+                                <button type="button" class="btn-add-items"
+                                        onclick="openAddItems(@order.OrderID, @selected.TableID)">
+                                    ➕ Add Items
+                                </button>
+                            }
+                            @if (order.CanMarkReady)
+                            {
+                                <form method="post" asp-action="UpdateOrderStatus">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="orderID" value="@order.OrderID" />
+                                    <input type="hidden" name="newStatus" value="In Progress" />
+                                    <input type="hidden" name="tableID" value="@selected.TableID" />
+                                    <button type="submit" class="btn-in-progress">🔥 In Progress</button>
+                                </form>
+                            }
+                            @if (order.CanServe)
+                            {
+                                <form method="post" asp-action="UpdateOrderStatus">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="orderID" value="@order.OrderID" />
+                                    <input type="hidden" name="newStatus" value="Served" />
+                                    <input type="hidden" name="tableID" value="@selected.TableID" />
+                                    <button type="submit" class="btn-served">✅ Mark Served</button>
+                                </form>
+                            }
+                            @if (order.CanClose)
+                            {
+                                <button type="button" class="btn-close-order"
+                                        onclick="openCloseOrder(@order.OrderID, @selected.TableID, @order.ComputedTotal)">
+                                    💳 Close &amp; Pay
+                                </button>
+                            }
+                            <form method="post" asp-action="ClearTable"
+                                  onsubmit="return confirm('Clear Table @selected.TableID? This will void the current order.');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="tableID" value="@selected.TableID" />
+                                <button type="submit" class="btn-clear-table">🧹 Clear</button>
+                            </form>
+                        </div>
+                    }
+
+                    @* ── OCCUPIED, NO ORDER STARTED ── *@
+                    else
+                    {
+                        <div class="empty-state">Table occupied — no order started.</div>
+                        <div class="order-actions" style="margin-top:1rem;">
+                            <form method="post" asp-action="StartOrder" style="flex:1;">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="tableID" value="@selected.TableID" />
+                                <button type="submit" class="btn-add-items" style="width:100%;">➕ Start Order</button>
+                            </form>
+                            <form method="post" asp-action="ClearTable">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="tableID" value="@selected.TableID" />
+                                <button type="submit" class="btn-clear-table">🧹 Clear</button>
+                            </form>
+                        </div>
+                    }
+                }
+            </aside>
+
+        </div>
     </div>
-    <div class="header-actions">
-      <button class="btn-outline" id="resetTablesBtn">🔄 Reset floor</button>
-      <button class="btn-primary-sm" id="newOrderBtn">➕ New order</button>
+
+    <!-- ADD ITEMS MODAL -->
+    <div class="modal-overlay" id="addItemsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>➕ Add Items</h3>
+                <button type="button" class="modal-close" onclick="closeModal('addItemsModal')">✕</button>
+            </div>
+
+            @foreach (var group in menuGroups)
+            {
+                <div class="menu-group-label">@group.Key</div>
+                foreach (var item in group)
+                {
+                    <div class="menu-item-row">
+                        <span class="mi-name">@item.Name</span>
+                        <span class="mi-price">R @item.Price.ToString("N2")</span>
+                        <form method="post" asp-action="AddOrderItem" class="mi-qty">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="orderID" id="addOrderID_@item.MenuItemID" value="" />
+                            <input type="hidden" name="menuItemID" value="@item.MenuItemID" />
+                            <input type="hidden" name="quantity" id="addQty_@item.MenuItemID" value="1" />
+                            <button type="button" class="qty-btn" onclick="changeQty(@item.MenuItemID, -1)">−</button>
+                            <span class="qty-display" id="qtyDisplay_@item.MenuItemID">1</span>
+                            <button type="button" class="qty-btn" onclick="changeQty(@item.MenuItemID, 1)">+</button>
+                            <button type="submit" class="btn-add-line">Add</button>
+                        </form>
+                    </div>
+                }
+            }
+
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-cancel" onclick="closeModal('addItemsModal')">Done</button>
+            </div>
+        </div>
     </div>
-  </header>
 
-  <!-- STATS -->
-  <div class="stats-row">
-    <div class="stat-card"><div class="label">Total tables</div><div class="value" id="totalTables">12</div></div>
-    <div class="stat-card"><div class="label">Occupied</div><div class="value" id="occupiedCount">3</div></div>
-    <div class="stat-card"><div class="label">Reserved</div><div class="value" id="reservedCount">1</div></div>
-    <div class="stat-card"><div class="label">Available</div><div class="value" id="availableCount">8</div></div>
-  </div>
+    <!-- CLOSE & PAY MODAL -->
+    <div class="modal-overlay" id="closeOrderModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>💳 Close &amp; Pay</h3>
+                <button type="button" class="modal-close" onclick="closeModal('closeOrderModal')">✕</button>
+            </div>
 
-  <!-- GRID -->
-  <div class="dashboard-grid">
+            <form method="post" asp-action="CloseOrder">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="orderID" id="closeOrderID" value="" />
+                <input type="hidden" name="tableID" id="closeTableID" value="" />
 
-    <!-- TABLES -->
-    <section class="tables-section">
-      <div class="section-header">
-        <h3>🍽️ Dining Room</h3>
-        <span class="sub">tap a table to view / edit order</span>
-      </div>
-      <div class="table-grid" id="tableGrid">
-        <!-- tables injected by JS -->
-      </div>
-    </section>
+                <div class="form-group">
+                    <label>Order Total</label>
+                    <input type="text" id="closeTotalDisplay" readonly style="background:#f8f4ee; font-weight:600;" />
+                </div>
 
-    <!-- ORDER PANEL -->
-    <aside class="order-panel" id="orderPanel">
-      <h3>📋 Order <span id="tableLabel">— select a table</span></h3>
-      <div id="orderContent">
-        <div class="empty-state">Tap a table to see its order.</div>
-      </div>
-    </aside>
+                <div class="form-group">
+                    <label for="paymentMethod">Payment Method</label>
+                    <select name="paymentMethod" id="paymentMethod" required>
+                        <option value="">— Select —</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Card">Card</option>
+                        <option value="EFT">EFT</option>
+                    </select>
+                </div>
 
-  </div>
-</div>
+                <div class="form-group">
+                    <label for="tipAmount">Tip Amount (R)</label>
+                    <input type="number" name="tipAmount" id="tipAmount" value="0" min="0" step="0.01" />
+                </div>
 
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
-<script>
-  // ─── DATA ────────────────────────────────────────────────
-  const menuItems = [
-    { name: 'Burrata con Prosciutto', price: 185 },
-    { name: 'Carpaccio di Manzo', price: 165 },
-    { name: 'Bruschetta al Pomodoro', price: 95 },
-    { name: 'Polpo alla Griglia', price: 210 },
-    { name: 'Pappardelle al Cinghiale', price: 225 },
-    { name: 'Risotto ai Funghi Porcini', price: 245 },
-    { name: 'Spaghetti alle Vongole', price: 235 },
-    { name: 'Gnocchi alla Sorrentina', price: 195 },
-    { name: 'Bistecca Fiorentina', price: 445 },
-    { name: 'Branzino al Forno', price: 320 },
-    { name: 'Pollo alla Cacciatora', price: 275 },
-    { name: 'Saltimbocca alla Romana', price: 295 },
-    { name: 'Tiramisù della Casa', price: 95 },
-    { name: 'Panna Cotta al Limone', price: 85 },
-    { name: 'Prosecco Superiore', price: 160 },
-    { name: 'Chianti Classico', price: 195 },
-    { name: 'Aperol Spritz', price: 105 },
-    { name: 'Negroni', price: 120 }
-  ];
-
-  // helper to pick random items
-  function randomItems(count) {
-    const shuffled = [...menuItems].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count).map(item => ({
-      ...item,
-      qty: Math.floor(Math.random() * 2) + 1
-    }));
-  }
-
-  // initial tables
-  let tables = [];
-  const tableCount = 12;
-
-  function initTables() {
-    tables = [];
-    for (let i = 1; i <= tableCount; i++) {
-      let status = 'available';
-      let order = [];
-      let guests = 0;
-      const r = Math.random();
-      if (r < 0.25) {
-        status = 'occupied';
-        guests = Math.floor(Math.random() * 4) + 2;
-        order = randomItems(Math.floor(Math.random() * 4) + 1);
-      } else if (r < 0.35) {
-        status = 'reserved';
-        guests = Math.floor(Math.random() * 4) + 2;
-        order = []; // reserved but no order yet
-      } else {
-        status = 'available';
-        guests = 0;
-        order = [];
-      }
-      tables.push({ id: i, status, order, guests });
-    }
-    // ensure at least one occupied and one reserved for demo
-    tables[0].status = 'occupied';
-    tables[0].guests = 4;
-    tables[0].order = randomItems(3);
-    tables[1].status = 'reserved';
-    tables[1].guests = 2;
-    tables[1].order = [];
-    tables[2].status = 'occupied';
-    tables[2].guests = 3;
-    tables[2].order = randomItems(2);
-  }
-  initTables();
-
-  // ─── STATE ────────────────────────────────────────────────
-  let selectedTableId = null;
-
-  // ─── DOM REFS ─────────────────────────────────────────────
-  const tableGrid = document.getElementById('tableGrid');
-  const orderContent = document.getElementById('orderContent');
-  const tableLabel = document.getElementById('tableLabel');
-  const totalTablesEl = document.getElementById('totalTables');
-  const occupiedCountEl = document.getElementById('occupiedCount');
-  const reservedCountEl = document.getElementById('reservedCount');
-  const availableCountEl = document.getElementById('availableCount');
-
-  // ─── TOAST ────────────────────────────────────────────────
-  function showToast(msg, duration = 3000) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(t._timeout);
-    t._timeout = setTimeout(() => t.classList.remove('show'), duration);
-  }
-
-  // ─── RENDER ───────────────────────────────────────────────
-  function renderStats() {
-    const occupied = tables.filter(t => t.status === 'occupied').length;
-    const reserved = tables.filter(t => t.status === 'reserved').length;
-    const available = tables.filter(t => t.status === 'available').length;
-    totalTablesEl.textContent = tables.length;
-    occupiedCountEl.textContent = occupied;
-    reservedCountEl.textContent = reserved;
-    availableCountEl.textContent = available;
-  }
-
-  function renderTables() {
-    tableGrid.innerHTML = '';
-    tables.forEach(table => {
-      const card = document.createElement('div');
-      card.className = 'table-card';
-      const statusMap = {
-        available: '🟢 Available',
-        occupied: '🟠 Occupied',
-        reserved: '🔵 Reserved'
-      };
-      const statusClass = table.status;
-      const hasOrder = table.order && table.order.length > 0;
-      card.innerHTML = `
-        <div class="table-nr">Table ${table.id}</div>
-        <div class="table-status ${statusClass}">${statusMap[table.status]}</div>
-        ${table.guests ? `<div class="guest-count">👥 ${table.guests} guests</div>` : ''}
-        ${hasOrder ? `<div class="order-badge">${table.order.reduce((sum, i) => sum + i.qty, 0)} items</div>` : ''}
-      `;
-      card.addEventListener('click', () => selectTable(table.id));
-      if (selectedTableId === table.id) {
-        card.style.borderColor = 'var(--gold)';
-        card.style.boxShadow = '0 0 0 2px var(--gold-light)';
-      } else {
-        card.style.borderColor = 'rgba(184,134,11,0.15)';
-        card.style.boxShadow = 'none';
-      }
-      tableGrid.appendChild(card);
-    });
-    renderStats();
-  }
-
-  function selectTable(id) {
-    selectedTableId = id;
-    renderTables();
-    renderOrderPanel(id);
-  }
-
-  function renderOrderPanel(tableId) {
-    const table = tables.find(t => t.id === tableId);
-    if (!table) {
-      orderContent.innerHTML = `<div class="empty-state">Table not found.</div>`;
-      tableLabel.textContent = '—';
-      return;
-    }
-    tableLabel.textContent = `Table ${table.id} · ${table.status}`;
-
-    if (table.status === 'available') {
-      orderContent.innerHTML = `
-        <div class="empty-state">🍽️ Table is available.<br><small style="font-size:0.7rem;">Tap "New order" to start serving.</small></div>
-        <div class="order-actions">
-          <button class="btn-mark-ready" data-action="newOrder" data-id="${table.id}">➕ Start order</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn-modal-cancel" onclick="closeModal('closeOrderModal')">Cancel</button>
+                    <button type="submit" class="btn-modal-submit">✅ Confirm Payment</button>
+                </div>
+            </form>
         </div>
-      `;
-      attachOrderActions();
-      return;
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    @if (TempData["ToastMessage"] != null)
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var t = document.getElementById('toast');
+                t.textContent = '@Html.Raw(TempData["ToastMessage"])';
+                t.classList.add('show');
+                setTimeout(function () { t.classList.remove('show'); }, 3000);
+            });
+        </script>
     }
 
-    if (table.status === 'reserved') {
-      orderContent.innerHTML = `
-        <div class="empty-state">🔵 Reserved for ${table.guests} guests.<br><small style="font-size:0.7rem;">Order will be taken upon arrival.</small></div>
-        <div class="order-actions">
-          <button class="btn-mark-ready" data-action="seatTable" data-id="${table.id}">🪑 Seat & take order</button>
-          <button class="btn-clear" data-action="clearTable" data-id="${table.id}">❌ Cancel reservation</button>
-        </div>
-      `;
-      attachOrderActions();
-      return;
-    }
+    <script>
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('open');
+        }
 
-    // occupied – show order
-    if (!table.order || table.order.length === 0) {
-      orderContent.innerHTML = `
-        <div class="empty-state">No items ordered yet.</div>
-        <div class="order-actions">
-          <button class="btn-mark-ready" data-action="addItems" data-id="${table.id}">➕ Add items</button>
-          <button class="btn-clear" data-action="clearTable" data-id="${table.id}">🧹 Clear table</button>
-        </div>
-      `;
-      attachOrderActions();
-      return;
-    }
-
-    let html = '';
-    let total = 0;
-    table.order.forEach(item => {
-      const subtotal = item.price * item.qty;
-      total += subtotal;
-      html += `
-        <div class="order-item">
-          <span><span class="item-qty">${item.qty}×</span> <span class="item-name">${item.name}</span></span>
-          <span class="item-price">R ${subtotal}</span>
-        </div>
-      `;
-    });
-    html += `<div class="order-total"><span>Total</span><span>R ${total}</span></div>`;
-
-    html += `
-      <div class="order-actions">
-        <button class="btn-mark-ready" data-action="addItems" data-id="${table.id}">➕ Add item</button>
-        <button class="btn-serve" data-action="markServed" data-id="${table.id}">✅ Mark served</button>
-        <button class="btn-clear" data-action="clearTable" data-id="${table.id}">🧹 Clear table</button>
-      </div>
-    `;
-    orderContent.innerHTML = html;
-    attachOrderActions();
-  }
-
-  // ─── ACTION HANDLERS ─────────────────────────────────────
-  function attachOrderActions() {
-    document.querySelectorAll('[data-action]').forEach(btn => {
-      btn.removeEventListener('click', handleAction);
-      btn.addEventListener('click', handleAction);
-    });
-  }
-
-  function handleAction(e) {
-    const btn = e.currentTarget;
-    const action = btn.dataset.action;
-    const id = parseInt(btn.dataset.id, 10);
-    const table = tables.find(t => t.id === id);
-    if (!table) return;
-
-    switch (action) {
-      case 'newOrder':
-        // change status to occupied, add 2 random items
-        table.status = 'occupied';
-        table.guests = 2;
-        table.order = randomItems(2);
-        showToast(`🆕 Order started for Table ${id}`);
-        break;
-
-      case 'seatTable':
-        table.status = 'occupied';
-        table.order = randomItems(2);
-        showToast(`🪑 Table ${id} seated, order taken.`);
-        break;
-
-      case 'addItems': {
-        const newItems = randomItems(Math.floor(Math.random() * 2) + 1);
-        // avoid duplicates just for demo – push
-        newItems.forEach(item => {
-          const existing = table.order.find(i => i.name === item.name);
-          if (existing) existing.qty += item.qty;
-          else table.order.push(item);
+        document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
+            overlay.addEventListener('click', function (e) {
+                if (e.target === this) this.classList.remove('open');
+            });
         });
-        showToast(`➕ Added ${newItems.length} item(s) to Table ${id}`);
-        break;
-      }
 
-      case 'markServed':
-        showToast(`✅ Order served for Table ${id}. Buon appetito!`);
-        // keep order, but you could clear after serve – we keep for demo
-        break;
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.open').forEach(function (m) {
+                    m.classList.remove('open');
+                });
+            }
+        });
 
-      case 'clearTable':
-        table.status = 'available';
-        table.guests = 0;
-        table.order = [];
-        selectedTableId = null;
-        showToast(`🧹 Table ${id} cleared and available.`);
-        break;
+        function openAddItems(orderID, tableID) {
+            document.querySelectorAll('[id^="addOrderID_"]').forEach(function (el) {
+                el.value = orderID;
+            });
+            document.getElementById('addItemsModal').classList.add('open');
+        }
 
-      default: return;
-    }
-    // re-render everything
-    renderTables();
-    if (selectedTableId) renderOrderPanel(selectedTableId);
-    else orderContent.innerHTML = `<div class="empty-state">Tap a table to see its order.</div>`;
-  }
+        var qtys = {};
 
-  // ─── RESET FLOOR ─────────────────────────────────────────
-  document.getElementById('resetTablesBtn').addEventListener('click', () => {
-    initTables();
-    selectedTableId = null;
-    renderTables();
-    orderContent.innerHTML = `<div class="empty-state">Tap a table to see its order.</div>`;
-    tableLabel.textContent = '— select a table';
-    showToast('🔄 Floor reset to demo state.');
-  });
+        function changeQty(menuItemID, delta) {
+            if (!qtys[menuItemID]) qtys[menuItemID] = 1;
+            qtys[menuItemID] = Math.max(1, qtys[menuItemID] + delta);
+            document.getElementById('qtyDisplay_' + menuItemID).textContent = qtys[menuItemID];
+            document.getElementById('addQty_' + menuItemID).value = qtys[menuItemID];
+        }
 
-  // ─── NEW ORDER (from header) ─────────────────────────────
-  document.getElementById('newOrderBtn').addEventListener('click', () => {
-    // find first available table
-    const avail = tables.find(t => t.status === 'available');
-    if (!avail) {
-      showToast('⚠️ No available tables right now.');
-      return;
-    }
-    avail.status = 'occupied';
-    avail.guests = 2;
-    avail.order = randomItems(2);
-    selectedTableId = avail.id;
-    renderTables();
-    renderOrderPanel(avail.id);
-    showToast(`🆕 New order started at Table ${avail.id}`);
-  });
-
-  // ─── INIT ─────────────────────────────────────────────────
-  renderTables();
-  // select first occupied for demo
-  const firstOcc = tables.find(t => t.status === 'occupied');
-  if (firstOcc) {
-    selectedTableId = firstOcc.id;
-    renderTables();
-    renderOrderPanel(firstOcc.id);
-  } else {
-    orderContent.innerHTML = `<div class="empty-state">Tap a table to see its order.</div>`;
-  }
-</script>
+        function openCloseOrder(orderID, tableID, total) {
+            document.getElementById('closeOrderID').value = orderID;
+            document.getElementById('closeTableID').value = tableID;
+            document.getElementById('closeTotalDisplay').value = 'R ' + parseFloat(total).toFixed(2);
+            document.getElementById('closeOrderModal').classList.add('open');
+        }
+    </script>
 
 </body>
 </html>
