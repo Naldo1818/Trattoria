@@ -431,8 +431,8 @@ namespace Trattoria.Controllers
         // ── Waiter ───────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// GET: Waiter dashboard — shows all tables with their active orders.
-        /// Optional selectedTableID highlights a table and shows its order panel.
+        /// GET: Waiter dashboard — each table shows a Food order and a Drinks order separately.
+        /// Order category is derived from MenuItems.Type via WaiterHomeViewModel.IsDrinkType().
         /// </summary>
         [HttpGet]
         public IActionResult WaiterHome(int? selectedTableID = null)
@@ -440,10 +440,10 @@ namespace Trattoria.Controllers
             var waiterID = HttpContext.Session.GetInt32("UserID") ?? 0;
             var waiterName = HttpContext.Session.GetString("UserName") ?? "Waiter";
 
-            // All tables
             var allTables = _dbContext.Tables.OrderBy(t => t.TableID).ToList();
+            var allMenuItems = _dbContext.MenuItems.OrderBy(m => m.Type).ThenBy(m => m.Name).ToList();
 
-            // All active (unpaid) orders keyed by TableID
+            // Active (unpaid, non-closed) orders with their lines
             var activeOrders = (
                 from o in _dbContext.Orders
                 where !o.IsPaid && o.Status != "Closed"
@@ -454,70 +454,75 @@ namespace Trattoria.Controllers
                 select new { o, od, m }
             ).ToList();
 
-            // Group order lines per order
-            var orderMap = activeOrders
+            // Group lines per OrderID
+            var linesByOrder = activeOrders
                 .GroupBy(x => x.o.OrderID)
                 .ToDictionary(
-                    g => g.First().o.TablesID,
-                    g =>
-                    {
-                        var first = g.First().o;
-                        return new OrderDisplayItem
-                        {
-                            OrderID = first.OrderID,
-                            OrderTime = first.OrderTime,
-                            Status = first.Status,
-                            TotalAmount = first.TotalAmount,
-                            IsPaid = first.IsPaid,
-                            PaymentMethod = first.PaymentMethod ?? string.Empty,
-                            Lines = g
-                                .Where(x => x.od != null && x.m != null)
-                                .Select(x => new OrderLineItem
-                                {
-                                    OrderDetailsID = x.od.OrderDetailsID,
-                                    MenuItemID = x.od.MenuItemID,
-                                    ItemName = x.m.Name,
-                                    ItemType = x.m.Type,
-                                    Quantity = x.od.Quantity,
-                                    Price = x.od.Price
-                                }).ToList()
-                        };
-                    }
+                    g => g.Key,
+                    g => g.Where(x => x.od != null && x.m != null)
+                          .Select(x => new OrderLineItem
+                          {
+                              OrderDetailsID = x.od.OrderDetailsID,
+                              MenuItemID = x.od.MenuItemID,
+                              ItemName = x.m.Name,
+                              ItemType = x.m.Type,
+                              Quantity = x.od.Quantity,
+                              Price = x.od.Price
+                          }).ToList()
                 );
+
+            // Distinct orders keyed by TableID — group into Food / Drinks by line types
+            // An order is "Drinks" if ALL its lines are drink types; otherwise "Food"
+            var ordersByTable = activeOrders
+                .GroupBy(x => x.o.OrderID)
+                .Select(g =>
+                {
+                    var first = g.First().o;
+                    var lines = linesByOrder.TryGetValue(first.OrderID, out var l) ? l : new();
+                    // Classify by whether ALL items are drinks
+                    bool isDrinks = lines.Any() && lines.All(li => WaiterHomeViewModel.IsDrinkType(li.ItemType));
+                    // If no lines yet, classify by PaymentMethod field used as a type tag
+                    if (!lines.Any())
+                        isDrinks = first.PaymentMethod?.StartsWith("__DRINKS") == true;
+
+                    return new OrderDisplayItem
+                    {
+                        OrderID = first.OrderID,
+                        OrderTime = first.OrderTime,
+                        Status = first.Status,
+                        IsPaid = first.IsPaid,
+                        PaymentMethod = first.PaymentMethod ?? string.Empty,
+                        OrderCategory = isDrinks ? "Drinks" : "Food",
+                        Lines = lines
+                    };
+                })
+                .GroupBy(o => activeOrders.First(x => x.o.OrderID == o.OrderID).o.TablesID)
+                .ToDictionary(g => g.Key, g => g.ToList());
 
             // Build table display items
             var tableItems = allTables.Select(t =>
             {
-                var hasActiveOrder = orderMap.TryGetValue(t.TableID, out var ord);
-                var item = new TableDisplayItem
+                var orders = ordersByTable.TryGetValue(t.TableID, out var ol) ? ol : new();
+                return new TableDisplayItem
                 {
                     TableID = t.TableID,
                     TableType = t.Type,
                     Capacity = t.Capacity,
                     IsAvailable = t.IsAvailable,
-                    ActiveOrder = hasActiveOrder ? ord : null
+                    FoodOrder = orders.FirstOrDefault(o => o.OrderCategory == "Food"),
+                    DrinksOrder = orders.FirstOrDefault(o => o.OrderCategory == "Drinks")
                 };
-
-                // Check if table is "Seated" (reserved but customer arrived)
-                var hasSeatedReservation = _dbContext.Reservations
-                    .Any(r => r.TablesID == t.TableID && r.Status == "Seated");
-
-                if (hasSeatedReservation && !hasActiveOrder)
-                {
-                    item.CustomStatus = "seated";
-                }
-
-                return item;
             }).ToList();
 
             var vm = new WaiterHomeViewModel
             {
                 Tables = tableItems,
-                MenuItems = _dbContext.MenuItems.OrderBy(m => m.Type).ThenBy(m => m.Name).ToList(),
+                FoodItems = allMenuItems.Where(m => !WaiterHomeViewModel.IsDrinkType(m.Type)).ToList(),
+                DrinkItems = allMenuItems.Where(m => WaiterHomeViewModel.IsDrinkType(m.Type)).ToList(),
                 TotalTables = allTables.Count,
                 OccupiedCount = allTables.Count(t => !t.IsAvailable),
                 AvailableCount = allTables.Count(t => t.IsAvailable),
-                ReservedCount = _dbContext.Reservations.Count(r => r.Status == "Confirmed" || r.Status == "Waiting" || r.Status == "Seated"),
+                ReservedCount = _dbContext.Reservations.Count(r => r.Status == "Confirmed" || r.Status == "Waiting"),
                 SelectedTableID = selectedTableID,
                 WaiterName = waiterName,
                 WaiterID = waiterID
@@ -527,7 +532,8 @@ namespace Trattoria.Controllers
         }
 
         /// <summary>
-        /// POST: Start a new order on a table (sets table occupied).
+        /// POST: Start TWO orders on a table — one Food, one Drinks.
+        /// The Drinks order is tagged by setting PaymentMethod = "__DRINKS" temporarily.
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -538,16 +544,17 @@ namespace Trattoria.Controllers
 
             var waiterID = HttpContext.Session.GetInt32("UserID") ?? 0;
 
-            // Check no active order already exists
+            // Prevent duplicate active orders
             var existing = _dbContext.Orders
-                .FirstOrDefault(o => o.TablesID == tableID && !o.IsPaid && o.Status != "Closed");
-            if (existing != null)
+                .Any(o => o.TablesID == tableID && !o.IsPaid && o.Status != "Closed");
+            if (existing)
             {
-                TempData["ToastMessage"] = "⚠️ Table already has an active order.";
+                TempData["ToastMessage"] = "⚠️ Table already has active orders.";
                 return RedirectToAction("WaiterHome", new { selectedTableID = tableID });
             }
 
-            var order = new Orders
+            // Food order
+            _dbContext.Orders.Add(new Orders
             {
                 UserID = waiterID,
                 TablesID = tableID,
@@ -555,48 +562,46 @@ namespace Trattoria.Controllers
                 Status = "Pending",
                 TotalAmount = 0,
                 TipAmount = 0,
-                PaymentMethod = string.Empty,
+                PaymentMethod = "__FOOD",
                 IsPaid = false
-            };
+            });
+
+            // Drinks order — tagged so the system knows it's drinks before any lines exist
+            _dbContext.Orders.Add(new Orders
+            {
+                UserID = waiterID,
+                TablesID = tableID,
+                OrderTime = DateTime.Now,
+                Status = "Pending",
+                TotalAmount = 0,
+                TipAmount = 0,
+                PaymentMethod = "__DRINKS",
+                IsPaid = false
+            });
 
             table.IsAvailable = false;
-
-            // If there's a "Seated" reservation, update its status
-            var seatedReservation = _dbContext.Reservations
-                .FirstOrDefault(r => r.TablesID == tableID && r.Status == "Seated");
-            if (seatedReservation != null)
-            {
-                seatedReservation.Status = "Occupied"; // Or "Completed" - whatever your flow requires
-            }
-
-            _dbContext.Orders.Add(order);
             _dbContext.SaveChanges();
 
-            TempData["ToastMessage"] = $"🆕 Order started for Table {tableID}.";
+            TempData["ToastMessage"] = $"🆕 Food & Drinks orders started for Table {tableID}.";
             return RedirectToAction("WaiterHome", new { selectedTableID = tableID });
         }
 
         /// <summary>
-        /// POST: Add a menu item to an existing active order.
+        /// POST: Add a menu item to a specific order (food or drinks).
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AddOrderItem(int orderID, int menuItemID, int quantity = 1)
+        public IActionResult AddOrderItem(int orderID, int menuItemID, int quantity, int tableID)
         {
             var order = _dbContext.Orders.Find(orderID);
             var menuItem = _dbContext.MenuItems.Find(menuItemID);
             if (order == null || menuItem == null) return NotFound();
 
-            // Check if item already on order — increase qty
             var existing = _dbContext.OrderDetails
                 .FirstOrDefault(od => od.OrderID == orderID && od.MenuItemID == menuItemID);
-
             if (existing != null)
-            {
                 existing.Quantity += quantity;
-            }
             else
-            {
                 _dbContext.OrderDetails.Add(new OrderDetails
                 {
                     OrderID = orderID,
@@ -604,24 +609,30 @@ namespace Trattoria.Controllers
                     Quantity = quantity,
                     Price = menuItem.Price
                 });
+
+            // Clear the type tag now that real lines exist; set PaymentMethod to the real category
+            if (order.PaymentMethod == "__FOOD" || order.PaymentMethod == "__DRINKS")
+            {
+                bool isDrink = WaiterHomeViewModel.IsDrinkType(menuItem.Type);
+                // keep the tag for classification — do not overwrite
             }
 
-            // Recalculate total
             _dbContext.SaveChanges();
-            var lines = _dbContext.OrderDetails
+
+            // Recalculate total
+            order.TotalAmount = _dbContext.OrderDetails
                 .Where(od => od.OrderID == orderID)
                 .Join(_dbContext.MenuItems, od => od.MenuItemID, m => m.MenuItemID,
                       (od, m) => od.Price * od.Quantity)
                 .Sum();
-            order.TotalAmount = lines;
             _dbContext.SaveChanges();
 
-            TempData["ToastMessage"] = $"➕ {menuItem.Name} added to order.";
-            return RedirectToAction("WaiterHome", new { selectedTableID = order.TablesID });
+            TempData["ToastMessage"] = $"➕ {menuItem.Name} added.";
+            return RedirectToAction("WaiterHome", new { selectedTableID = tableID });
         }
 
         /// <summary>
-        /// POST: Remove one line item from an order.
+        /// POST: Remove a line item from an order.
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -630,11 +641,10 @@ namespace Trattoria.Controllers
             var line = _dbContext.OrderDetails.Find(orderDetailsID);
             if (line == null) return NotFound();
 
-            var orderID = line.OrderID;
+            int orderID = line.OrderID;
             _dbContext.OrderDetails.Remove(line);
             _dbContext.SaveChanges();
 
-            // Recalculate total
             var total = _dbContext.OrderDetails
                 .Where(od => od.OrderID == orderID)
                 .Join(_dbContext.MenuItems, od => od.MenuItemID, m => m.MenuItemID,
@@ -643,12 +653,32 @@ namespace Trattoria.Controllers
             var order = _dbContext.Orders.Find(orderID);
             if (order != null) { order.TotalAmount = total; _dbContext.SaveChanges(); }
 
-            TempData["ToastMessage"] = "🗑️ Item removed from order.";
+            TempData["ToastMessage"] = "🗑️ Item removed.";
             return RedirectToAction("WaiterHome", new { selectedTableID = tableID });
         }
 
         /// <summary>
-        /// POST: Update order status (Pending → In Progress → Ready → Served).
+        /// POST: Send a Food or Drinks order to its station (In Progress).
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult SendToStation(int orderID, int tableID)
+        {
+            var order = _dbContext.Orders.Find(orderID);
+            if (order == null) return NotFound();
+
+            order.Status = "In Progress";
+            _dbContext.SaveChanges();
+
+            bool isDrinks = order.PaymentMethod?.StartsWith("__DRINKS") == true;
+            TempData["ToastMessage"] = isDrinks
+                ? $"🍹 Drinks order sent to bar (Table {tableID})."
+                : $"🔥 Food order sent to kitchen (Table {tableID}).";
+            return RedirectToAction("WaiterHome", new { selectedTableID = tableID });
+        }
+
+        /// <summary>
+        /// POST: Update order status — used by waiter to mark Served after station marks Ready.
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -660,31 +690,29 @@ namespace Trattoria.Controllers
             order.Status = newStatus;
             _dbContext.SaveChanges();
 
-            var emoji = newStatus switch
-            {
-                "In Progress" => "🔥",
-                "Ready" => "🔔",
-                "Served" => "✅",
-                _ => "📋"
-            };
-            TempData["ToastMessage"] = $"{emoji} Order marked as {newStatus} for Table {tableID}.";
+            TempData["ToastMessage"] = $"✅ Order #{orderID} marked as {newStatus}.";
             return RedirectToAction("WaiterHome", new { selectedTableID = tableID });
         }
 
         /// <summary>
-        /// POST: Close an order — mark paid, free the table.
+        /// POST: Close & Pay — marks both food and drinks orders as paid, frees the table.
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult CloseOrder(int orderID, int tableID, string paymentMethod, decimal tipAmount = 0)
+        public IActionResult CloseOrder(int tableID, string paymentMethod, decimal tipAmount = 0)
         {
-            var order = _dbContext.Orders.Find(orderID);
-            if (order == null) return NotFound();
+            var openOrders = _dbContext.Orders
+                .Where(o => o.TablesID == tableID && !o.IsPaid && o.Status != "Closed")
+                .ToList();
 
-            order.IsPaid = true;
-            order.Status = "Closed";
-            order.PaymentMethod = paymentMethod;
-            order.TipAmount = tipAmount;
+            foreach (var o in openOrders)
+            {
+                o.IsPaid = true;
+                o.Status = "Closed";
+                // preserve __FOOD/__DRINKS tag? No — overwrite with real payment method
+                o.PaymentMethod = paymentMethod;
+                o.TipAmount = tipAmount;
+            }
 
             var table = _dbContext.Tables.Find(tableID);
             if (table != null) table.IsAvailable = true;
@@ -696,39 +724,24 @@ namespace Trattoria.Controllers
         }
 
         /// <summary>
-        /// POST: Clear a table without payment (e.g. reservation cancelled, no-show).
+        /// POST: Clear a table — voids all open orders, frees the table.
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult ClearTable(int tableID)
         {
-            var table = _dbContext.Tables.Find(tableID);
-            if (table != null) table.IsAvailable = true;
-
-            // If there's a "Seated" reservation, revert it to "Confirmed" or cancel it
-            var seatedReservation = _dbContext.Reservations
-                .FirstOrDefault(r => r.TablesID == tableID && r.Status == "Seated");
-            if (seatedReservation != null)
-            {
-                seatedReservation.Status = "Confirmed"; // Or "Cancelled" - depending on your flow
-            }
-
-            // Cancel any pending orders on this table
             var openOrders = _dbContext.Orders
                 .Where(o => o.TablesID == tableID && !o.IsPaid && o.Status != "Closed")
                 .ToList();
-            foreach (var o in openOrders)
-            {
-                o.Status = "Closed";
-                o.IsPaid = false; // not paid — just voided
-            }
+            foreach (var o in openOrders) o.Status = "Closed";
+
+            var table = _dbContext.Tables.Find(tableID);
+            if (table != null) table.IsAvailable = true;
 
             _dbContext.SaveChanges();
-
             TempData["ToastMessage"] = $"🧹 Table {tableID} cleared.";
             return RedirectToAction("WaiterHome");
         }
-
         // ── Receptionist ─────────────────────────────────────────────────────────
 
         /// <summary>

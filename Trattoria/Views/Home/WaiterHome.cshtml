@@ -2,9 +2,9 @@
 @{
     ViewData["Title"] = "Waiter Dashboard · Trattoria Bella";
     Layout = null;
-    var selected = Model.SelectedTable;
-    var order = selected?.ActiveOrder;
-    var menuGroups = Model.MenuItems.GroupBy(m => m.Type).OrderBy(g => g.Key).ToList();
+    var selected     = Model.SelectedTable;
+    var foodOrder    = selected?.FoodOrder;
+    var drinksOrder  = selected?.DrinksOrder;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -14,1106 +14,618 @@
     <title>@ViewData["Title"]</title>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --cream: #F5F0E8;
-            --warm-white: #FAF7F2;
-            --gold: #B8860B;
-            --gold-light: #D4A820;
-            --brown: #3D2B1F;
-            --brown-mid: #6B4226;
-            --red: #8B1A1A;
-            --text: #2A1F17;
-            --text-muted: #7A6558;
-            --shadow: 0 8px 24px rgba(0,0,0,0.08);
-            --radius: 12px;
+            --cream: #F5F0E8; --warm-white: #FAF7F2; --gold: #B8860B;
+            --gold-light: #D4A820; --brown: #3D2B1F; --brown-mid: #6B4226;
+            --red: #8B1A1A; --text: #2A1F17; --text-muted: #7A6558;
+            --shadow: 0 8px 24px rgba(0,0,0,0.08); --radius: 12px;
         }
-
-        body {
-            font-family: 'Jost', sans-serif;
-            background: #f2ede6;
-            color: var(--text);
-            padding: 2rem;
-            min-height: 100vh;
-        }
-
-        .waiter-dashboard {
-            max-width: 1440px;
-            margin: 0 auto;
-        }
+        body { font-family: 'Jost', sans-serif; background: #f2ede6; color: var(--text); padding: 2rem; min-height: 100vh; }
+        .waiter-dashboard { max-width: 1440px; margin: 0 auto; }
 
         /* Header */
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .brand {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 2rem;
-            font-weight: 600;
-            color: var(--brown);
-        }
-
-            .brand span {
-                color: var(--gold);
-            }
-
-        .waiter-badge {
-            background: var(--brown);
-            color: var(--cream);
-            padding: 0.4rem 1.2rem;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            font-weight: 400;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 0.8rem;
-            align-items: center;
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            padding: 0.5rem 1.4rem;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: 0.2s;
-            font-family: 'Jost', sans-serif;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-            .btn-outline:hover {
-                background: var(--gold);
-                color: white;
-            }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        .header-left { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+        .brand { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 600; color: var(--brown); }
+        .brand span { color: var(--gold); }
+        .waiter-badge { background: var(--brown); color: var(--cream); padding: 0.4rem 1.2rem; border-radius: 40px; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 400; }
+        .btn-outline { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 0.5rem 1.4rem; border-radius: 40px; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: 0.2s; font-family: 'Jost', sans-serif; text-decoration: none; display: inline-block; }
+        .btn-outline:hover { background: var(--gold); color: white; }
 
         /* Stats */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 1.2rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .stat-card {
-            background: var(--warm-white);
-            padding: 1.2rem 1.5rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border-left: 4px solid var(--gold);
-        }
-
-            .stat-card .label {
-                font-size: 0.65rem;
-                letter-spacing: 0.12em;
-                text-transform: uppercase;
-                color: var(--text-muted);
-                font-weight: 400;
-            }
-
-            .stat-card .value {
-                font-family: 'Cormorant Garamond', serif;
-                font-size: 2rem;
-                font-weight: 400;
-                color: var(--brown);
-                line-height: 1.2;
-            }
+        .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.2rem; margin-bottom: 2.5rem; }
+        .stat-card { background: var(--warm-white); padding: 1.2rem 1.5rem; border-radius: var(--radius); box-shadow: var(--shadow); border-left: 4px solid var(--gold); }
+        .stat-card .label { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); font-weight: 400; }
+        .stat-card .value { font-family: 'Cormorant Garamond', serif; font-size: 2rem; font-weight: 400; color: var(--brown); line-height: 1.2; }
 
         /* Main grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 2.2fr 1.2fr;
-            gap: 2rem;
-            align-items: start;
-        }
-
-        @@media (max-width: 960px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-        }
+        .dashboard-grid { display: grid; grid-template-columns: 2.2fr 1.2fr; gap: 2rem; align-items: start; }
+        @@media (max-width: 960px) { .dashboard-grid { grid-template-columns: 1fr; } }
 
         /* Tables section */
-        .tables-section {
-            background: var(--warm-white);
-            padding: 1.8rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-            .section-header h3 {
-                font-family: 'Cormorant Garamond', serif;
-                font-size: 1.6rem;
-                font-weight: 400;
-                color: var(--brown);
-            }
-
-            .section-header .sub {
-                font-size: 0.7rem;
-                color: var(--text-muted);
-                letter-spacing: 0.05em;
-            }
+        .tables-section { background: var(--warm-white); padding: 1.8rem; border-radius: var(--radius); box-shadow: var(--shadow); }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.5rem; }
+        .section-header h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.6rem; font-weight: 400; color: var(--brown); }
+        .section-header .sub { font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.05em; }
 
         /* Table cards */
-        .table-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 1rem;
-        }
+        .table-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; }
+        .table-card { background: white; border-radius: var(--radius); padding: 1rem 0.8rem; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 2px solid rgba(184,134,11,0.15); text-align: center; cursor: pointer; transition: 0.2s; position: relative; text-decoration: none; display: block; color: inherit; }
+        .table-card:hover { transform: translateY(-3px); box-shadow: 0 8px 16px rgba(0,0,0,0.06); border-color: var(--gold-light); }
+        .table-card.selected { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(184,134,11,0.2); }
+        .table-card .table-nr { font-weight: 600; font-size: 1rem; color: var(--brown); letter-spacing: 0.04em; }
+        .table-card .table-type { font-size: 0.6rem; color: var(--text-muted); margin-top: 0.1rem; }
+        .table-status-badge { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.2rem 0.6rem; border-radius: 40px; display: inline-block; margin-top: 0.35rem; }
+        .table-status-badge.available { background: #dce8d8; color: #2a5a2a; }
+        .table-status-badge.occupied  { background: #f0e0c8; color: var(--brown-mid); }
+        .table-status-badge.reserved  { background: #d8e0f0; color: #2a4a7a; }
+        .table-card .guest-count { font-size: 0.65rem; color: var(--text-muted); margin-top: 0.2rem; }
+        .order-badge { position: absolute; top: -6px; right: -6px; background: var(--red); color: white; font-size: 0.6rem; border-radius: 30px; padding: 0.1rem 0.55rem; font-weight: 500; }
 
-        .table-card {
-            background: white;
-            border-radius: var(--radius);
-            padding: 1rem 0.8rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            border: 2px solid rgba(184,134,11,0.15);
-            text-align: center;
-            cursor: pointer;
-            transition: 0.2s;
-            position: relative;
-            text-decoration: none;
-            display: block;
-            color: inherit;
-        }
+        /* ── ORDER PANEL ── */
+        .order-panel { background: var(--warm-white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.8rem; position: sticky; top: 2rem; }
+        .order-panel-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid rgba(184,134,11,0.2); padding-bottom: 0.7rem; margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.4rem; }
+        .order-panel-header h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 400; color: var(--brown); }
+        .order-panel-header .table-sub { font-size: 0.7rem; color: var(--text-muted); font-weight: 300; }
 
-            .table-card:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 8px 16px rgba(0,0,0,0.06);
-                border-color: var(--gold-light);
-            }
+        /* ── SPLIT: food + drinks sections inside panel ── */
+        .order-split { display: flex; flex-direction: column; gap: 1.2rem; }
 
-            .table-card.selected {
-                border-color: var(--gold);
-                box-shadow: 0 0 0 3px rgba(184,134,11,0.2);
-            }
-
-            .table-card .table-nr {
-                font-weight: 600;
-                font-size: 1rem;
-                color: var(--brown);
-                letter-spacing: 0.04em;
-            }
-
-            .table-card .table-type {
-                font-size: 0.6rem;
-                color: var(--text-muted);
-                margin-top: 0.1rem;
-            }
-
-        .table-status-badge {
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            padding: 0.2rem 0.6rem;
-            border-radius: 40px;
-            display: inline-block;
-            margin-top: 0.35rem;
-        }
-
-            .table-status-badge.available {
-                background: #dce8d8;
-                color: #2a5a2a;
-            }
-
-            .table-status-badge.occupied {
-                background: #f0e0c8;
-                color: var(--brown-mid);
-            }
-
-            .table-status-badge.reserved {
-                background: #d8e0f0;
-                color: #2a4a7a;
-            }
-
-            .table-status-badge.seated {
-                background: #e8d8f0;
-                color: #5a2a7a;
-            }
-
-        .table-card .guest-count {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            margin-top: 0.2rem;
-        }
-
-        .order-badge {
-            position: absolute;
-            top: -6px;
-            right: -6px;
-            background: var(--red);
-            color: white;
-            font-size: 0.6rem;
-            border-radius: 30px;
-            padding: 0.1rem 0.55rem;
-            font-weight: 500;
-        }
-
-        /* Order panel */
-        .order-panel {
-            background: var(--warm-white);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 1.8rem;
-            position: sticky;
-            top: 2rem;
-        }
-
-        .order-panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            border-bottom: 1px solid rgba(184,134,11,0.2);
-            padding-bottom: 0.7rem;
-            margin-bottom: 1.2rem;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-        }
-
-            .order-panel-header h3 {
-                font-family: 'Cormorant Garamond', serif;
-                font-size: 1.4rem;
-                font-weight: 400;
-                color: var(--brown);
-            }
-
-            .order-panel-header .table-sub {
-                font-size: 0.7rem;
-                color: var(--text-muted);
-                font-weight: 300;
-            }
+        .order-section { border-radius: 10px; border: 1px solid rgba(184,134,11,0.15); overflow: hidden; }
+        .order-section-head { display: flex; justify-content: space-between; align-items: center; padding: 0.55rem 0.9rem; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
+        .order-section-head.food   { background: #fdf5e8; color: #7a5010; border-bottom: 1px solid rgba(184,134,11,0.15); }
+        .order-section-head.drinks { background: #eef0f8; color: #2a3a7a; border-bottom: 1px solid rgba(100,130,200,0.2); }
+        .order-section-body { padding: 0.6rem 0.9rem; background: white; }
 
         /* Status pill */
-        .status-pill {
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            letter-spacing: 0.07em;
-            padding: 0.2rem 0.8rem;
-            border-radius: 30px;
-            display: inline-block;
-            margin-bottom: 0.8rem;
-        }
-
-            .status-pill.pending {
-                background: #f0e8d8;
-                color: #8a6020;
-            }
-
-            .status-pill.in-progress {
-                background: #f8e0c8;
-                color: #8a4020;
-            }
-
-            .status-pill.ready {
-                background: #d8ecd8;
-                color: #2a5a2a;
-            }
-
-            .status-pill.served {
-                background: #d8e8d8;
-                color: #1e4a1e;
-            }
-
-            .status-pill.closed {
-                background: #e0e0d8;
-                color: var(--text-muted);
-            }
+        .status-pill { font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.07em; padding: 0.15rem 0.7rem; border-radius: 30px; display: inline-block; }
+        .status-pill.pending     { background: #f0e8d8; color: #8a6020; }
+        .status-pill.seated      { background: #e8d8f0; color: #5a2a7a; }
+        .status-pill.in-progress { background: #f8e0c8; color: #8a4020; }
+        .status-pill.ready       { background: #d8ecd8; color: #2a5a2a; }
+        .status-pill.served      { background: #d8e8d8; color: #1e4a1e; }
+        .status-pill.closed      { background: #e0e0d8; color: var(--text-muted); }
 
         /* Order lines */
-        .order-line {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.55rem 0;
-            border-bottom: 1px solid rgba(0,0,0,0.04);
-            font-size: 0.88rem;
-            gap: 0.5rem;
-        }
+        .order-line { display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0; border-bottom: 1px solid rgba(0,0,0,0.04); font-size: 0.85rem; gap: 0.5rem; }
+        .order-line:last-of-type { border-bottom: none; }
+        .line-left { display: flex; align-items: center; gap: 0.5rem; flex: 1; }
+        .qty { color: var(--text-muted); font-size: 0.78rem; min-width: 20px; }
+        .line-right { display: flex; align-items: center; gap: 0.4rem; }
+        .price { font-weight: 500; color: var(--brown); white-space: nowrap; font-size: 0.82rem; }
+        .btn-remove-line { background: none; border: none; cursor: pointer; color: #c8a0a0; font-size: 0.72rem; padding: 0.1rem 0.3rem; border-radius: 4px; transition: 0.15s; }
+        .btn-remove-line:hover { color: var(--red); background: #f8eded; }
 
-            .order-line .line-left {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-                flex: 1;
-            }
+        .order-subtotal { display: flex; justify-content: space-between; font-weight: 600; font-size: 0.9rem; padding: 0.6rem 0 0.1rem; border-top: 1px solid rgba(184,134,11,0.15); margin-top: 0.3rem; }
 
-            .order-line .qty {
-                color: var(--text-muted);
-                font-size: 0.8rem;
-                min-width: 22px;
-            }
+        /* Section action buttons */
+        .section-actions { display: flex; gap: 0.4rem; padding: 0.6rem 0.9rem; background: white; border-top: 1px solid rgba(0,0,0,0.04); flex-wrap: wrap; }
+        .section-actions button { padding: 0.3rem 0.9rem; border: none; border-radius: 40px; font-size: 0.62rem; letter-spacing: 0.07em; text-transform: uppercase; cursor: pointer; font-family: 'Jost', sans-serif; transition: 0.2s; }
+        .btn-add-food    { background: #c8900a; color: white; }
+        .btn-add-food:hover { background: var(--gold-light); }
+        .btn-add-drinks  { background: #3a5ab8; color: white; }
+        .btn-add-drinks:hover { background: #2a4a9a; }
+        .btn-send-kitchen { background: #d48020; color: white; }
+        .btn-send-kitchen:hover { background: #b86818; }
+        .btn-send-bar    { background: #3a5ab8; color: white; }
+        .btn-send-bar:hover { background: #2a4a9a; }
+        .btn-mark-served { background: #1e5a1e; color: white; }
+        .btn-mark-served:hover { background: #153e15; }
 
-            .order-line .item-name {
-                font-weight: 400;
-            }
+        /* Grand total + close row */
+        .grand-total { display: flex; justify-content: space-between; font-weight: 700; font-size: 1rem; padding: 0.9rem 0 0.4rem; border-top: 2px solid rgba(184,134,11,0.2); margin-top: 0.8rem; }
+        .panel-actions { display: flex; gap: 0.5rem; margin-top: 0.8rem; flex-wrap: wrap; }
+        .panel-actions button { flex: 1; min-width: 80px; padding: 0.55rem 0.6rem; border: none; border-radius: 40px; font-size: 0.65rem; letter-spacing: 0.07em; text-transform: uppercase; cursor: pointer; font-family: 'Jost', sans-serif; transition: 0.2s; }
+        .btn-close-order  { background: var(--brown); color: var(--cream); }
+        .btn-close-order:hover { background: var(--brown-mid); }
+        .btn-clear-table  { background: #e8d8d8; color: #6a3a3a; }
+        .btn-clear-table:hover { background: #dcc8c8; }
 
-            .order-line .line-right {
-                display: flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-
-            .order-line .price {
-                font-weight: 500;
-                color: var(--brown);
-                white-space: nowrap;
-            }
-
-        .btn-remove-line {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #c8a0a0;
-            font-size: 0.75rem;
-            padding: 0.1rem 0.3rem;
-            border-radius: 4px;
-            transition: 0.15s;
-        }
-
-            .btn-remove-line:hover {
-                color: var(--red);
-                background: #f8eded;
-            }
-
-        .order-total {
-            display: flex;
-            justify-content: space-between;
-            font-weight: 600;
-            font-size: 1.05rem;
-            padding: 0.9rem 0 0.4rem;
-            border-top: 2px solid rgba(184,134,11,0.2);
-            margin-top: 0.4rem;
-        }
-
-        /* Order action buttons */
-        .order-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1.2rem;
-            flex-wrap: wrap;
-        }
-
-            .order-actions button {
-                flex: 1;
-                min-width: 70px;
-                padding: 0.55rem 0.6rem;
-                border: none;
-                border-radius: 40px;
-                font-size: 0.65rem;
-                letter-spacing: 0.07em;
-                text-transform: uppercase;
-                cursor: pointer;
-                font-family: 'Jost', sans-serif;
-                transition: 0.2s;
-            }
-
-        .btn-add-items {
-            background: var(--gold);
-            color: white;
-        }
-
-            .btn-add-items:hover {
-                background: var(--gold-light);
-            }
-
-        .btn-in-progress {
-            background: #d48020;
-            color: white;
-        }
-
-            .btn-in-progress:hover {
-                background: #b86818;
-            }
-
-        .btn-served {
-            background: #1e5a1e;
-            color: white;
-        }
-
-            .btn-served:hover {
-                background: #153e15;
-            }
-
-        .btn-close-order {
-            background: var(--brown);
-            color: var(--cream);
-        }
-
-            .btn-close-order:hover {
-                background: var(--brown-mid);
-            }
-
-        .btn-clear-table {
-            background: #e8d8d8;
-            color: #6a3a3a;
-        }
-
-            .btn-clear-table:hover {
-                background: #dcc8c8;
-            }
-
-        /* Empty state */
-        .empty-state {
-            color: var(--text-muted);
-            font-weight: 300;
-            padding: 1.2rem 0;
-            text-align: center;
-            font-style: italic;
-        }
+        .empty-state { color: var(--text-muted); font-weight: 300; padding: 0.8rem 0; text-align: center; font-style: italic; font-size: 0.85rem; }
 
         /* Legend */
-        .legend {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            margin-top: 1.4rem;
-            padding-top: 1rem;
-            border-top: 1px solid rgba(184,134,11,0.1);
-        }
+        .legend { display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.7rem; color: var(--text-muted); margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid rgba(184,134,11,0.1); }
 
-        /* Modals */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(61,43,31,0.45);
-            backdrop-filter: blur(3px);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.25s ease;
-        }
+        /* ── MODALS ── */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(61,43,31,0.45); backdrop-filter: blur(3px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+        .modal-overlay.open { opacity: 1; pointer-events: all; }
+        .modal { background: var(--warm-white); border-radius: var(--radius); box-shadow: 0 20px 60px rgba(0,0,0,0.18); padding: 2rem 2.2rem; width: 100%; max-width: 520px; transform: translateY(20px); transition: transform 0.25s ease; max-height: 85vh; overflow-y: auto; }
+        .modal-overlay.open .modal { transform: translateY(0); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; }
+        .modal-header h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 400; color: var(--brown); }
+        .modal-close { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-muted); }
+        .modal-close:hover { color: var(--red); }
+        .menu-group-label { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); font-weight: 400; margin: 1rem 0 0.4rem; padding-bottom: 0.3rem; border-bottom: 1px solid rgba(184,134,11,0.15); }
+        .menu-item-row { display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0.5rem; border-radius: 8px; transition: 0.15s; gap: 0.5rem; }
+        .menu-item-row:hover { background: var(--cream); }
+        .mi-name { font-size: 0.85rem; flex: 1; }
+        .mi-price { font-size: 0.78rem; color: var(--brown); font-weight: 500; white-space: nowrap; }
+        .mi-qty { display: flex; align-items: center; gap: 0.35rem; }
+        .qty-btn { background: var(--cream); border: 1px solid rgba(184,134,11,0.25); border-radius: 50%; width: 20px; height: 20px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.15s; }
+        .qty-btn:hover { background: var(--gold); color: white; border-color: var(--gold); }
+        .qty-display { font-size: 0.78rem; min-width: 16px; text-align: center; font-weight: 500; }
+        .btn-add-line { background: var(--gold); color: white; border: none; border-radius: 30px; padding: 0.2rem 0.7rem; font-size: 0.58rem; text-transform: uppercase; cursor: pointer; font-family: 'Jost', sans-serif; transition: 0.15s; }
+        .btn-add-line.drinks { background: #3a5ab8; }
+        .btn-add-line:hover { opacity: 0.85; }
+        .modal-footer { display: flex; justify-content: flex-end; margin-top: 1.2rem; }
+        .btn-modal-cancel { background: var(--cream); border: none; color: var(--text-muted); padding: 0.6rem 1.4rem; border-radius: 40px; font-family: 'Jost', sans-serif; font-size: 0.7rem; text-transform: uppercase; cursor: pointer; }
 
-            .modal-overlay.open {
-                opacity: 1;
-                pointer-events: all;
-            }
-
-        .modal {
-            background: var(--warm-white);
-            border-radius: var(--radius);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
-            padding: 2rem 2.2rem;
-            width: 100%;
-            max-width: 540px;
-            transform: translateY(20px);
-            transition: transform 0.25s ease;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-
-        .modal-overlay.open .modal {
-            transform: translateY(0);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.4rem;
-        }
-
-            .modal-header h3 {
-                font-family: 'Cormorant Garamond', serif;
-                font-size: 1.4rem;
-                font-weight: 400;
-                color: var(--brown);
-            }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: var(--text-muted);
-        }
-
-            .modal-close:hover {
-                color: var(--red);
-            }
-
-        /* Menu items in modal */
-        .menu-group-label {
-            font-size: 0.65rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            font-weight: 400;
-            margin: 1rem 0 0.5rem;
-            padding-bottom: 0.3rem;
-            border-bottom: 1px solid rgba(184,134,11,0.15);
-        }
-
-        .menu-item-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0.6rem;
-            border-radius: 8px;
-            transition: 0.15s;
-            gap: 0.5rem;
-        }
-
-            .menu-item-row:hover {
-                background: var(--cream);
-            }
-
-            .menu-item-row .mi-name {
-                font-size: 0.88rem;
-                flex: 1;
-            }
-
-            .menu-item-row .mi-price {
-                font-size: 0.8rem;
-                color: var(--brown);
-                font-weight: 500;
-                white-space: nowrap;
-            }
-
-        .mi-qty {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-        }
-
-        .qty-btn {
-            background: var(--cream);
-            border: 1px solid rgba(184,134,11,0.25);
-            border-radius: 50%;
-            width: 22px;
-            height: 22px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.15s;
-        }
-
-            .qty-btn:hover {
-                background: var(--gold);
-                color: white;
-                border-color: var(--gold);
-            }
-
-        .qty-display {
-            font-size: 0.8rem;
-            min-width: 18px;
-            text-align: center;
-            font-weight: 500;
-        }
-
-        .btn-add-line {
-            background: var(--gold);
-            color: white;
-            border: none;
-            border-radius: 30px;
-            padding: 0.25rem 0.8rem;
-            font-size: 0.6rem;
-            text-transform: uppercase;
-            letter-spacing: 0.07em;
-            cursor: pointer;
-            font-family: 'Jost', sans-serif;
-            transition: 0.15s;
-        }
-
-            .btn-add-line:hover {
-                background: var(--gold-light);
-            }
-
-        /* Close order modal form */
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.3rem;
-            margin-bottom: 1rem;
-        }
-
-            .form-group label {
-                font-size: 0.65rem;
-                letter-spacing: 0.1em;
-                text-transform: uppercase;
-                color: var(--text-muted);
-            }
-
-            .form-group select, .form-group input {
-                border: 1px solid rgba(184,134,11,0.25);
-                border-radius: 8px;
-                padding: 0.55rem 0.8rem;
-                font-family: 'Jost', sans-serif;
-                font-size: 0.85rem;
-                color: var(--text);
-                background: white;
-                outline: none;
-                width: 100%;
-            }
-
-                .form-group select:focus, .form-group input:focus {
-                    border-color: var(--gold);
-                }
-
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.7rem;
-            margin-top: 1.4rem;
-        }
-
-        .btn-modal-cancel {
-            background: var(--cream);
-            border: none;
-            color: var(--text-muted);
-            padding: 0.6rem 1.4rem;
-            border-radius: 40px;
-            font-family: 'Jost', sans-serif;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            cursor: pointer;
-        }
-
-        .btn-modal-submit {
-            background: var(--red);
-            border: none;
-            color: white;
-            padding: 0.6rem 1.8rem;
-            border-radius: 40px;
-            font-family: 'Jost', sans-serif;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            cursor: pointer;
-        }
-
-            .btn-modal-submit:hover {
-                background: var(--brown);
-            }
+        /* Pay modal */
+        .form-group { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 1rem; }
+        .form-group label { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); }
+        .form-group select, .form-group input { border: 1px solid rgba(184,134,11,0.25); border-radius: 8px; padding: 0.55rem 0.8rem; font-family: 'Jost', sans-serif; font-size: 0.85rem; color: var(--text); background: white; outline: none; width: 100%; }
+        .form-group select:focus, .form-group input:focus { border-color: var(--gold); }
+        .pay-footer { display: flex; justify-content: flex-end; gap: 0.7rem; margin-top: 1.2rem; }
+        .btn-pay-submit { background: var(--red); border: none; color: white; padding: 0.6rem 1.8rem; border-radius: 40px; font-family: 'Jost', sans-serif; font-size: 0.7rem; text-transform: uppercase; cursor: pointer; }
+        .btn-pay-submit:hover { background: var(--brown); }
 
         /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: var(--brown);
-            color: var(--cream);
-            padding: 0.8rem 1.6rem;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-            transform: translateX(130%);
-            transition: transform 0.35s ease;
-            z-index: 1100;
-        }
-
-            .toast.show {
-                transform: translateX(0);
-            }
+        .toast { position: fixed; bottom: 2rem; right: 2rem; background: var(--brown); color: var(--cream); padding: 0.8rem 1.6rem; border-radius: 40px; font-size: 0.85rem; box-shadow: 0 6px 20px rgba(0,0,0,0.15); transform: translateX(130%); transition: transform 0.35s ease; z-index: 1100; }
+        .toast.show { transform: translateX(0); }
     </style>
 </head>
 <body>
 
-    <div class="waiter-dashboard">
+<div class="waiter-dashboard">
 
-        <!-- HEADER -->
-        <header class="dashboard-header">
-            <div class="header-left">
-                <div class="brand">Trattoria <span>Bella</span></div>
-                <span class="waiter-badge">👨‍🍳 Waiter · @Model.WaiterName</span>
-            </div>
-            <div class="header-actions">
-                <a asp-action="WaiterHome" class="btn-outline">🔄 Refresh</a>
-            </div>
-        </header>
-
-        <!-- STATS -->
-        <div class="stats-row">
-            <div class="stat-card">
-                <div class="label">Total Tables</div>
-                <div class="value">@Model.TotalTables</div>
-            </div>
-            <div class="stat-card">
-                <div class="label">Occupied</div>
-                <div class="value">@Model.OccupiedCount</div>
-            </div>
-            <div class="stat-card">
-                <div class="label">Reserved</div>
-                <div class="value">@Model.ReservedCount</div>
-            </div>
-            <div class="stat-card">
-                <div class="label">Available</div>
-                <div class="value">@Model.AvailableCount</div>
-            </div>
+    <!-- HEADER -->
+    <header class="dashboard-header">
+        <div class="header-left">
+            <div class="brand">Trattoria <span>Bella</span></div>
+            <span class="waiter-badge">👨‍🍳 Waiter · @Model.WaiterName</span>
         </div>
+        <div class="header-actions">
+            <a asp-action="WaiterHome" class="btn-outline">🔄 Refresh</a>
+        </div>
+    </header>
 
-        <!-- MAIN GRID -->
-        <div class="dashboard-grid">
+    <!-- STATS -->
+    <div class="stats-row">
+        <div class="stat-card"><div class="label">Total Tables</div><div class="value">@Model.TotalTables</div></div>
+        <div class="stat-card"><div class="label">Occupied</div><div class="value">@Model.OccupiedCount</div></div>
+        <div class="stat-card"><div class="label">Reserved</div><div class="value">@Model.ReservedCount</div></div>
+        <div class="stat-card"><div class="label">Available</div><div class="value">@Model.AvailableCount</div></div>
+    </div>
 
-            <!-- LEFT: Table Grid -->
-            <section class="tables-section">
-                <div class="section-header">
-                    <h3>🍽️ Dining Room</h3>
-                    <span class="sub">tap a table to view / manage order</span>
-                </div>
+    <!-- MAIN GRID -->
+    <div class="dashboard-grid">
 
-                <div class="table-grid">
-                    @foreach (var t in Model.Tables)
-                    {
-                        var isSelected = Model.SelectedTableID == t.TableID;
-                        var statusLabel = t.Status switch
-                        {
-                            "available" => "🟢 Available",
-                            "occupied" => "🟠 Occupied",
-                            "reserved" => "🔵 Reserved",
-                            "seated" => "🟣 Seated",
-                            _ => "⚪ " + t.Status
-                        };
-                        <a asp-action="WaiterHome" asp-route-selectedTableID="@t.TableID"
-                           class="table-card @(isSelected ? "selected" : "")">
-                            <div class="table-nr">Table @t.TableID</div>
-                            <div class="table-type">@t.TableType</div>
-                            <span class="table-status-badge @t.Status">@statusLabel</span>
-                            <div class="guest-count">Cap. @t.Capacity</div>
-                            @if (t.HasOrder)
-                            {
-                                <div class="order-badge">@t.TotalItems</div>
-                            }
-                        </a>
-                    }
-                </div>
-
-                <div class="legend">
-                    <span>🟢 Available</span>
-                    <span>🟠 Occupied</span>
-                    <span>🔵 Reserved</span>
-                    <span>🟣 Seated</span>
-                </div>
-            </section>
-
-            <!-- RIGHT: Order Panel -->
-            <aside class="order-panel">
-                @if (selected == null)
+        <!-- LEFT: Table Grid -->
+        <section class="tables-section">
+            <div class="section-header">
+                <h3>🍽️ Dining Room</h3>
+                <span class="sub">tap a table to manage food &amp; drinks</span>
+            </div>
+            <div class="table-grid">
+                @foreach (var t in Model.Tables)
                 {
-                    <div class="order-panel-header">
-                        <h3>📋 Order</h3>
-                        <span class="table-sub">— select a table</span>
-                    </div>
-                    <div class="empty-state">Tap a table to see its order.</div>
-                }
-                else
-                {
-                    <div class="order-panel-header">
-                        <h3>📋 Table @selected.TableID</h3>
-                        <span class="table-sub">@selected.TableType · Cap. @selected.Capacity</span>
-                    </div>
-
-                    @* ── AVAILABLE ── *@
-                    @if (selected.Status == "available")
-                    {
-                        <div class="empty-state">🍽️ Table is available.</div>
-                        <div class="order-actions" style="margin-top:1rem;">
-                            <form method="post" asp-action="StartOrder" style="flex:1;">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="tableID" value="@selected.TableID" />
-                                <button type="submit" class="btn-add-items" style="width:100%;">➕ Start Order</button>
-                            </form>
-                        </div>
-                    }
-
-                    @* ── RESERVED, NO ORDER YET ── *@
-                    else if (selected.Status == "reserved" && order == null)
-                    {
-                        <div class="empty-state">🔵 Reserved — order on arrival.</div>
-                        <div class="order-actions" style="margin-top:1rem;">
-                            <form method="post" asp-action="StartOrder" style="flex:1;">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="tableID" value="@selected.TableID" />
-                                <button type="submit" class="btn-add-items" style="width:100%;">🪑 Seat &amp; Start Order</button>
-                            </form>
-                            <form method="post" asp-action="ClearTable">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="tableID" value="@selected.TableID" />
-                                <button type="submit" class="btn-clear-table">❌ Cancel</button>
-                            </form>
-                        </div>
-                    }
-
-                    @* ── OCCUPIED WITH ACTIVE ORDER ── *@
-                    else if (order != null)
-                    {
-                        <span class="status-pill @order.StatusCssClass">@order.StatusLabel</span>
-
-                        @if (!order.Lines.Any())
+                    var isSelected  = Model.SelectedTableID == t.TableID;
+                    var statusLabel = t.Status switch {
+                        "available" => "🟢 Available",
+                        "occupied"  => "🟠 Occupied",
+                        _           => "🔵 Reserved"
+                    };
+                    <a asp-action="WaiterHome" asp-route-selectedTableID="@t.TableID"
+                       class="table-card @(isSelected ? "selected" : "")">
+                        <div class="table-nr">Table @t.TableID</div>
+                        <div class="table-type">@t.TableType</div>
+                        <span class="table-status-badge @t.Status">@statusLabel</span>
+                        <div class="guest-count">Cap. @t.Capacity</div>
+                        @if (t.HasAnyOrder)
                         {
-                            <div class="empty-state">No items yet — add from menu.</div>
+                            <div class="order-badge">@t.TotalItems</div>
                         }
-                        else
+                    </a>
+                }
+            </div>
+            <div class="legend">
+                <span>🟢 Available</span>
+                <span>🟠 Occupied</span>
+                <span>🔵 Reserved</span>
+            </div>
+        </section>
+
+        <!-- RIGHT: Order Panel -->
+        <aside class="order-panel">
+            @if (selected == null)
+            {
+                <div class="order-panel-header">
+                    <h3>📋 Order</h3>
+                    <span class="table-sub">— select a table</span>
+                </div>
+                <div class="empty-state">Tap a table to see its order.</div>
+            }
+            else
+            {
+                <div class="order-panel-header">
+                    <h3>📋 Table @selected.TableID</h3>
+                    <span class="table-sub">@selected.TableType · Cap. @selected.Capacity</span>
+                </div>
+
+                @* ── AVAILABLE ── *@
+                @if (selected.Status == "available")
+                {
+                    <div class="empty-state">🍽️ Table is available.</div>
+                    <div class="panel-actions" style="margin-top:1rem;">
+                        <form method="post" asp-action="StartOrder" style="flex:1;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="tableID" value="@selected.TableID" />
+                            <button type="submit" class="btn-add-food" style="width:100%;padding:0.6rem;">➕ Start Food &amp; Drinks Order</button>
+                        </form>
+                    </div>
+                }
+
+                @* ── RESERVED, NO ORDER ── *@
+                else if (selected.Status == "reserved" && foodOrder == null && drinksOrder == null)
+                {
+                    <div class="empty-state">🔵 Reserved — seat and start order on arrival.</div>
+                    <div class="panel-actions" style="margin-top:1rem;">
+                        <form method="post" asp-action="StartOrder" style="flex:1;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="tableID" value="@selected.TableID" />
+                            <button type="submit" class="btn-add-food" style="width:100%;padding:0.6rem;">🪑 Seat &amp; Start Order</button>
+                        </form>
+                        <form method="post" asp-action="ClearTable">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="tableID" value="@selected.TableID" />
+                            <button type="submit" class="btn-clear-table">❌ Cancel</button>
+                        </form>
+                    </div>
+                }
+
+                @* ── ACTIVE ORDERS ── *@
+                else if (foodOrder != null || drinksOrder != null)
+                {
+                    <div class="order-split">
+
+                        @* ── FOOD SECTION ── *@
+                        @if (foodOrder != null)
                         {
-                            foreach (var line in order.Lines)
-                            {
-                                <div class="order-line">
-                                    <div class="line-left">
-                                        <span class="qty">@line.Quantity×</span>
-                                        <span class="item-name">@line.ItemName</span>
-                                    </div>
-                                    <div class="line-right">
-                                        <span class="price">R @line.Subtotal.ToString("N2")</span>
-                                        @if (order.CanAddItems)
-                                        {
-                                            <form method="post" asp-action="RemoveOrderItem" style="display:inline;">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="orderDetailsID" value="@line.OrderDetailsID" />
-                                                <input type="hidden" name="tableID" value="@selected.TableID" />
-                                                <button type="submit" class="btn-remove-line" title="Remove">✕</button>
-                                            </form>
-                                        }
-                                    </div>
+                            <div class="order-section">
+                                <div class="order-section-head food">
+                                    <span>🍽️ Food</span>
+                                    <span class="status-pill @foodOrder.StatusCssClass">@foodOrder.StatusLabel</span>
                                 </div>
-                            }
-                            <div class="order-total">
-                                <span>Total</span>
-                                <span>R @order.ComputedTotal.ToString("N2")</span>
+                                <div class="order-section-body">
+                                    @if (!foodOrder.Lines.Any())
+                                    {
+                                        <div class="empty-state">No food items yet.</div>
+                                    }
+                                    else
+                                    {
+                                        foreach (var line in foodOrder.Lines)
+                                        {
+                                            <div class="order-line">
+                                                <div class="line-left">
+                                                    <span class="qty">@line.Quantity×</span>
+                                                    <span>@line.ItemName</span>
+                                                </div>
+                                                <div class="line-right">
+                                                    <span class="price">R @line.Subtotal.ToString("N2")</span>
+                                                    @if (foodOrder.CanAddItems)
+                                                    {
+                                                        <form method="post" asp-action="RemoveOrderItem" style="display:inline;">
+                                                            @Html.AntiForgeryToken()
+                                                            <input type="hidden" name="orderDetailsID" value="@line.OrderDetailsID" />
+                                                            <input type="hidden" name="tableID" value="@selected.TableID" />
+                                                            <button type="submit" class="btn-remove-line">✕</button>
+                                                        </form>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                        <div class="order-subtotal">
+                                            <span>Food subtotal</span>
+                                            <span>R @foodOrder.ComputedTotal.ToString("N2")</span>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="section-actions">
+                                    @if (foodOrder.CanAddItems)
+                                    {
+                                        <button type="button" class="btn-add-food"
+                                                onclick="openModal('addFoodModal', @foodOrder.OrderID)">➕ Add Food</button>
+                                    }
+                                    @if (foodOrder.CanSendToStation)
+                                    {
+                                        <form method="post" asp-action="SendToStation">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="orderID" value="@foodOrder.OrderID" />
+                                            <input type="hidden" name="tableID" value="@selected.TableID" />
+                                            <button type="submit" class="btn-send-kitchen">🔥 Send to Kitchen</button>
+                                        </form>
+                                    }
+                                    @if (foodOrder.CanMarkServed)
+                                    {
+                                        <form method="post" asp-action="UpdateOrderStatus">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="orderID" value="@foodOrder.OrderID" />
+                                            <input type="hidden" name="newStatus" value="Served" />
+                                            <input type="hidden" name="tableID" value="@selected.TableID" />
+                                            <button type="submit" class="btn-mark-served">✅ Food Served</button>
+                                        </form>
+                                    }
+                                </div>
                             </div>
                         }
 
-                        <div class="order-actions">
-                            @if (order.CanAddItems)
-                            {
-                                <button type="button" class="btn-add-items"
-                                        onclick="openAddItems(@order.OrderID, @selected.TableID)">
-                                    ➕ Add Items
-                                </button>
-                            }
-                            @if (order.CanMarkReady)
-                            {
-                                <form method="post" asp-action="UpdateOrderStatus">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="orderID" value="@order.OrderID" />
-                                    <input type="hidden" name="newStatus" value="In Progress" />
-                                    <input type="hidden" name="tableID" value="@selected.TableID" />
-                                    <button type="submit" class="btn-in-progress">🔥 In Progress</button>
-                                </form>
-                            }
-                            @if (order.CanServe)
-                            {
-                                <form method="post" asp-action="UpdateOrderStatus">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="orderID" value="@order.OrderID" />
-                                    <input type="hidden" name="newStatus" value="Served" />
-                                    <input type="hidden" name="tableID" value="@selected.TableID" />
-                                    <button type="submit" class="btn-served">✅ Mark Served</button>
-                                </form>
-                            }
-                            @if (order.CanClose)
-                            {
-                                <button type="button" class="btn-close-order"
-                                        onclick="openCloseOrder(@order.OrderID, @selected.TableID, @order.ComputedTotal)">
-                                    💳 Close &amp; Pay
-                                </button>
-                            }
-                            <form method="post" asp-action="ClearTable"
-                                  onsubmit="return confirm('Clear Table @selected.TableID? This will void the current order.');">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="tableID" value="@selected.TableID" />
-                                <button type="submit" class="btn-clear-table">🧹 Clear</button>
-                            </form>
+                        @* ── DRINKS SECTION ── *@
+                        @if (drinksOrder != null)
+                        {
+                            <div class="order-section">
+                                <div class="order-section-head drinks">
+                                    <span>🍹 Drinks</span>
+                                    <span class="status-pill @drinksOrder.StatusCssClass">@drinksOrder.StatusLabel</span>
+                                </div>
+                                <div class="order-section-body">
+                                    @if (!drinksOrder.Lines.Any())
+                                    {
+                                        <div class="empty-state">No drinks yet.</div>
+                                    }
+                                    else
+                                    {
+                                        foreach (var line in drinksOrder.Lines)
+                                        {
+                                            <div class="order-line">
+                                                <div class="line-left">
+                                                    <span class="qty">@line.Quantity×</span>
+                                                    <span>@line.ItemName</span>
+                                                </div>
+                                                <div class="line-right">
+                                                    <span class="price">R @line.Subtotal.ToString("N2")</span>
+                                                    @if (drinksOrder.CanAddItems)
+                                                    {
+                                                        <form method="post" asp-action="RemoveOrderItem" style="display:inline;">
+                                                            @Html.AntiForgeryToken()
+                                                            <input type="hidden" name="orderDetailsID" value="@line.OrderDetailsID" />
+                                                            <input type="hidden" name="tableID" value="@selected.TableID" />
+                                                            <button type="submit" class="btn-remove-line">✕</button>
+                                                        </form>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                        <div class="order-subtotal">
+                                            <span>Drinks subtotal</span>
+                                            <span>R @drinksOrder.ComputedTotal.ToString("N2")</span>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="section-actions">
+                                    @if (drinksOrder.CanAddItems)
+                                    {
+                                        <button type="button" class="btn-add-drinks"
+                                                onclick="openModal('addDrinksModal', @drinksOrder.OrderID)">➕ Add Drinks</button>
+                                    }
+                                    @if (drinksOrder.CanSendToStation)
+                                    {
+                                        <form method="post" asp-action="SendToStation">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="orderID" value="@drinksOrder.OrderID" />
+                                            <input type="hidden" name="tableID" value="@selected.TableID" />
+                                            <button type="submit" class="btn-send-bar">🍹 Send to Bar</button>
+                                        </form>
+                                    }
+                                    @if (drinksOrder.CanMarkServed)
+                                    {
+                                        <form method="post" asp-action="UpdateOrderStatus">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="orderID" value="@drinksOrder.OrderID" />
+                                            <input type="hidden" name="newStatus" value="Served" />
+                                            <input type="hidden" name="tableID" value="@selected.TableID" />
+                                            <button type="submit" class="btn-mark-served">✅ Drinks Served</button>
+                                        </form>
+                                    }
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+
+                        <div class="grand-total">
+                            <span>Grand Total</span>
+                            <span>R @((foodOrder?.ComputedTotal ?? 0) + (drinksOrder?.ComputedTotal ?? 0))</span>
                         </div>
-                    }
-
-                    @* ── OCCUPIED, NO ORDER STARTED ── *@
-                    else
-                    {
-                        <div class="empty-state">Table occupied — no order started.</div>
-                        <div class="order-actions" style="margin-top:1rem;">
-                            <form method="post" asp-action="StartOrder" style="flex:1;">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="tableID" value="@selected.TableID" />
-                                <button type="submit" class="btn-add-items" style="width:100%;">➕ Start Order</button>
-                            </form>
-                            <form method="post" asp-action="ClearTable">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="tableID" value="@selected.TableID" />
-                                <button type="submit" class="btn-clear-table">🧹 Clear</button>
-                            </form>
-                        </div>
-                    }
-                }
-            </aside>
-
-        </div>
-    </div>
-
-    <!-- ADD ITEMS MODAL -->
-    <div class="modal-overlay" id="addItemsModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>➕ Add Items</h3>
-                <button type="button" class="modal-close" onclick="closeModal('addItemsModal')">✕</button>
-            </div>
-
-            @foreach (var group in menuGroups)
-            {
-                <div class="menu-group-label">@group.Key</div>
-                foreach (var item in group)
-                {
-                    <div class="menu-item-row">
-                        <span class="mi-name">@item.Name</span>
-                        <span class="mi-price">R @item.Price.ToString("N2")</span>
-                        <form method="post" asp-action="AddOrderItem" class="mi-qty">
+                    <div class="panel-actions">
+                        @if (selected.CanClose)
+                        {
+                            <button type="button" class="btn-close-order"
+                                    onclick="openPayModal(@selected.TableID, @((foodOrder?.ComputedTotal ?? 0) + (drinksOrder?.ComputedTotal ?? 0)))">
+                                💳 Close &amp; Pay
+                            </button>
+                        }
+                        <form method="post" asp-action="ClearTable"
+                              onsubmit="return confirm('Clear Table @selected.TableID? All orders will be voided.');">
                             @Html.AntiForgeryToken()
-                            <input type="hidden" name="orderID" id="addOrderID_@item.MenuItemID" value="" />
-                            <input type="hidden" name="menuItemID" value="@item.MenuItemID" />
-                            <input type="hidden" name="quantity" id="addQty_@item.MenuItemID" value="1" />
-                            <button type="button" class="qty-btn" onclick="changeQty(@item.MenuItemID, -1)">−</button>
-                            <span class="qty-display" id="qtyDisplay_@item.MenuItemID">1</span>
-                            <button type="button" class="qty-btn" onclick="changeQty(@item.MenuItemID, 1)">+</button>
-                            <button type="submit" class="btn-add-line">Add</button>
+                            <input type="hidden" name="tableID" value="@selected.TableID" />
+                            <button type="submit" class="btn-clear-table">🧹 Clear</button>
+                        </form>
+                    </div>
+                }
+
+                @* ── OCCUPIED BUT NO ORDERS YET ── *@
+                else
+                {
+                    <div class="empty-state">Table occupied — no orders started.</div>
+                    <div class="panel-actions" style="margin-top:1rem;">
+                        <form method="post" asp-action="StartOrder" style="flex:1;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="tableID" value="@selected.TableID" />
+                            <button type="submit" class="btn-add-food" style="width:100%;padding:0.6rem;">➕ Start Order</button>
+                        </form>
+                        <form method="post" asp-action="ClearTable">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="tableID" value="@selected.TableID" />
+                            <button type="submit" class="btn-clear-table">🧹 Clear</button>
                         </form>
                     </div>
                 }
             }
+        </aside>
+    </div>
+</div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn-modal-cancel" onclick="closeModal('addItemsModal')">Done</button>
-            </div>
+<!-- ── ADD FOOD MODAL ── -->
+<div class="modal-overlay" id="addFoodModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>🍽️ Add Food</h3>
+            <button type="button" class="modal-close" onclick="closeModal('addFoodModal')">✕</button>
+        </div>
+        @foreach (var group in Model.FoodGroups)
+        {
+            <div class="menu-group-label">@group.Key</div>
+            foreach (var item in group)
+            {
+                <div class="menu-item-row">
+                    <span class="mi-name">@item.Name</span>
+                    <span class="mi-price">R @item.Price.ToString("N2")</span>
+                    <form method="post" asp-action="AddOrderItem" class="mi-qty">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="orderID"    id="fOrderID_@item.MenuItemID"  value="" />
+                        <input type="hidden" name="menuItemID" value="@item.MenuItemID" />
+                        <input type="hidden" name="quantity"   id="fQty_@item.MenuItemID"     value="1" />
+                        <input type="hidden" name="tableID"    id="fTableID_@item.MenuItemID" value="" />
+                        <button type="button" class="qty-btn" onclick="changeQty('f',@item.MenuItemID,-1)">−</button>
+                        <span class="qty-display" id="fQtyDisplay_@item.MenuItemID">1</span>
+                        <button type="button" class="qty-btn" onclick="changeQty('f',@item.MenuItemID,1)">+</button>
+                        <button type="submit" class="btn-add-line">Add</button>
+                    </form>
+                </div>
+            }
+        }
+        <div class="modal-footer">
+            <button type="button" class="btn-modal-cancel" onclick="closeModal('addFoodModal')">Done</button>
         </div>
     </div>
+</div>
 
-    <!-- CLOSE & PAY MODAL -->
-    <div class="modal-overlay" id="closeOrderModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>💳 Close &amp; Pay</h3>
-                <button type="button" class="modal-close" onclick="closeModal('closeOrderModal')">✕</button>
-            </div>
-
-            <form method="post" asp-action="CloseOrder">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="orderID" id="closeOrderID" value="" />
-                <input type="hidden" name="tableID" id="closeTableID" value="" />
-
-                <div class="form-group">
-                    <label>Order Total</label>
-                    <input type="text" id="closeTotalDisplay" readonly style="background:#f8f4ee; font-weight:600;" />
+<!-- ── ADD DRINKS MODAL ── -->
+<div class="modal-overlay" id="addDrinksModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>🍹 Add Drinks</h3>
+            <button type="button" class="modal-close" onclick="closeModal('addDrinksModal')">✕</button>
+        </div>
+        @foreach (var group in Model.DrinkGroups)
+        {
+            <div class="menu-group-label">@group.Key</div>
+            foreach (var item in group)
+            {
+                <div class="menu-item-row">
+                    <span class="mi-name">@item.Name</span>
+                    <span class="mi-price">R @item.Price.ToString("N2")</span>
+                    <form method="post" asp-action="AddOrderItem" class="mi-qty">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="orderID"    id="dOrderID_@item.MenuItemID"  value="" />
+                        <input type="hidden" name="menuItemID" value="@item.MenuItemID" />
+                        <input type="hidden" name="quantity"   id="dQty_@item.MenuItemID"     value="1" />
+                        <input type="hidden" name="tableID"    id="dTableID_@item.MenuItemID" value="" />
+                        <button type="button" class="qty-btn" onclick="changeQty('d',@item.MenuItemID,-1)">−</button>
+                        <span class="qty-display" id="dQtyDisplay_@item.MenuItemID">1</span>
+                        <button type="button" class="qty-btn" onclick="changeQty('d',@item.MenuItemID,1)">+</button>
+                        <button type="submit" class="btn-add-line drinks">Add</button>
+                    </form>
                 </div>
-
-                <div class="form-group">
-                    <label for="paymentMethod">Payment Method</label>
-                    <select name="paymentMethod" id="paymentMethod" required>
-                        <option value="">— Select —</option>
-                        <option value="Cash">Cash</option>
-                        <option value="Card">Card</option>
-                        <option value="EFT">EFT</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="tipAmount">Tip Amount (R)</label>
-                    <input type="number" name="tipAmount" id="tipAmount" value="0" min="0" step="0.01" />
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button" class="btn-modal-cancel" onclick="closeModal('closeOrderModal')">Cancel</button>
-                    <button type="submit" class="btn-modal-submit">✅ Confirm Payment</button>
-                </div>
-            </form>
+            }
+        }
+        <div class="modal-footer">
+            <button type="button" class="btn-modal-cancel" onclick="closeModal('addDrinksModal')">Done</button>
         </div>
     </div>
+</div>
 
-    <!-- TOAST -->
-    <div class="toast" id="toast"></div>
+<!-- ── CLOSE & PAY MODAL ── -->
+<div class="modal-overlay" id="payModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>💳 Close &amp; Pay</h3>
+            <button type="button" class="modal-close" onclick="closeModal('payModal')">✕</button>
+        </div>
+        <form method="post" asp-action="CloseOrder">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="tableID" id="payTableID" value="" />
+            <div class="form-group">
+                <label>Grand Total</label>
+                <input type="text" id="payTotalDisplay" readonly style="background:#f8f4ee;font-weight:600;" />
+            </div>
+            <div class="form-group">
+                <label for="paymentMethod">Payment Method</label>
+                <select name="paymentMethod" id="paymentMethod" required>
+                    <option value="">— Select —</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Card">Card</option>
+                    <option value="EFT">EFT</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="tipAmount">Tip Amount (R)</label>
+                <input type="number" name="tipAmount" id="tipAmount" value="0" min="0" step="0.01" />
+            </div>
+            <div class="pay-footer">
+                <button type="button" class="btn-modal-cancel" onclick="closeModal('payModal')">Cancel</button>
+                <button type="submit" class="btn-pay-submit">✅ Confirm Payment</button>
+            </div>
+        </form>
+    </div>
+</div>
 
-    @if (TempData["ToastMessage"] != null)
-    {
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                var t = document.getElementById('toast');
-                t.textContent = '@Html.Raw(TempData["ToastMessage"])';
-                t.classList.add('show');
-                setTimeout(function () { t.classList.remove('show'); }, 3000);
-            });
-        </script>
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+@if (TempData["ToastMessage"] != null)
+{
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var t = document.getElementById('toast');
+            t.textContent = '@Html.Raw(TempData["ToastMessage"])';
+            t.classList.add('show');
+            setTimeout(function () { t.classList.remove('show'); }, 3000);
+        });
+    </script>
+}
+
+<script>
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    document.querySelectorAll('.modal-overlay').forEach(function (o) {
+        o.addEventListener('click', function (e) { if (e.target === this) this.classList.remove('open'); });
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape')
+            document.querySelectorAll('.modal-overlay.open').forEach(function (m) { m.classList.remove('open'); });
+    });
+
+    // Open food or drinks modal — stamp orderID + tableID into every hidden input
+    function openModal(modalId, orderID) {
+        var prefix = modalId === 'addFoodModal' ? 'f' : 'd';
+        var tableID = document.getElementById('payTableID')?.value || '';
+
+        document.querySelectorAll('[id^="' + prefix + 'OrderID_"]').forEach(function (el) { el.value = orderID; });
+        document.querySelectorAll('[id^="' + prefix + 'TableID_"]').forEach(function (el) {
+            // grab current selected table from the page URL
+            var params = new URLSearchParams(window.location.search);
+            el.value = params.get('selectedTableID') || '';
+        });
+        document.getElementById(modalId).classList.add('open');
     }
 
-    <script>
-        function closeModal(id) {
-            document.getElementById(id).classList.remove('open');
-        }
+    var qtys = {};
+    function changeQty(prefix, menuItemID, delta) {
+        var key = prefix + menuItemID;
+        if (!qtys[key]) qtys[key] = 1;
+        qtys[key] = Math.max(1, qtys[key] + delta);
+        document.getElementById(prefix + 'QtyDisplay_' + menuItemID).textContent = qtys[key];
+        document.getElementById(prefix + 'Qty_' + menuItemID).value = qtys[key];
+    }
 
-        document.querySelectorAll('.modal-overlay').forEach(function (overlay) {
-            overlay.addEventListener('click', function (e) {
-                if (e.target === this) this.classList.remove('open');
-            });
-        });
-
-        document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') {
-                document.querySelectorAll('.modal-overlay.open').forEach(function (m) {
-                    m.classList.remove('open');
-                });
-            }
-        });
-
-        function openAddItems(orderID, tableID) {
-            document.querySelectorAll('[id^="addOrderID_"]').forEach(function (el) {
-                el.value = orderID;
-            });
-            document.getElementById('addItemsModal').classList.add('open');
-        }
-
-        var qtys = {};
-
-        function changeQty(menuItemID, delta) {
-            if (!qtys[menuItemID]) qtys[menuItemID] = 1;
-            qtys[menuItemID] = Math.max(1, qtys[menuItemID] + delta);
-            document.getElementById('qtyDisplay_' + menuItemID).textContent = qtys[menuItemID];
-            document.getElementById('addQty_' + menuItemID).value = qtys[menuItemID];
-        }
-
-        function openCloseOrder(orderID, tableID, total) {
-            document.getElementById('closeOrderID').value = orderID;
-            document.getElementById('closeTableID').value = tableID;
-            document.getElementById('closeTotalDisplay').value = 'R ' + parseFloat(total).toFixed(2);
-            document.getElementById('closeOrderModal').classList.add('open');
-        }
-    </script>
+    function openPayModal(tableID, total) {
+        document.getElementById('payTableID').value = tableID;
+        document.getElementById('payTotalDisplay').value = 'R ' + parseFloat(total).toFixed(2);
+        document.getElementById('payModal').classList.add('open');
+    }
+</script>
 
 </body>
 </html>
