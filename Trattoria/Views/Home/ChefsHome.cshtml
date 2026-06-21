@@ -1,10 +1,15 @@
-﻿<!DOCTYPE html>
+﻿@model Trattoria.ViewModels.ChefsHomeViewModel
+@{
+    ViewData["Title"] = "Kitchen Dashboard · Trattoria Bella";
+    Layout = null;
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trattoria Bella · Chef's Homepage</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
     <style>
         * {
             margin: 0;
@@ -35,11 +40,11 @@
         }
 
         .chef-dashboard {
-            max-width: 1440px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
-        /* ----- HEADER ----- */
+        /* Header */
         .dashboard-header {
             display: flex;
             justify-content: space-between;
@@ -78,12 +83,6 @@
             font-weight: 400;
         }
 
-        .header-actions {
-            display: flex;
-            gap: 0.8rem;
-            align-items: center;
-        }
-
         .btn-outline {
             background: transparent;
             border: 1px solid var(--gold);
@@ -96,6 +95,8 @@
             cursor: pointer;
             transition: 0.2s;
             font-family: 'Jost', sans-serif;
+            text-decoration: none;
+            display: inline-block;
         }
 
             .btn-outline:hover {
@@ -103,25 +104,7 @@
                 color: white;
             }
 
-        .btn-primary-sm {
-            background: var(--red);
-            border: none;
-            color: white;
-            padding: 0.5rem 1.6rem;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: 0.2s;
-            font-family: 'Jost', sans-serif;
-        }
-
-            .btn-primary-sm:hover {
-                background: var(--brown);
-            }
-
-        /* ----- STATS ROW (kitchen metrics) ----- */
+        /* Stats */
         .stats-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -159,15 +142,7 @@
                 font-weight: 300;
             }
 
-        /* ----- MAIN GRID: orders + prep ----- */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 2fr 1.2fr;
-            gap: 2rem;
-            align-items: start;
-        }
-
-        /* ----- ACTIVE ORDERS (kitchen view) ----- */
+        /* Orders section — full width, no sidebar */
         .orders-section {
             background: var(--warm-white);
             padding: 1.8rem 1.8rem 2rem;
@@ -181,6 +156,7 @@
             align-items: center;
             margin-bottom: 1.5rem;
             flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
             .section-header h3 {
@@ -196,10 +172,17 @@
                 letter-spacing: 0.05em;
             }
 
+        /* Order cards grid — 2 columns on wide screens */
         .order-list {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 1rem;
+        }
+
+        @@media (max-width: 760px) {
+            .order-list {
+                grid-template-columns: 1fr;
+            }
         }
 
         .order-card {
@@ -211,18 +194,37 @@
             transition: 0.15s;
             display: flex;
             flex-direction: column;
-            gap: 0.6rem;
+            gap: 0.7rem;
         }
 
             .order-card:hover {
                 border-color: var(--gold-light);
             }
 
+            /* Colour the left border by status */
+            .order-card.pending {
+                border-left: 4px solid #c8a060;
+            }
+
+            .order-card.seated {
+                border-left: 4px solid #c8a060;
+            }
+
+            .order-card.in-progress {
+                border-left: 4px solid #d48020;
+            }
+
+            .order-card.ready {
+                border-left: 4px solid #2a7a2a;
+            }
+
+        /* Order head */
         .order-head {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
+            gap: 0.4rem;
         }
 
             .order-head .table-id {
@@ -237,7 +239,7 @@
                     font-size: 0.75rem;
                 }
 
-            .order-head .time {
+            .order-head .order-time {
                 font-size: 0.7rem;
                 color: var(--text-muted);
                 background: #f0ebe4;
@@ -245,60 +247,66 @@
                 border-radius: 40px;
             }
 
-            .order-head .status-badge {
-                font-size: 0.6rem;
-                letter-spacing: 0.08em;
-                text-transform: uppercase;
-                padding: 0.2rem 0.9rem;
-                border-radius: 40px;
+        /* Status badge */
+        .status-badge {
+            font-size: 0.6rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.2rem 0.9rem;
+            border-radius: 40px;
+        }
+
+            .status-badge.pending, .status-badge.seated {
                 background: #f0e8dc;
                 color: var(--brown-mid);
             }
 
-                .order-head .status-badge.ready {
-                    background: #dce8d8;
-                    color: #1e4a1e;
-                }
+            .status-badge.in-progress {
+                background: #f5e0c8;
+                color: #a0672a;
+            }
 
-                .order-head .status-badge.cooking {
-                    background: #f5e0c8;
-                    color: #a0672a;
-                }
+            .status-badge.ready {
+                background: #dce8d8;
+                color: #1e4a1e;
+            }
 
-                .order-head .status-badge.pending {
-                    background: #f0d8d8;
-                    color: #8b1a1a;
-                }
-
+        /* Order items */
         .order-items {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.4rem 0.8rem;
-            font-size: 0.85rem;
-            color: var(--text);
+            gap: 0.4rem 0.7rem;
         }
 
-            .order-items .item {
-                background: #f5f0e8;
-                padding: 0.15rem 0.7rem;
-                border-radius: 30px;
-                font-weight: 300;
+        .order-item-pill {
+            background: #f5f0e8;
+            padding: 0.2rem 0.8rem;
+            border-radius: 30px;
+            font-size: 0.82rem;
+            font-weight: 300;
+        }
+
+            .order-item-pill .qty {
+                font-weight: 600;
+                color: var(--brown-mid);
             }
 
-                .order-items .item .qty {
-                    font-weight: 500;
-                    color: var(--brown-mid);
-                }
+            .order-item-pill .item-type {
+                font-size: 0.65rem;
+                color: var(--text-muted);
+                margin-left: 0.3rem;
+            }
 
+        /* Action buttons */
         .order-actions {
             display: flex;
-            gap: 0.6rem;
-            margin-top: 0.2rem;
+            gap: 0.5rem;
             flex-wrap: wrap;
+            margin-top: 0.2rem;
         }
 
             .order-actions button {
-                padding: 0.3rem 1.2rem;
+                padding: 0.35rem 1.1rem;
                 border: none;
                 border-radius: 40px;
                 font-size: 0.65rem;
@@ -309,101 +317,53 @@
                 transition: 0.2s;
             }
 
-        .btn-prepare {
+        .btn-start-cooking {
             background: var(--gold);
             color: white;
         }
 
-            .btn-prepare:hover {
+            .btn-start-cooking:hover {
                 background: var(--gold-light);
             }
 
-        .btn-ready {
+        .btn-mark-ready {
+            background: #2a7a6a;
+            color: white;
+        }
+
+            .btn-mark-ready:hover {
+                background: #1e5a4e;
+            }
+
+        .btn-mark-served {
             background: #2a5a2a;
             color: white;
         }
 
-            .btn-ready:hover {
+            .btn-mark-served:hover {
                 background: #1e421e;
             }
 
-        .btn-done {
-            background: #ccc;
-            color: #333;
+        .btn-cancel-order {
+            background: #e8d8d8;
+            color: #6a3a3a;
         }
 
-            .btn-done:hover {
-                background: #bbb;
+            .btn-cancel-order:hover {
+                background: #dcc8c8;
             }
 
-        /* ----- PREP / MIS EN PLACE (right panel) ----- */
-        .prep-panel {
-            background: var(--warm-white);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 1.8rem;
-            position: sticky;
-            top: 2rem;
+        /* Empty state */
+        .empty-state {
+            color: var(--text-muted);
+            font-weight: 300;
+            padding: 2rem 0;
+            text-align: center;
+            font-style: italic;
+            font-size: 1rem;
         }
 
-            .prep-panel h3 {
-                font-family: 'Cormorant Garamond', serif;
-                font-size: 1.4rem;
-                font-weight: 400;
-                color: var(--brown);
-                border-bottom: 1px solid rgba(184,134,11,0.2);
-                padding-bottom: 0.7rem;
-                margin-bottom: 1.2rem;
-                display: flex;
-                justify-content: space-between;
-            }
-
-                .prep-panel h3 span {
-                    font-size: 0.7rem;
-                    font-family: 'Jost', sans-serif;
-                    font-weight: 300;
-                    color: var(--text-muted);
-                }
-
-        .prep-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.7rem 0;
-            border-bottom: 1px solid rgba(0,0,0,0.04);
-            font-size: 0.9rem;
-            align-items: center;
-        }
-
-            .prep-item .prep-name {
-                font-weight: 400;
-            }
-
-            .prep-item .prep-qty {
-                background: #f0ebe4;
-                padding: 0.1rem 0.8rem;
-                border-radius: 30px;
-                font-size: 0.75rem;
-                color: var(--brown-mid);
-            }
-
-            .prep-item .prep-status {
-                font-size: 0.6rem;
-                text-transform: uppercase;
-                letter-spacing: 0.06em;
-                color: var(--text-muted);
-            }
-
-        .prep-total {
-            margin-top: 1.2rem;
-            padding-top: 1rem;
-            border-top: 2px solid rgba(184,134,11,0.15);
-            font-weight: 400;
-            color: var(--brown);
-            display: flex;
-            justify-content: space-between;
-        }
-
-        /* ----- TOAST ----- */
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 2rem;
@@ -422,9 +382,6 @@
             .toast.show {
                 transform: translateX(0);
             }
-
-        /* responsive */
-       
     </style>
 </head>
 <body>
@@ -435,298 +392,152 @@
         <header class="dashboard-header">
             <div class="header-left">
                 <div class="brand">Trattoria <span>Bella</span></div>
-                <span class="chef-badge">👨‍🍳 Chef · Luca</span>
+                <span class="chef-badge">🍳 Chef · @Model.ChefName</span>
             </div>
             <div class="header-actions">
-                <button class="btn-outline" id="resetKitchenBtn">🔄 Reset kitchen</button>
-                <button class="btn-primary-sm" id="addDummyOrderBtn">➕ Add dummy order</button>
+                <a asp-action="ChefsHome" class="btn-outline">🔄 Refresh</a>
             </div>
         </header>
 
         <!-- STATS -->
         <div class="stats-row">
-            <div class="stat-card"><div class="label">Active orders</div><div class="value" id="activeOrders">4</div></div>
-            <div class="stat-card"><div class="label">Cooking</div><div class="value" id="cookingCount">2</div></div>
-            <div class="stat-card"><div class="label">Ready to serve</div><div class="value" id="readyCount">1</div></div>
-            <div class="stat-card"><div class="label">Total items in prep</div><div class="value" id="totalPrepItems">12</div><div class="sub">across all orders</div></div>
+            <div class="stat-card">
+                <div class="label">Active Orders</div>
+                <div class="value">@Model.ActiveOrdersCount</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">New / Pending</div>
+                <div class="value">@Model.PendingCount</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Cooking</div>
+                <div class="value">@Model.CookingCount</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Ready to Serve</div>
+                <div class="value">@Model.ReadyCount</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Items in Prep</div>
+                <div class="value">@Model.TotalItemsInPrep</div>
+                <div class="sub">pending + cooking</div>
+            </div>
         </div>
 
-        <!-- GRID -->
-        <div class="dashboard-grid">
+        <!-- ORDERS — full width -->
+        <section class="orders-section">
+            <div class="section-header">
+                <h3>🔥 Active Orders</h3>
+                <span class="sub">@Model.ActiveOrdersCount order@(Model.ActiveOrdersCount == 1 ? "" : "s")</span>
+            </div>
 
-            <!-- ORDERS -->
-            <section class="orders-section">
-                <div class="section-header">
-                    <h3>🔥 Active Orders</h3>
-                    <span class="sub" id="orderCountLabel">4 orders</span>
-                </div>
-                <div class="order-list" id="orderList">
-                    <!-- injected by JS -->
-                </div>
-            </section>
+            @if (!Model.Orders.Any())
+            {
+                <div class="empty-state">No active orders — kitchen is clear. 🍽️</div>
+            }
+            else
+            {
+                <div class="order-list">
+                    @foreach (var o in Model.Orders)
+                    {
+                        <div class="order-card @o.StatusCssClass">
 
-            <!-- PREP / MIS EN PLACE -->
-            <aside class="prep-panel" id="prepPanel">
-                <h3>🧂 Mis en Place <span id="prepCountLabel">0 items</span></h3>
-                <div id="prepContent">
-                    <div style="color: var(--text-muted); font-weight: 300; padding: 0.5rem 0;">No prep items yet.</div>
-                </div>
-                <div class="prep-total" id="prepTotal">
-                    <span>Total portions</span>
-                    <span id="totalPortions">0</span>
-                </div>
-            </aside>
+                            <!-- Head row -->
+                            <div class="order-head">
+                                <span class="table-id">
+                                    Table @o.TableID
+                                    <small>· #@o.OrderID @(string.IsNullOrEmpty(o.TableType) || o.TableType == "—" ? "" : $"· {o.TableType}")</small>
+                                </span>
+                                <span class="order-time">@o.OrderTime.ToString("HH:mm")</span>
+                                <span class="status-badge @o.StatusCssClass">@o.StatusLabel</span>
+                            </div>
 
-        </div>
+                            <!-- Items -->
+                            @if (o.Lines.Any())
+                            {
+                                <div class="order-items">
+                                    @foreach (var line in o.Lines)
+                                    {
+                                        <span class="order-item-pill">
+                                            <span class="qty">@line.Quantity×</span>
+                                            @line.ItemName
+                                            <span class="item-type">@line.ItemType</span>
+                                        </span>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div style="font-size:0.8rem; color:var(--text-muted); font-style:italic;">No items on this order yet.</div>
+                            }
+
+                            <!-- Actions -->
+                            <div class="order-actions">
+
+                                @* Pending / Seated → Start Cooking *@
+                                @if (o.CanStartCooking)
+                                {
+                                    <form method="post" asp-action="StartCooking">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="orderID" value="@o.OrderID" />
+                                        <button type="submit" class="btn-start-cooking">🔪 Start Cooking</button>
+                                    </form>
+                                }
+
+                                @* In Progress → Mark Ready *@
+                                @if (o.CanMarkReady)
+                                {
+                                    <form method="post" asp-action="MarkOrderReady">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="orderID" value="@o.OrderID" />
+                                        <button type="submit" class="btn-mark-ready">🔔 Mark Ready</button>
+                                    </form>
+                                }
+
+                                @* Ready → Collected by Waiter *@
+                                @if (o.CanMarkServed)
+                                {
+                                    <form method="post" asp-action="MarkOrderServed">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="orderID" value="@o.OrderID" />
+                                        <button type="submit" class="btn-mark-served">🍽️ Collected</button>
+                                    </form>
+                                }
+
+                                @* Cancel — always available while in kitchen *@
+                                @if (!o.CanMarkServed)
+                                {
+                                    <form method="post" asp-action="CancelKitchenOrder"
+                                          onsubmit="return confirm('Cancel order #@o.OrderID?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="orderID" value="@o.OrderID" />
+                                        <button type="submit" class="btn-cancel-order">✕ Cancel</button>
+                                    </form>
+                                }
+
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+
     </div>
 
     <!-- TOAST -->
     <div class="toast" id="toast"></div>
 
-    <script>
-        // ─── DATA ────────────────────────────────────────────────
-        const menuItems = [
-          { name: 'Burrata con Prosciutto', price: 185 },
-          { name: 'Carpaccio di Manzo', price: 165 },
-          { name: 'Bruschetta al Pomodoro', price: 95 },
-          { name: 'Polpo alla Griglia', price: 210 },
-          { name: 'Pappardelle al Cinghiale', price: 225 },
-          { name: 'Risotto ai Funghi Porcini', price: 245 },
-          { name: 'Spaghetti alle Vongole', price: 235 },
-          { name: 'Gnocchi alla Sorrentina', price: 195 },
-          { name: 'Bistecca Fiorentina', price: 445 },
-          { name: 'Branzino al Forno', price: 320 },
-          { name: 'Pollo alla Cacciatora', price: 275 },
-          { name: 'Saltimbocca alla Romana', price: 295 },
-          { name: 'Tiramisù della Casa', price: 95 },
-          { name: 'Panna Cotta al Limone', price: 85 },
-          { name: 'Prosecco Superiore', price: 160 },
-          { name: 'Chianti Classico', price: 195 },
-          { name: 'Aperol Spritz', price: 105 },
-          { name: 'Negroni', price: 120 }
-        ];
-
-        function randomItems(count) {
-          const shuffled = [...menuItems].sort(() => 0.5 - Math.random());
-          return shuffled.slice(0, count).map(item => ({
-            ...item,
-            qty: Math.floor(Math.random() * 2) + 1
-          }));
-        }
-
-        // status: 'pending' (new), 'cooking', 'ready'
-        let orders = [];
-        let orderIdCounter = 100;
-
-        function generateOrders() {
-          orders = [];
-          const statuses = ['pending', 'cooking', 'ready'];
-          const count = Math.floor(Math.random() * 3) + 3; // 3-5 orders
-          for (let i = 0; i < count; i++) {
-            const status = statuses[Math.floor(Math.random() * statuses.length)];
-            const items = randomItems(Math.floor(Math.random() * 4) + 1);
-            orders.push({
-              id: orderIdCounter++,
-              table: Math.floor(Math.random() * 12) + 1,
-              items: items,
-              status: status,
-              time: new Date(Date.now() - Math.floor(Math.random() * 30) * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    @if (TempData["ToastMessage"] != null)
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var t = document.getElementById('toast');
+                t.textContent = '@Html.Raw(TempData["ToastMessage"])';
+                t.classList.add('show');
+                setTimeout(function () { t.classList.remove('show'); }, 3000);
             });
-          }
-          // ensure at least one of each for demo
-          if (!orders.some(o => o.status === 'pending')) {
-            orders[0].status = 'pending';
-          }
-          if (!orders.some(o => o.status === 'cooking')) {
-            orders[1].status = 'cooking';
-          }
-          if (!orders.some(o => o.status === 'ready')) {
-            orders[2].status = 'ready';
-          }
-        }
-        generateOrders();
-
-        // ─── DOM REFS ─────────────────────────────────────────────
-        const orderList = document.getElementById('orderList');
-        const prepContent = document.getElementById('prepContent');
-        const prepCountLabel = document.getElementById('prepCountLabel');
-        const totalPortionsEl = document.getElementById('totalPortions');
-        const activeOrdersEl = document.getElementById('activeOrders');
-        const cookingCountEl = document.getElementById('cookingCount');
-        const readyCountEl = document.getElementById('readyCount');
-        const totalPrepItemsEl = document.getElementById('totalPrepItems');
-        const orderCountLabel = document.getElementById('orderCountLabel');
-
-        // ─── TOAST ────────────────────────────────────────────────
-        function showToast(msg, duration = 2800) {
-          const t = document.getElementById('toast');
-          t.textContent = msg;
-          t.classList.add('show');
-          clearTimeout(t._timeout);
-          t._timeout = setTimeout(() => t.classList.remove('show'), duration);
-        }
-
-        // ─── RENDER ───────────────────────────────────────────────
-        function renderStats() {
-          const active = orders.length;
-          const cooking = orders.filter(o => o.status === 'cooking').length;
-          const ready = orders.filter(o => o.status === 'ready').length;
-          const totalItems = orders.reduce((acc, o) => acc + o.items.reduce((s, i) => s + i.qty, 0), 0);
-
-          activeOrdersEl.textContent = active;
-          cookingCountEl.textContent = cooking;
-          readyCountEl.textContent = ready;
-          totalPrepItemsEl.textContent = totalItems;
-          orderCountLabel.textContent = `${active} orders`;
-        }
-
-        function renderOrders() {
-          if (orders.length === 0) {
-            orderList.innerHTML = `<div style="color: var(--text-muted); font-weight: 300; padding: 1rem 0; text-align: center;">No active orders. 🍽️</div>`;
-            return;
-          }
-
-          let html = '';
-          orders.forEach(order => {
-            const statusMap = {
-              pending: { label: '🆕 New', cls: 'pending' },
-              cooking: { label: '🔥 Cooking', cls: 'cooking' },
-              ready: { label: '✅ Ready', cls: 'ready' }
-            };
-            const st = statusMap[order.status] || statusMap.pending;
-
-            const itemsHtml = order.items.map(item =>
-              `<span class="item"><span class="qty">${item.qty}×</span> ${item.name}</span>`
-            ).join('');
-
-            html += `
-              <div class="order-card" data-order-id="${order.id}">
-                <div class="order-head">
-                  <span class="table-id">Table ${order.table} <small>· order #${order.id}</small></span>
-                  <span class="time">${order.time}</span>
-                  <span class="status-badge ${st.cls}">${st.label}</span>
-                </div>
-                <div class="order-items">${itemsHtml}</div>
-                <div class="order-actions">
-                  ${order.status === 'pending' ? `<button class="btn-prepare" data-action="startCooking" data-id="${order.id}">🔪 Start cooking</button>` : ''}
-                  ${order.status === 'cooking' ? `<button class="btn-ready" data-action="markReady" data-id="${order.id}">✅ Mark ready</button>` : ''}
-                  ${order.status === 'ready' ? `<button class="btn-done" data-action="serveComplete" data-id="${order.id}">🍽️ Served & done</button>` : ''}
-                  ${order.status !== 'ready' ? `<button class="btn-done" data-action="cancelOrder" data-id="${order.id}" style="background:#e8d8d8;color:#6a3a3a;">✕ Cancel</button>` : ''}
-                </div>
-              </div>
-            `;
-          });
-          orderList.innerHTML = html;
-          attachOrderActions();
-        }
-
-        function renderPrep() {
-          // aggregate all items from all orders (including pending & cooking)
-          const prepMap = new Map();
-          orders.forEach(order => {
-            if (order.status === 'ready') return; // ready orders are not in prep
-            order.items.forEach(item => {
-              const key = item.name;
-              if (prepMap.has(key)) {
-                prepMap.set(key, prepMap.get(key) + item.qty);
-              } else {
-                prepMap.set(key, item.qty);
-              }
-            });
-          });
-
-          const entries = Array.from(prepMap.entries());
-          const totalPortions = entries.reduce((sum, [, qty]) => sum + qty, 0);
-
-          if (entries.length === 0) {
-            prepContent.innerHTML = `<div style="color: var(--text-muted); font-weight: 300; padding: 0.5rem 0;">No prep items. All orders ready or none active.</div>`;
-            prepCountLabel.textContent = '0 items';
-            totalPortionsEl.textContent = '0';
-            return;
-          }
-
-          let html = '';
-          entries.forEach(([name, qty]) => {
-            html += `
-              <div class="prep-item">
-                <span class="prep-name">${name}</span>
-                <span class="prep-qty">${qty} portions</span>
-              </div>
-            `;
-          });
-          prepContent.innerHTML = html;
-          prepCountLabel.textContent = `${entries.length} items`;
-          totalPortionsEl.textContent = totalPortions;
-        }
-
-        function renderAll() {
-          renderStats();
-          renderOrders();
-          renderPrep();
-        }
-
-        // ─── ACTION HANDLERS ─────────────────────────────────────
-        function attachOrderActions() {
-          document.querySelectorAll('[data-action]').forEach(btn => {
-            btn.removeEventListener('click', handleOrderAction);
-            btn.addEventListener('click', handleOrderAction);
-          });
-        }
-
-        function handleOrderAction(e) {
-          const btn = e.currentTarget;
-          const action = btn.dataset.action;
-          const id = parseInt(btn.dataset.id, 10);
-          const order = orders.find(o => o.id === id);
-          if (!order) return;
-
-          switch (action) {
-            case 'startCooking':
-              order.status = 'cooking';
-              showToast(`🔪 Order #${id} moved to cooking.`);
-              break;
-            case 'markReady':
-              order.status = 'ready';
-              showToast(`✅ Order #${id} is ready to serve!`);
-              break;
-            case 'serveComplete':
-              // remove from active orders
-              orders = orders.filter(o => o.id !== id);
-              showToast(`🍽️ Order #${id} served and completed.`);
-              break;
-            case 'cancelOrder':
-              orders = orders.filter(o => o.id !== id);
-              showToast(`✕ Order #${id} cancelled.`);
-              break;
-            default: return;
-          }
-          renderAll();
-        }
-
-        // ─── RESET ─────────────────────────────────────────────────
-        document.getElementById('resetKitchenBtn').addEventListener('click', () => {
-          generateOrders();
-          renderAll();
-          showToast('🔄 Kitchen reset to demo state.');
-        });
-
-        // ─── ADD DUMMY ORDER ─────────────────────────────────────
-        document.getElementById('addDummyOrderBtn').addEventListener('click', () => {
-          const newOrder = {
-            id: orderIdCounter++,
-            table: Math.floor(Math.random() * 12) + 1,
-            items: randomItems(Math.floor(Math.random() * 3) + 2),
-            status: 'pending',
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-          };
-          orders.push(newOrder);
-          renderAll();
-          showToast(`➕ New dummy order #${newOrder.id} added (Table ${newOrder.table}).`);
-        });
-
-        // ─── INIT ─────────────────────────────────────────────────
-        renderAll();
-    </script>
+        </script>
+    }
 
 </body>
 </html>

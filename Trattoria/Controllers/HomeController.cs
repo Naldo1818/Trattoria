@@ -67,16 +67,359 @@ namespace Trattoria.Controllers
 
         // ── Chef ─────────────────────────────────────────────────────────────────
 
+        /// <summary>
+        /// GET: Kitchen dashboard — all active (unpaid, non-closed) orders with their items.
+        /// </summary>
+        [HttpGet]
         public IActionResult ChefsHome()
         {
-            return View();
+            var chefName = HttpContext.Session.GetString("UserName") ?? "Chef";
+
+            // All active kitchen orders (not paid, not closed, not yet served)
+            var kitchenOrders = (
+                from o in _dbContext.Orders
+                where !o.IsPaid && o.Status != "Closed" && o.Status != "Served"
+                join t in _dbContext.Tables on o.TablesID equals t.TableID into tj
+                from t in tj.DefaultIfEmpty()
+                orderby o.OrderTime
+                select new { o, t }
+            ).ToList();
+
+            var orderIDs = kitchenOrders.Select(x => x.o.OrderID).ToList();
+
+            var allLines = (
+                from od in _dbContext.OrderDetails
+                where orderIDs.Contains(od.OrderID)
+                join m in _dbContext.MenuItems on od.MenuItemID equals m.MenuItemID
+                select new { od, m }
+            ).ToList();
+
+            var linesByOrder = allLines
+                .GroupBy(x => x.od.OrderID)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(x => new KitchenLineItem
+                    {
+                        OrderDetailsID = x.od.OrderDetailsID,
+                        ItemName = x.m.Name,
+                        ItemType = x.m.Type,
+                        Quantity = x.od.Quantity
+                    }).ToList()
+                );
+
+            var orders = kitchenOrders.Select(x => new KitchenOrderItem
+            {
+                OrderID = x.o.OrderID,
+                TableID = x.o.TablesID,
+                TableType = x.t != null ? x.t.Type : "—",
+                OrderTime = x.o.OrderTime,
+                Status = x.o.Status,
+                Lines = linesByOrder.TryGetValue(x.o.OrderID, out var lines) ? lines : new()
+            }).ToList();
+
+            var vm = new ChefsHomeViewModel
+            {
+                Orders = orders,
+                ActiveOrdersCount = orders.Count,
+                PendingCount = orders.Count(o => o.CanStartCooking),
+                CookingCount = orders.Count(o => o.Status == "In Progress"),
+                ReadyCount = orders.Count(o => o.Status == "Ready"),
+                TotalItemsInPrep = orders.Where(o => o.Status != "Ready").Sum(o => o.TotalQty),
+                ChefName = chefName
+            };
+
+            return View(vm);
         }
+
+        /// <summary>
+        /// POST: Chef moves an order to "In Progress" (start cooking).
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult StartCooking(int orderID)
+        {
+            var order = _dbContext.Orders.Find(orderID);
+            if (order == null) return NotFound();
+            order.Status = "In Progress";
+            _dbContext.SaveChanges();
+            TempData["ToastMessage"] = $"🔪 Order #{orderID} — cooking started.";
+            return RedirectToAction("ChefsHome");
+        }
+
+        /// <summary>
+        /// POST: Chef marks an order as "Ready" (plated, ready to collect).
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult MarkOrderReady(int orderID)
+        {
+            var order = _dbContext.Orders.Find(orderID);
+            if (order == null) return NotFound();
+            order.Status = "Ready";
+            _dbContext.SaveChanges();
+            TempData["ToastMessage"] = $"✅ Order #{orderID} is ready to serve!";
+            return RedirectToAction("ChefsHome");
+        }
+
+        /// <summary>
+        /// POST: Chef marks a ready order as collected by the waiter.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult MarkOrderServed(int orderID)
+        {
+            var order = _dbContext.Orders.Find(orderID);
+            if (order == null) return NotFound();
+            order.Status = "Served";
+            _dbContext.SaveChanges();
+            TempData["ToastMessage"] = $"🍽️ Order #{orderID} collected by waiter.";
+            return RedirectToAction("ChefsHome");
+        }
+
+        /// <summary>
+        /// POST: Chef voids/cancels an order from the kitchen.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CancelKitchenOrder(int orderID)
+        {
+            var order = _dbContext.Orders.Find(orderID);
+            if (order == null) return NotFound();
+            order.Status = "Closed";
+            var otherActive = _dbContext.Orders
+                .Any(o => o.TablesID == order.TablesID && o.OrderID != orderID
+                          && !o.IsPaid && o.Status != "Closed");
+            if (!otherActive)
+            {
+                var table = _dbContext.Tables.Find(order.TablesID);
+                if (table != null) table.IsAvailable = true;
+            }
+            _dbContext.SaveChanges();
+            TempData["ToastMessage"] = $"✕ Order #{orderID} cancelled.";
+            return RedirectToAction("ChefsHome");
+        }
+
 
         // ── Bartender ────────────────────────────────────────────────────────────
 
+        /// <summary>
+        /// GET: Bartender dashboard — shows all drink orders from active orders.
+        /// </summary>
+        [HttpGet]
         public IActionResult BartenderHome()
         {
-            return View();
+            var bartenderName = HttpContext.Session.GetString("UserName") ?? "Elena";
+            var bartenderID = HttpContext.Session.GetInt32("UserID") ?? 0;
+
+            // Get all active (unpaid, not closed) orders
+            var activeOrders = _dbContext.Orders
+                .Where(o => !o.IsPaid && o.Status != "Closed")
+                .ToList();
+
+            // Get all order details for these orders
+            var orderIds = activeOrders.Select(o => o.OrderID).ToList();
+
+            // Join OrderDetails with MenuItems manually
+            var orderDetailsWithMenu = _dbContext.OrderDetails
+                .Where(od => orderIds.Contains(od.OrderID))
+                .Join(_dbContext.MenuItems,
+                      od => od.MenuItemID,
+                      m => m.MenuItemID,
+                      (od, m) => new { OrderDetail = od, MenuItem = m })
+                .ToList();
+
+            // Get all tables
+            var tables = _dbContext.Tables.ToDictionary(t => t.TableID, t => t);
+
+            // Filter orders that have drink items (Wine & Drinks category)
+            var drinkOrders = new List<DrinkOrderDisplayItem>();
+
+            foreach (var order in activeOrders)
+            {
+                var drinkItems = orderDetailsWithMenu
+                    .Where(x => x.OrderDetail.OrderID == order.OrderID &&
+                                x.MenuItem.Type == "Wine & Drinks")
+                    .Select(x => new DrinkLineItem
+                    {
+                        OrderDetailsID = x.OrderDetail.OrderDetailsID,
+                        MenuItemID = x.OrderDetail.MenuItemID,
+                        ItemName = x.MenuItem.Name,
+                        Quantity = x.OrderDetail.Quantity,
+                        Price = x.OrderDetail.Price,
+                        IsDrink = true
+                    })
+                    .ToList();
+
+                if (drinkItems.Any())
+                {
+                    var table = tables.GetValueOrDefault(order.TablesID);
+                    drinkOrders.Add(new DrinkOrderDisplayItem
+                    {
+                        OrderID = order.OrderID,
+                        TableID = order.TablesID,
+                        TableType = table?.Type ?? "Standard",
+                        OrderTime = order.OrderTime,
+                        Status = order.Status,
+                        Items = drinkItems
+                    });
+                }
+            }
+
+            // Order by status priority: Pending first, then In Progress, then Ready
+            var orderedDrinkOrders = drinkOrders
+                .OrderBy(o => o.Status == "Pending" ? 0 :
+                             o.Status == "In Progress" ? 1 :
+                             o.Status == "Ready" ? 2 : 3)
+                .ThenBy(o => o.OrderTime)
+                .ToList();
+
+            var vm = new BartenderHomeViewModel
+            {
+                DrinkOrders = orderedDrinkOrders,
+                ActiveDrinkOrders = orderedDrinkOrders.Count,
+                MixingCount = orderedDrinkOrders.Count(o => o.Status == "In Progress"),
+                ReadyCount = orderedDrinkOrders.Count(o => o.Status == "Ready"),
+                TotalTables = _dbContext.Tables.Count(),
+                BartenderName = bartenderName,
+                BartenderID = bartenderID
+            };
+
+            return View(vm);
+        }
+
+        /// <summary>
+        /// POST: Start mixing a drink order (Pending → In Progress)
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult StartMixingDrinkOrder(int orderID)
+        {
+            var order = _dbContext.Orders.Find(orderID);
+            if (order == null)
+            {
+                TempData["ToastMessage"] = "❌ Order not found.";
+                return RedirectToAction("BartenderHome");
+            }
+
+            if (order.Status != "Pending")
+            {
+                TempData["ToastMessage"] = "⚠️ Order is not in Pending status.";
+                return RedirectToAction("BartenderHome");
+            }
+
+            order.Status = "In Progress";
+            _dbContext.SaveChanges();
+
+            TempData["ToastMessage"] = $"🥄 Order #{orderID} is now mixing.";
+            return RedirectToAction("BartenderHome");
+        }
+
+        /// <summary>
+        /// POST: Mark drink order as ready (In Progress → Ready)
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult MarkDrinkOrderReady(int orderID)
+        {
+            var order = _dbContext.Orders.Find(orderID);
+            if (order == null)
+            {
+                TempData["ToastMessage"] = "❌ Order not found.";
+                return RedirectToAction("BartenderHome");
+            }
+
+            if (order.Status != "In Progress")
+            {
+                TempData["ToastMessage"] = "⚠️ Order is not in In Progress status.";
+                return RedirectToAction("BartenderHome");
+            }
+
+            order.Status = "Ready";
+            _dbContext.SaveChanges();
+
+            TempData["ToastMessage"] = $"✅ Order #{orderID} is ready to serve!";
+            return RedirectToAction("BartenderHome");
+        }
+
+        /// <summary>
+        /// POST: Serve and complete a drink order (Ready → Served)
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ServeDrinkOrder(int orderID)
+        {
+            var order = _dbContext.Orders.Find(orderID);
+            if (order == null)
+            {
+                TempData["ToastMessage"] = "❌ Order not found.";
+                return RedirectToAction("BartenderHome");
+            }
+
+            if (order.Status != "Ready")
+            {
+                TempData["ToastMessage"] = "⚠️ Order is not ready to serve.";
+                return RedirectToAction("BartenderHome");
+            }
+
+            order.Status = "Served";
+            _dbContext.SaveChanges();
+
+            TempData["ToastMessage"] = $"🍸 Order #{orderID} has been served.";
+            return RedirectToAction("BartenderHome");
+        }
+
+        /// <summary>
+        /// POST: Cancel a drink order
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult CancelDrinkOrder(int orderID)
+        {
+            var order = _dbContext.Orders.Find(orderID);
+            if (order == null)
+            {
+                TempData["ToastMessage"] = "❌ Order not found.";
+                return RedirectToAction("BartenderHome");
+            }
+
+            // Check if order has already been served
+            if (order.Status == "Served")
+            {
+                TempData["ToastMessage"] = "⚠️ Cannot cancel a served order.";
+                return RedirectToAction("BartenderHome");
+            }
+
+            // Get all drink items from this order (Wine & Drinks category)
+            var drinkItems = _dbContext.OrderDetails
+                .Where(od => od.OrderID == orderID)
+                .Join(_dbContext.MenuItems,
+                      od => od.MenuItemID,
+                      m => m.MenuItemID,
+                      (od, m) => new { OrderDetail = od, MenuItem = m })
+                .Where(x => x.MenuItem.Type == "Wine & Drinks")
+                .Select(x => x.OrderDetail)
+                .ToList();
+
+            foreach (var item in drinkItems)
+            {
+                _dbContext.OrderDetails.Remove(item);
+            }
+
+            // If no items left on order, close it
+            var remainingItems = _dbContext.OrderDetails
+                .Where(od => od.OrderID == orderID)
+                .Count();
+
+            if (remainingItems == 0)
+            {
+                order.Status = "Closed";
+                order.IsPaid = false; // Voided
+            }
+
+            _dbContext.SaveChanges();
+
+            TempData["ToastMessage"] = $"✕ Drink order #{orderID} cancelled.";
+            return RedirectToAction("BartenderHome");
         }
 
         // ── Waiter ───────────────────────────────────────────────────────────────

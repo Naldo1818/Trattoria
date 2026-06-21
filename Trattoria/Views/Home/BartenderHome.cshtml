@@ -1,710 +1,516 @@
-﻿<!DOCTYPE html>
+﻿@model Trattoria.ViewModels.BartenderHomeViewModel
+@{
+    ViewData["Title"] = "Bartender Dashboard · Trattoria Bella";
+    Layout = null;
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trattoria Bella · Bartender Homepage</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    :root {
-      --cream: #F5F0E8;
-      --warm-white: #FAF7F2;
-      --gold: #B8860B;
-      --gold-light: #D4A820;
-      --brown: #3D2B1F;
-      --brown-mid: #6B4226;
-      --red: #8B1A1A;
-      --text: #2A1F17;
-      --text-muted: #7A6558;
-      --shadow: 0 8px 24px rgba(0,0,0,0.08);
-      --radius: 14px;
-    }
+        :root {
+            --cream: #F5F0E8;
+            --warm-white: #FAF7F2;
+            --gold: #B8860B;
+            --gold-light: #D4A820;
+            --brown: #3D2B1F;
+            --brown-mid: #6B4226;
+            --red: #8B1A1A;
+            --text: #2A1F17;
+            --text-muted: #7A6558;
+            --shadow: 0 8px 24px rgba(0,0,0,0.08);
+            --radius: 14px;
+        }
 
-    body {
-      font-family: 'Jost', sans-serif;
-      background: #f2ede6;
-      color: var(--text);
-      padding: 2rem;
-      min-height: 100vh;
-    }
+        body {
+            font-family: 'Jost', sans-serif;
+            background: #f2ede6;
+            color: var(--text);
+            padding: 2rem;
+            min-height: 100vh;
+        }
 
-    .bartender-dashboard {
-      max-width: 1440px;
-      margin: 0 auto;
-    }
+        .bartender-dashboard {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
 
-    /* ----- HEADER ----- */
-    .dashboard-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
+        /* ----- HEADER ----- */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
 
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-    }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
 
-    .brand {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2rem;
-      font-weight: 600;
-      color: var(--brown);
-    }
-    .brand span { color: var(--gold); }
+        .brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--brown);
+        }
 
-    .bartender-badge {
-      background: var(--brown);
-      color: var(--cream);
-      padding: 0.4rem 1.4rem;
-      border-radius: 40px;
-      font-size: 0.75rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-weight: 400;
-    }
+            .brand span {
+                color: var(--gold);
+            }
 
-    .header-actions {
-      display: flex;
-      gap: 0.8rem;
-      align-items: center;
-    }
+        .bartender-badge {
+            background: var(--brown);
+            color: var(--cream);
+            padding: 0.4rem 1.4rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            font-weight: 400;
+        }
 
-    .btn-outline {
-      background: transparent;
-      border: 1px solid var(--gold);
-      color: var(--gold);
-      padding: 0.5rem 1.4rem;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: 0.2s;
-      font-family: 'Jost', sans-serif;
-    }
-    .btn-outline:hover {
-      background: var(--gold);
-      color: white;
-    }
+        .header-actions {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+        }
 
-    .btn-primary-sm {
-      background: var(--red);
-      border: none;
-      color: white;
-      padding: 0.5rem 1.6rem;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: 0.2s;
-      font-family: 'Jost', sans-serif;
-    }
-    .btn-primary-sm:hover {
-      background: var(--brown);
-    }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 0.5rem 1.4rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Jost', sans-serif;
+            text-decoration: none;
+            display: inline-block;
+        }
 
-    /* ----- STATS ROW (bar metrics) ----- */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1.2rem;
-      margin-bottom: 2.5rem;
-    }
+            .btn-outline:hover {
+                background: var(--gold);
+                color: white;
+            }
 
-    .stat-card {
-      background: var(--warm-white);
-      padding: 1.2rem 1.5rem;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      border-left: 4px solid var(--gold);
-    }
-    .stat-card .label {
-      font-size: 0.65rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      font-weight: 400;
-    }
-    .stat-card .value {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 2rem;
-      font-weight: 400;
-      color: var(--brown);
-      line-height: 1.2;
-    }
-    .stat-card .sub {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      font-weight: 300;
-    }
+        /* ----- STATS ROW (bar metrics) ----- */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 2.5rem;
+        }
 
-    /* ----- MAIN GRID: drink orders + inventory ----- */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 2fr 1.2fr;
-      gap: 2rem;
-      align-items: start;
-    }
+        .stat-card {
+            background: var(--warm-white);
+            padding: 1.2rem 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--gold);
+        }
 
-    /* ----- DRINK ORDERS (bar view) ----- */
-    .orders-section {
-      background: var(--warm-white);
-      padding: 1.8rem 1.8rem 2rem;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
+            .stat-card .label {
+                font-size: 0.65rem;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                color: var(--text-muted);
+                font-weight: 400;
+            }
 
-    .section-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-    .section-header h3 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.6rem;
-      font-weight: 400;
-      color: var(--brown);
-    }
-    .section-header .sub {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      letter-spacing: 0.05em;
-    }
+            .stat-card .value {
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 2rem;
+                font-weight: 400;
+                color: var(--brown);
+                line-height: 1.2;
+            }
 
-    .order-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
+            .stat-card .sub {
+                font-size: 0.7rem;
+                color: var(--text-muted);
+                font-weight: 300;
+            }
 
-    .order-card {
-      background: white;
-      border-radius: var(--radius);
-      padding: 1.2rem 1.4rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-      border: 1px solid rgba(184,134,11,0.12);
-      transition: 0.15s;
-      display: flex;
-      flex-direction: column;
-      gap: 0.6rem;
-    }
-    .order-card:hover {
-      border-color: var(--gold-light);
-    }
+        /* ----- DRINK ORDERS (bar view) ----- */
+        .orders-section {
+            background: var(--warm-white);
+            padding: 1.8rem 1.8rem 2rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
 
-    .order-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .order-head .table-id {
-      font-weight: 600;
-      font-size: 1rem;
-      color: var(--brown);
-    }
-    .order-head .table-id small {
-      font-weight: 300;
-      color: var(--text-muted);
-      font-size: 0.75rem;
-    }
-    .order-head .time {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      background: #f0ebe4;
-      padding: 0.2rem 0.8rem;
-      border-radius: 40px;
-    }
-    .order-head .status-badge {
-      font-size: 0.6rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 0.2rem 0.9rem;
-      border-radius: 40px;
-      background: #f0e8dc;
-      color: var(--brown-mid);
-    }
-    .order-head .status-badge.ready {
-      background: #dce8d8;
-      color: #1e4a1e;
-    }
-    .order-head .status-badge.mixing {
-      background: #f5e0c8;
-      color: #a0672a;
-    }
-    .order-head .status-badge.pending {
-      background: #f0d8d8;
-      color: #8b1a1a;
-    }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
 
-    .order-items {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem 0.8rem;
-      font-size: 0.85rem;
-      color: var(--text);
-    }
-    .order-items .item {
-      background: #f5f0e8;
-      padding: 0.15rem 0.7rem;
-      border-radius: 30px;
-      font-weight: 300;
-    }
-    .order-items .item .qty {
-      font-weight: 500;
-      color: var(--brown-mid);
-    }
-    .order-items .item.drink {
-      background: #e8eef0;
-      border-left: 2px solid var(--gold-light);
-    }
+            .section-header h3 {
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 1.6rem;
+                font-weight: 400;
+                color: var(--brown);
+            }
 
-    .order-actions {
-      display: flex;
-      gap: 0.6rem;
-      margin-top: 0.2rem;
-      flex-wrap: wrap;
-    }
-    .order-actions button {
-      padding: 0.3rem 1.2rem;
-      border: none;
-      border-radius: 40px;
-      font-size: 0.65rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      cursor: pointer;
-      font-family: 'Jost', sans-serif;
-      transition: 0.2s;
-    }
-    .btn-mix {
-      background: var(--gold);
-      color: white;
-    }
-    .btn-mix:hover {
-      background: var(--gold-light);
-    }
-    .btn-serve-drink {
-      background: #2a5a2a;
-      color: white;
-    }
-    .btn-serve-drink:hover {
-      background: #1e421e;
-    }
-    .btn-done-drink {
-      background: #ccc;
-      color: #333;
-    }
-    .btn-done-drink:hover {
-      background: #bbb;
-    }
+            .section-header .sub {
+                font-size: 0.7rem;
+                color: var(--text-muted);
+                letter-spacing: 0.05em;
+            }
 
-    /* ----- INVENTORY PANEL (right) ----- */
-    .inventory-panel {
-      background: var(--warm-white);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 1.8rem;
-      position: sticky;
-      top: 2rem;
-    }
+        .order-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
 
-    .inventory-panel h3 {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.4rem;
-      font-weight: 400;
-      color: var(--brown);
-      border-bottom: 1px solid rgba(184,134,11,0.2);
-      padding-bottom: 0.7rem;
-      margin-bottom: 1.2rem;
-      display: flex;
-      justify-content: space-between;
-    }
-    .inventory-panel h3 span {
-      font-size: 0.7rem;
-      font-family: 'Jost', sans-serif;
-      font-weight: 300;
-      color: var(--text-muted);
-    }
+        .order-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.2rem 1.4rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid rgba(184,134,11,0.12);
+            transition: 0.15s;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
 
-    .inventory-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.7rem 0;
-      border-bottom: 1px solid rgba(0,0,0,0.04);
-      font-size: 0.9rem;
-      align-items: center;
-    }
-    .inventory-item .inv-name {
-      font-weight: 400;
-    }
-    .inventory-item .inv-qty {
-      background: #f0ebe4;
-      padding: 0.1rem 0.8rem;
-      border-radius: 30px;
-      font-size: 0.75rem;
-      color: var(--brown-mid);
-    }
-    .inventory-item .inv-status {
-      font-size: 0.6rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--text-muted);
-    }
-    .inventory-item.low .inv-qty {
-      background: #f0d8d8;
-      color: #8b1a1a;
-    }
+            .order-card:hover {
+                border-color: var(--gold-light);
+            }
 
-    .inventory-total {
-      margin-top: 1.2rem;
-      padding-top: 1rem;
-      border-top: 2px solid rgba(184,134,11,0.15);
-      font-weight: 400;
-      color: var(--brown);
-      display: flex;
-      justify-content: space-between;
-    }
+        .order-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
 
-    /* ----- TOAST ----- */
-    .toast {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: var(--brown);
-      color: var(--cream);
-      padding: 0.8rem 1.6rem;
-      border-radius: 40px;
-      font-size: 0.85rem;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-      transform: translateX(130%);
-      transition: transform 0.35s ease;
-      z-index: 999;
-    }
-    .toast.show {
-      transform: translateX(0);
-    }
+            .order-head .table-id {
+                font-weight: 600;
+                font-size: 1rem;
+                color: var(--brown);
+            }
 
-    /* responsive */
-  
-  </style>
+                .order-head .table-id small {
+                    font-weight: 300;
+                    color: var(--text-muted);
+                    font-size: 0.75rem;
+                }
+
+            .order-head .time {
+                font-size: 0.7rem;
+                color: var(--text-muted);
+                background: #f0ebe4;
+                padding: 0.2rem 0.8rem;
+                border-radius: 40px;
+            }
+
+            .order-head .status-badge {
+                font-size: 0.6rem;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                padding: 0.2rem 0.9rem;
+                border-radius: 40px;
+                background: #f0e8dc;
+                color: var(--brown-mid);
+            }
+
+                .order-head .status-badge.ready {
+                    background: #dce8d8;
+                    color: #1e4a1e;
+                }
+
+                .order-head .status-badge.in-progress {
+                    background: #f5e0c8;
+                    color: #a0672a;
+                }
+
+                .order-head .status-badge.pending {
+                    background: #f0d8d8;
+                    color: #8b1a1a;
+                }
+
+                .order-head .status-badge.served {
+                    background: #d8e8d8;
+                    color: #1e4a1e;
+                }
+
+        .order-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem 0.8rem;
+            font-size: 0.85rem;
+            color: var(--text);
+        }
+
+            .order-items .item {
+                background: #f5f0e8;
+                padding: 0.15rem 0.7rem;
+                border-radius: 30px;
+                font-weight: 300;
+            }
+
+                .order-items .item .qty {
+                    font-weight: 500;
+                    color: var(--brown-mid);
+                }
+
+                .order-items .item.drink {
+                    background: #e8eef0;
+                    border-left: 2px solid var(--gold-light);
+                }
+
+        .order-actions {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 0.2rem;
+            flex-wrap: wrap;
+        }
+
+            .order-actions button {
+                padding: 0.3rem 1.2rem;
+                border: none;
+                border-radius: 40px;
+                font-size: 0.65rem;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                cursor: pointer;
+                font-family: 'Jost', sans-serif;
+                transition: 0.2s;
+            }
+
+        .btn-mix {
+            background: var(--gold);
+            color: white;
+        }
+
+            .btn-mix:hover {
+                background: var(--gold-light);
+            }
+
+        .btn-serve-drink {
+            background: #2a5a2a;
+            color: white;
+        }
+
+            .btn-serve-drink:hover {
+                background: #1e421e;
+            }
+
+        .btn-done-drink {
+            background: #ccc;
+            color: #333;
+        }
+
+            .btn-done-drink:hover {
+                background: #bbb;
+            }
+
+        .btn-cancel-drink {
+            background: #e8d8d8;
+            color: #6a3a3a;
+        }
+
+            .btn-cancel-drink:hover {
+                background: #dcc8c8;
+            }
+
+        /* Empty state */
+        .empty-state {
+            color: var(--text-muted);
+            font-weight: 300;
+            padding: 2rem 0;
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* ----- TOAST ----- */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--brown);
+            color: var(--cream);
+            padding: 0.8rem 1.6rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            transform: translateX(130%);
+            transition: transform 0.35s ease;
+            z-index: 999;
+        }
+
+            .toast.show {
+                transform: translateX(0);
+            }
+
+        /* responsive */
+        @@media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .order-head {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<div class="bartender-dashboard">
+    <div class="bartender-dashboard">
 
-  <!-- HEADER -->
-  <header class="dashboard-header">
-    <div class="header-left">
-      <div class="brand">Trattoria <span>Bella</span></div>
-      <span class="bartender-badge">🍸 Bartender · Elena</span>
-    </div>
-    <div class="header-actions">
-      <button class="btn-outline" id="resetBarBtn">🔄 Reset bar</button>
-      <button class="btn-primary-sm" id="addDummyDrinkOrderBtn">➕ Add drink order</button>
-    </div>
-  </header>
+        <!-- HEADER -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <div class="brand">Trattoria <span>Bella</span></div>
+                <span class="bartender-badge">🍸 Bartender · @Model.BartenderName</span>
+            </div>
+            <div class="header-actions">
+                <a asp-action="BartenderHome" class="btn-outline">🔄 Refresh</a>
+            </div>
+        </header>
 
-  <!-- STATS -->
-  <div class="stats-row">
-    <div class="stat-card"><div class="label">Active drink orders</div><div class="value" id="activeDrinkOrders">0</div></div>
-    <div class="stat-card"><div class="label">Mixing</div><div class="value" id="mixingCount">0</div></div>
-    <div class="stat-card"><div class="label">Ready to serve</div><div class="value" id="readyDrinkCount">0</div></div>
-    <div class="stat-card"><div class="label">Inventory items</div><div class="value" id="inventoryCount">0</div><div class="sub">low stock alert</div></div>
-  </div>
-
-  <!-- GRID -->
-  <div class="dashboard-grid">
-
-    <!-- DRINK ORDERS -->
-    <section class="orders-section">
-      <div class="section-header">
-        <h3>🍹 Drink Orders</h3>
-        <span class="sub" id="drinkOrderCountLabel">0 orders</span>
-      </div>
-      <div class="order-list" id="drinkOrderList">
-        <!-- injected by JS -->
-      </div>
-    </section>
-
-    <!-- INVENTORY -->
-    <aside class="inventory-panel" id="inventoryPanel">
-      <h3>🥃 Bar Inventory <span id="inventoryCountLabel">0 items</span></h3>
-      <div id="inventoryContent">
-        <div style="color: var(--text-muted); font-weight: 300; padding: 0.5rem 0;">No inventory loaded.</div>
-      </div>
-      <div class="inventory-total" id="inventoryTotal">
-        <span>Total bottles</span>
-        <span id="totalBottles">0</span>
-      </div>
-    </aside>
-
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast"></div>
-
-<script>
-  // ─── DATA ────────────────────────────────────────────────
-  const drinkMenu = [
-    { name: 'Prosecco Superiore', price: 160 },
-    { name: 'Pinot Grigio', price: 140 },
-    { name: 'Chianti Classico', price: 195 },
-    { name: 'Barolo', price: 280 },
-    { name: 'Aperol Spritz', price: 105 },
-    { name: 'Negroni', price: 120 },
-    { name: 'Lemonade & Lime', price: 65 },
-    { name: 'Italian Soda', price: 55 }
-  ];
-
-  // inventory items (bottles / portions)
-  const inventoryBase = [
-    { name: 'Prosecco', qty: 12 },
-    { name: 'Pinot Grigio', qty: 8 },
-    { name: 'Chianti', qty: 10 },
-    { name: 'Barolo', qty: 4 },
-    { name: 'Aperol', qty: 6 },
-    { name: 'Campari', qty: 5 },
-    { name: 'Gin', qty: 7 },
-    { name: 'Sweet Vermouth', qty: 4 },
-    { name: 'Soda Water', qty: 15 },
-    { name: 'Lemonade', qty: 10 }
-  ];
-
-  let inventory = JSON.parse(JSON.stringify(inventoryBase));
-
-  function randomDrinks(count) {
-    const shuffled = [...drinkMenu].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count).map(item => ({
-      ...item,
-      qty: Math.floor(Math.random() * 2) + 1
-    }));
-  }
-
-  // orders: status 'pending', 'mixing', 'ready'
-  let drinkOrders = [];
-  let orderIdCounter = 200;
-
-  function generateDrinkOrders() {
-    drinkOrders = [];
-    const statuses = ['pending', 'mixing', 'ready'];
-    const count = Math.floor(Math.random() * 3) + 2; // 2-4 orders
-    for (let i = 0; i < count; i++) {
-      const status = statuses[Math.floor(Math.random() * statuses.length)];
-      const items = randomDrinks(Math.floor(Math.random() * 3) + 1);
-      drinkOrders.push({
-        id: orderIdCounter++,
-        table: Math.floor(Math.random() * 12) + 1,
-        items: items,
-        status: status,
-        time: new Date(Date.now() - Math.floor(Math.random() * 20) * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-      });
-    }
-    // ensure at least one of each for demo
-    if (!drinkOrders.some(o => o.status === 'pending')) {
-      drinkOrders[0] = { ...drinkOrders[0], status: 'pending' };
-    }
-    if (!drinkOrders.some(o => o.status === 'mixing')) {
-      const idx = drinkOrders.length > 1 ? 1 : 0;
-      drinkOrders[idx] = { ...drinkOrders[idx], status: 'mixing' };
-    }
-    if (!drinkOrders.some(o => o.status === 'ready')) {
-      const idx = drinkOrders.length > 2 ? 2 : 0;
-      drinkOrders[idx] = { ...drinkOrders[idx], status: 'ready' };
-    }
-  }
-  generateDrinkOrders();
-
-  // ─── DOM REFS ─────────────────────────────────────────────
-  const orderList = document.getElementById('drinkOrderList');
-  const inventoryContent = document.getElementById('inventoryContent');
-  const inventoryCountLabel = document.getElementById('inventoryCountLabel');
-  const totalBottlesEl = document.getElementById('totalBottles');
-  const activeDrinkOrdersEl = document.getElementById('activeDrinkOrders');
-  const mixingCountEl = document.getElementById('mixingCount');
-  const readyDrinkCountEl = document.getElementById('readyDrinkCount');
-  const inventoryCountEl = document.getElementById('inventoryCount');
-  const drinkOrderCountLabel = document.getElementById('drinkOrderCountLabel');
-
-  // ─── TOAST ────────────────────────────────────────────────
-  function showToast(msg, duration = 2800) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(t._timeout);
-    t._timeout = setTimeout(() => t.classList.remove('show'), duration);
-  }
-
-  // ─── RENDER ───────────────────────────────────────────────
-  function renderStats() {
-    const active = drinkOrders.length;
-    const mixing = drinkOrders.filter(o => o.status === 'mixing').length;
-    const ready = drinkOrders.filter(o => o.status === 'ready').length;
-    const invCount = inventory.reduce((acc, i) => acc + i.qty, 0);
-    const lowItems = inventory.filter(i => i.qty < 3).length;
-
-    activeDrinkOrdersEl.textContent = active;
-    mixingCountEl.textContent = mixing;
-    readyDrinkCountEl.textContent = ready;
-    inventoryCountEl.textContent = inventory.length;
-    drinkOrderCountLabel.textContent = `${active} orders`;
-  }
-
-  function renderOrders() {
-    if (drinkOrders.length === 0) {
-      orderList.innerHTML = `<div style="color: var(--text-muted); font-weight: 300; padding: 1rem 0; text-align: center;">No drink orders. 🍸</div>`;
-      return;
-    }
-
-    let html = '';
-    drinkOrders.forEach(order => {
-      const statusMap = {
-        pending: { label: '🆕 New', cls: 'pending' },
-        mixing: { label: '🥄 Mixing', cls: 'mixing' },
-        ready: { label: '✅ Ready', cls: 'ready' }
-      };
-      const st = statusMap[order.status] || statusMap.pending;
-
-      const itemsHtml = order.items.map(item =>
-        `<span class="item drink"><span class="qty">${item.qty}×</span> ${item.name}</span>`
-      ).join('');
-
-      html += `
-        <div class="order-card" data-order-id="${order.id}">
-          <div class="order-head">
-            <span class="table-id">Table ${order.table} <small>· order #${order.id}</small></span>
-            <span class="time">${order.time}</span>
-            <span class="status-badge ${st.cls}">${st.label}</span>
-          </div>
-          <div class="order-items">${itemsHtml}</div>
-          <div class="order-actions">
-            ${order.status === 'pending' ? `<button class="btn-mix" data-action="startMixing" data-id="${order.id}">🥄 Start mixing</button>` : ''}
-            ${order.status === 'mixing' ? `<button class="btn-serve-drink" data-action="markDrinkReady" data-id="${order.id}">✅ Mark ready</button>` : ''}
-            ${order.status === 'ready' ? `<button class="btn-done-drink" data-action="serveDrinkComplete" data-id="${order.id}">🍸 Served & done</button>` : ''}
-            ${order.status !== 'ready' ? `<button class="btn-done-drink" data-action="cancelDrinkOrder" data-id="${order.id}" style="background:#e8d8d8;color:#6a3a3a;">✕ Cancel</button>` : ''}
-          </div>
+        <!-- STATS -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="label">Active drink orders</div>
+                <div class="value">@Model.ActiveDrinkOrders</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Mixing</div>
+                <div class="value">@Model.MixingCount</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Ready to serve</div>
+                <div class="value">@Model.ReadyCount</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Total Tables</div>
+                <div class="value">@Model.TotalTables</div>
+            </div>
         </div>
-      `;
-    });
-    orderList.innerHTML = html;
-    attachOrderActions();
-  }
 
-  function renderInventory() {
-    const total = inventory.reduce((acc, i) => acc + i.qty, 0);
-    if (inventory.length === 0) {
-      inventoryContent.innerHTML = `<div style="color: var(--text-muted); font-weight: 300; padding: 0.5rem 0;">No inventory.</div>`;
-      inventoryCountLabel.textContent = '0 items';
-      totalBottlesEl.textContent = '0';
-      return;
+        <!-- DRINK ORDERS -->
+        <section class="orders-section">
+            <div class="section-header">
+                <h3>🍹 Drink Orders</h3>
+                <span class="sub">@Model.ActiveDrinkOrders orders</span>
+            </div>
+
+            @if (!Model.DrinkOrders.Any())
+            {
+                <div class="empty-state">🍸 No drink orders waiting. All caught up!</div>
+            }
+            else
+            {
+                <div class="order-list">
+                    @foreach (var order in Model.DrinkOrders)
+                    {
+                        <div class="order-card">
+                            <div class="order-head">
+                                <span class="table-id">
+                                    Table @order.TableID
+                                    <small>· @order.TableType</small>
+                                </span>
+                                <span class="time">@order.TimeDisplay</span>
+                                <span class="status-badge @order.StatusCssClass">
+                                    @order.StatusLabel
+                                </span>
+                            </div>
+                            <div class="order-items">
+                                @foreach (var item in order.Items)
+                                {
+                                    <span class="item drink">
+                                        <span class="qty">@item.Quantity×</span> @item.ItemName
+                                    </span>
+                                }
+                            </div>
+                            <div class="order-actions">
+                                @if (order.CanStartMixing)
+                                {
+                                    <form method="post" asp-action="StartMixingDrinkOrder">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="orderID" value="@order.OrderID" />
+                                        <button type="submit" class="btn-mix">🥄 Start mixing</button>
+                                    </form>
+                                }
+                                @if (order.CanMarkReady)
+                                {
+                                    <form method="post" asp-action="MarkDrinkOrderReady">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="orderID" value="@order.OrderID" />
+                                        <button type="submit" class="btn-serve-drink">✅ Mark ready</button>
+                                    </form>
+                                }
+                                @if (order.CanServe)
+                                {
+                                    <form method="post" asp-action="ServeDrinkOrder">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="orderID" value="@order.OrderID" />
+                                        <button type="submit" class="btn-done-drink">🍸 Served</button>
+                                    </form>
+                                }
+                                @if (order.CanCancel)
+                                {
+                                    <form method="post" asp-action="CancelDrinkOrder"
+                                          onsubmit="return confirm('Cancel drink order #@order.OrderID? This will remove all drink items from the order.');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="orderID" value="@order.OrderID" />
+                                        <button type="submit" class="btn-cancel-drink">✕ Cancel</button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </section>
+
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    @if (TempData["ToastMessage"] != null)
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var t = document.getElementById('toast');
+                t.textContent = '@Html.Raw(TempData["ToastMessage"])';
+                t.classList.add('show');
+                setTimeout(function () { t.classList.remove('show'); }, 3000);
+            });
+        </script>
     }
-
-    let html = '';
-    inventory.forEach(item => {
-      const low = item.qty < 3;
-      html += `
-        <div class="inventory-item ${low ? 'low' : ''}">
-          <span class="inv-name">${item.name}</span>
-          <span class="inv-qty">${item.qty} ${item.qty === 1 ? 'bottle' : 'bottles'}</span>
-          ${low ? '<span class="inv-status">⚠️ low</span>' : ''}
-        </div>
-      `;
-    });
-    inventoryContent.innerHTML = html;
-    inventoryCountLabel.textContent = `${inventory.length} items`;
-    totalBottlesEl.textContent = total;
-  }
-
-  function renderAll() {
-    renderStats();
-    renderOrders();
-    renderInventory();
-  }
-
-  // ─── ACTION HANDLERS ─────────────────────────────────────
-  function attachOrderActions() {
-    document.querySelectorAll('[data-action]').forEach(btn => {
-      btn.removeEventListener('click', handleOrderAction);
-      btn.addEventListener('click', handleOrderAction);
-    });
-  }
-
-  function handleOrderAction(e) {
-    const btn = e.currentTarget;
-    const action = btn.dataset.action;
-    const id = parseInt(btn.dataset.id, 10);
-    const order = drinkOrders.find(o => o.id === id);
-    if (!order) return;
-
-    switch (action) {
-      case 'startMixing':
-        order.status = 'mixing';
-        // consume inventory: reduce qty for each item
-        order.items.forEach(item => {
-          const inv = inventory.find(i => i.name === item.name);
-          if (inv) {
-            inv.qty = Math.max(0, inv.qty - item.qty);
-          }
-        });
-        showToast(`🥄 Order #${id} now mixing.`);
-        break;
-      case 'markDrinkReady':
-        order.status = 'ready';
-        showToast(`✅ Order #${id} is ready to serve!`);
-        break;
-      case 'serveDrinkComplete':
-        drinkOrders = drinkOrders.filter(o => o.id !== id);
-        showToast(`🍸 Order #${id} served and completed.`);
-        break;
-      case 'cancelDrinkOrder':
-        drinkOrders = drinkOrders.filter(o => o.id !== id);
-        showToast(`✕ Order #${id} cancelled.`);
-        break;
-      default: return;
-    }
-    renderAll();
-  }
-
-  // ─── RESET ─────────────────────────────────────────────────
-  document.getElementById('resetBarBtn').addEventListener('click', () => {
-    inventory = JSON.parse(JSON.stringify(inventoryBase));
-    generateDrinkOrders();
-    renderAll();
-    showToast('🔄 Bar reset to demo state.');
-  });
-
-  // ─── ADD DUMMY DRINK ORDER ──────────────────────────────
-  document.getElementById('addDummyDrinkOrderBtn').addEventListener('click', () => {
-    const newOrder = {
-      id: orderIdCounter++,
-      table: Math.floor(Math.random() * 12) + 1,
-      items: randomDrinks(Math.floor(Math.random() * 3) + 1),
-      status: 'pending',
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-    drinkOrders.push(newOrder);
-    renderAll();
-    showToast(`➕ New drink order #${newOrder.id} added (Table ${newOrder.table}).`);
-  });
-
-  // ─── INIT ─────────────────────────────────────────────────
-  renderAll();
-</script>
 
 </body>
 </html>
