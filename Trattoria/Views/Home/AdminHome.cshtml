@@ -1,10 +1,16 @@
-﻿<!DOCTYPE html>
+﻿@model Trattoria.ViewModels.AdminHomeViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard · Trattoria Bella";
+    Layout = null;
+    var tab = Model.ActiveTab;
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trattoria Bella · Admin Homepage</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
     <style>
         * {
             margin: 0;
@@ -39,7 +45,7 @@
             margin: 0 auto;
         }
 
-        /* ----- HEADER ----- */
+        /* Header */
         .dashboard-header {
             display: flex;
             justify-content: space-between;
@@ -78,12 +84,6 @@
             font-weight: 400;
         }
 
-        .header-actions {
-            display: flex;
-            gap: 0.8rem;
-            align-items: center;
-        }
-
         .btn-outline {
             background: transparent;
             border: 1px solid var(--gold);
@@ -96,6 +96,8 @@
             cursor: pointer;
             transition: 0.2s;
             font-family: 'Jost', sans-serif;
+            text-decoration: none;
+            display: inline-block;
         }
 
             .btn-outline:hover {
@@ -103,30 +105,12 @@
                 color: white;
             }
 
-        .btn-primary-sm {
-            background: var(--red);
-            border: none;
-            color: white;
-            padding: 0.5rem 1.6rem;
-            border-radius: 40px;
-            font-size: 0.7rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: 0.2s;
-            font-family: 'Jost', sans-serif;
-        }
-
-            .btn-primary-sm:hover {
-                background: var(--brown);
-            }
-
-        /* ----- STATS ROW (admin metrics) ----- */
+        /* Stats */
         .stats-row {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 1.2rem;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
         }
 
         .stat-card {
@@ -159,15 +143,41 @@
                 font-weight: 300;
             }
 
-        /* ----- MAIN GRID: management panels ----- */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            align-items: start;
+        /* Tab nav */
+        .tab-nav {
+            display: flex;
+            gap: 0.4rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
         }
 
-        /* ----- PANEL BASE ----- */
+            .tab-nav a {
+                padding: 0.5rem 1.4rem;
+                border-radius: 40px;
+                font-size: 0.7rem;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                text-decoration: none;
+                font-family: 'Jost', sans-serif;
+                transition: 0.2s;
+                border: 1px solid transparent;
+                color: var(--text-muted);
+                background: var(--warm-white);
+                box-shadow: var(--shadow);
+            }
+
+                .tab-nav a:hover {
+                    border-color: var(--gold-light);
+                    color: var(--brown);
+                }
+
+                .tab-nav a.active {
+                    background: var(--brown);
+                    color: var(--cream);
+                    border-color: var(--brown);
+                }
+
+        /* Panel */
         .panel {
             background: var(--warm-white);
             border-radius: var(--radius);
@@ -179,13 +189,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.4rem;
             flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
             .panel-header h3 {
                 font-family: 'Cormorant Garamond', serif;
-                font-size: 1.4rem;
+                font-size: 1.5rem;
                 font-weight: 400;
                 color: var(--brown);
             }
@@ -198,187 +209,552 @@
                 color: var(--text-muted);
             }
 
-            .panel-header .action-link {
-                font-size: 0.7rem;
-                color: var(--gold);
-                text-decoration: none;
-                letter-spacing: 0.05em;
-                cursor: pointer;
+        /* Two-col grid */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @@media (max-width: 900px) {
+            .two-col {
+                grid-template-columns: 1fr;
             }
+        }
 
-                .panel-header .action-link:hover {
-                    text-decoration: underline;
-                }
-
-        /* ----- USER LIST (staff) ----- */
+        /* ── STAFF ── */
         .user-list {
             display: flex;
             flex-direction: column;
-            gap: 0.6rem;
+            gap: 0.55rem;
         }
 
         .user-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.6rem 0.8rem;
+            padding: 0.65rem 0.9rem;
             background: white;
-            border-radius: 8px;
+            border-radius: 10px;
             border: 1px solid rgba(184,134,11,0.08);
+            gap: 0.5rem;
+            flex-wrap: wrap;
         }
 
-            .user-item .user-info {
-                display: flex;
-                align-items: center;
-                gap: 0.8rem;
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .user-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--gold-light);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 0.88rem;
+        }
+
+        .user-role-badge {
+            font-size: 0.62rem;
+            color: var(--text-muted);
+            background: var(--cream);
+            padding: 0.1rem 0.7rem;
+            border-radius: 30px;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 0.4rem;
+            align-items: center;
+        }
+
+        .btn-remove {
+            background: #e8d8d8;
+            border: none;
+            color: #6a3a3a;
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            cursor: pointer;
+            font-family: 'Jost', sans-serif;
+            transition: 0.15s;
+        }
+
+            .btn-remove:hover {
+                background: #dcc8c8;
             }
 
-            .user-item .user-avatar {
-                width: 32px;
-                height: 32px;
-                border-radius: 50%;
-                background: var(--gold-light);
-                color: white;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-weight: 500;
-                font-size: 0.8rem;
+        /* Add staff form */
+        .add-form {
+            background: white;
+            border-radius: 10px;
+            padding: 1.2rem;
+            border: 1px solid rgba(184,134,11,0.12);
+            margin-top: 1rem;
+        }
+
+            .add-form h4 {
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 1.1rem;
+                font-weight: 400;
+                color: var(--brown);
+                margin-bottom: 0.9rem;
             }
 
-            .user-item .user-name {
-                font-weight: 500;
-                font-size: 0.9rem;
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.7rem;
+            margin-bottom: 0.7rem;
+        }
+
+            .form-row.single {
+                grid-template-columns: 1fr;
             }
 
-            .user-item .user-role {
-                font-size: 0.65rem;
-                color: var(--text-muted);
-                background: var(--cream);
-                padding: 0.1rem 0.7rem;
-                border-radius: 30px;
-            }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
 
-            .user-item .user-status {
-                font-size: 0.6rem;
+            .form-group label {
+                font-size: 0.62rem;
+                letter-spacing: 0.1em;
                 text-transform: uppercase;
-                letter-spacing: 0.06em;
-                color: #2a5a2a;
+                color: var(--text-muted);
             }
 
-                .user-item .user-status.inactive {
-                    color: var(--text-muted);
+            .form-group input, .form-group select, .form-group textarea {
+                border: 1px solid rgba(184,134,11,0.22);
+                border-radius: 8px;
+                padding: 0.5rem 0.7rem;
+                font-family: 'Jost', sans-serif;
+                font-size: 0.83rem;
+                color: var(--text);
+                background: var(--warm-white);
+                outline: none;
+                width: 100%;
+            }
+
+                .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+                    border-color: var(--gold);
                 }
 
-        /* ----- MENU ITEMS (quick list) ----- */
-        .menu-preview {
+            .form-group textarea {
+                resize: vertical;
+                min-height: 60px;
+            }
+
+        .btn-submit {
+            background: var(--red);
+            border: none;
+            color: white;
+            padding: 0.55rem 1.6rem;
+            border-radius: 40px;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 0.5rem;
+        }
+
+            .btn-submit:hover {
+                background: var(--brown);
+            }
+
+            .btn-submit.gold {
+                background: var(--gold);
+            }
+
+                .btn-submit.gold:hover {
+                    background: var(--gold-light);
+                }
+
+        /* ── MENU ── */
+        .menu-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+            .menu-table th {
+                text-align: left;
+                font-size: 0.62rem;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                color: var(--text-muted);
+                font-weight: 400;
+                padding: 0 0.6rem 0.6rem;
+                border-bottom: 1px solid rgba(184,134,11,0.15);
+            }
+
+            .menu-table td {
+                padding: 0.6rem 0.6rem;
+                border-bottom: 1px solid rgba(0,0,0,0.04);
+                vertical-align: middle;
+            }
+
+            .menu-table tr:last-child td {
+                border-bottom: none;
+            }
+
+            .menu-table tr:hover td {
+                background: #faf7f0;
+            }
+
+        .type-badge {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            background: var(--cream);
+            color: var(--text-muted);
+            padding: 0.1rem 0.6rem;
+            border-radius: 30px;
+        }
+
+        .price-cell {
+            font-weight: 500;
+            color: var(--brown);
+            white-space: nowrap;
+        }
+
+        .desc-cell {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .td-actions {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        .btn-edit {
+            background: #e8f0d8;
+            border: none;
+            color: #3a5a1a;
+            padding: 0.2rem 0.7rem;
+            border-radius: 30px;
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-family: 'Jost', sans-serif;
+            transition: 0.15s;
+        }
+
+            .btn-edit:hover {
+                background: #d8e8c8;
+            }
+
+        /* ── OVERVIEW: reservations + sales ── */
+        .res-list {
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
         }
 
-        .menu-preview-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.4rem 0;
-            border-bottom: 1px solid rgba(0,0,0,0.04);
-            font-size: 0.85rem;
-        }
-
-            .menu-preview-item .item-cat {
-                font-size: 0.6rem;
-                color: var(--text-muted);
-                text-transform: uppercase;
-                letter-spacing: 0.06em;
-                background: var(--cream);
-                padding: 0.05rem 0.6rem;
-                border-radius: 30px;
-            }
-
-            .menu-preview-item .item-price {
-                font-weight: 500;
-                color: var(--brown);
-            }
-
-        /* ----- RESERVATIONS (today) ----- */
-        .reservation-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
-        }
-
-        .reservation-item {
+        .res-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.5rem 0.8rem;
+            padding: 0.55rem 0.8rem;
             background: white;
             border-radius: 8px;
             border-left: 3px solid var(--gold);
+            gap: 0.5rem;
+            flex-wrap: wrap;
         }
 
-            .reservation-item .res-info {
-                display: flex;
-                flex-direction: column;
+        .res-name {
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .res-detail {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .res-time {
+            font-weight: 500;
+            font-size: 0.8rem;
+            color: var(--brown);
+            background: var(--cream);
+            padding: 0.15rem 0.7rem;
+            border-radius: 30px;
+        }
+
+        .res-status {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 0.15rem 0.65rem;
+            border-radius: 30px;
+        }
+
+            .res-status.confirmed {
+                background: #dce8d8;
+                color: #1e4a1e;
             }
 
-            .reservation-item .res-name {
-                font-weight: 500;
-                font-size: 0.85rem;
+            .res-status.seated {
+                background: #f5e0c8;
+                color: #a0672a;
             }
 
-            .reservation-item .res-detail {
-                font-size: 0.7rem;
+            .res-status.completed {
+                background: #e8e0d8;
                 color: var(--text-muted);
             }
 
-            .reservation-item .res-time {
-                font-weight: 500;
-                font-size: 0.8rem;
-                color: var(--brown);
+            .res-status.cancelled {
+                background: #f0d8d8;
+                color: #8b1a1a;
             }
 
-        /* ----- SALES SNAPSHOT (mini chart) ----- */
-        .sales-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 0.8rem;
-            margin-top: 0.5rem;
+            .res-status.waiting {
+                background: #f0d8d8;
+                color: #8b1a1a;
+            }
+
+        /* ── REPORTS ── */
+        .report-section {
+            margin-bottom: 2rem;
         }
 
-        .sales-day {
-            text-align: center;
-            padding: 0.6rem 0.4rem;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid rgba(184,134,11,0.08);
+            .report-section h4 {
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 1.2rem;
+                font-weight: 400;
+                color: var(--brown);
+                margin-bottom: 1rem;
+            }
+
+        .sales-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
         }
 
-            .sales-day .day-label {
-                font-size: 0.6rem;
+            .sales-table th {
+                text-align: left;
+                font-size: 0.62rem;
+                letter-spacing: 0.1em;
                 text-transform: uppercase;
                 color: var(--text-muted);
-                letter-spacing: 0.06em;
+                font-weight: 400;
+                padding: 0 0.8rem 0.6rem;
+                border-bottom: 1px solid rgba(184,134,11,0.15);
             }
 
-            .sales-day .day-amount {
+            .sales-table td {
+                padding: 0.65rem 0.8rem;
+                border-bottom: 1px solid rgba(0,0,0,0.04);
+            }
+
+            .sales-table tr:last-child td {
+                border-bottom: none;
+            }
+
+            .sales-table .today-row td {
+                background: #fdf8ee;
+                font-weight: 500;
+            }
+
+            .sales-table .total-row td {
+                border-top: 2px solid rgba(184,134,11,0.2);
+                font-weight: 600;
+                font-size: 0.9rem;
+            }
+
+        .revenue-cell {
+            color: var(--brown);
+            font-weight: 500;
+        }
+
+        /* Bar chart */
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+            height: 100px;
+            margin: 1rem 0 0.5rem;
+        }
+
+        .bar-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .bar {
+            width: 100%;
+            background: var(--gold);
+            border-radius: 4px 4px 0 0;
+            transition: 0.3s;
+            min-height: 4px;
+        }
+
+            .bar.today {
+                background: var(--brown);
+            }
+
+        .bar-label {
+            font-size: 0.55rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-top: 0.4rem;
+            text-align: center;
+        }
+
+        /* Summary cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem 1.2rem;
+            border: 1px solid rgba(184,134,11,0.12);
+            text-align: center;
+        }
+
+            .summary-card .sc-label {
+                font-size: 0.62rem;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                color: var(--text-muted);
+            }
+
+            .summary-card .sc-value {
+                font-family: 'Cormorant Garamond', serif;
+                font-size: 1.6rem;
+                font-weight: 400;
+                color: var(--brown);
+                line-height: 1.2;
+            }
+
+        /* Empty state */
+        .empty-state {
+            color: var(--text-muted);
+            font-weight: 300;
+            padding: 1rem 0;
+            text-align: center;
+            font-style: italic;
+        }
+
+        /* Edit modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(61,43,31,0.45);
+            backdrop-filter: blur(3px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+            .modal-overlay.open {
+                opacity: 1;
+                pointer-events: all;
+            }
+
+        .modal {
+            background: var(--warm-white);
+            border-radius: var(--radius);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+            padding: 2rem 2.2rem;
+            width: 100%;
+            max-width: 480px;
+            transform: translateY(20px);
+            transition: transform 0.25s ease;
+        }
+
+        .modal-overlay.open .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.4rem;
+        }
+
+            .modal-header h3 {
                 font-family: 'Cormorant Garamond', serif;
                 font-size: 1.4rem;
                 font-weight: 400;
                 color: var(--brown);
             }
 
-            .sales-day .day-orders {
-                font-size: 0.6rem;
-                color: var(--text-muted);
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+            .modal-close:hover {
+                color: var(--red);
             }
 
-            .sales-day.highlight {
-                border-color: var(--gold);
-                background: #fcf8f0;
-            }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.7rem;
+            margin-top: 1.4rem;
+        }
 
-        /* ----- TOAST ----- */
+        .btn-modal-cancel {
+            background: var(--cream);
+            border: none;
+            color: var(--text-muted);
+            padding: 0.6rem 1.4rem;
+            border-radius: 40px;
+            font-family: 'Jost', sans-serif;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        /* Toast */
         .toast {
             position: fixed;
             bottom: 2rem;
@@ -391,26 +767,12 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.15);
             transform: translateX(130%);
             transition: transform 0.35s ease;
-            z-index: 999;
+            z-index: 1100;
         }
 
             .toast.show {
                 transform: translateX(0);
             }
-
-        /* responsive */
-      
-        body {
-            padding: 1rem;
-        }
-
-        }
-      
-        .sales-grid {
-            grid-template-columns: 1fr;
-        }
-
-        }
     </style>
 </head>
 <body>
@@ -421,289 +783,523 @@
         <header class="dashboard-header">
             <div class="header-left">
                 <div class="brand">Trattoria <span>Bella</span></div>
-                <span class="admin-badge">⚙️ Admin · Giovanni</span>
+                <span class="admin-badge">⚙️ Admin · @Model.AdminName</span>
             </div>
             <div class="header-actions">
-                <button class="btn-outline" id="resetAdminBtn">🔄 Reset data</button>
-                <button class="btn-primary-sm" id="addDummyDataBtn">➕ Add test data</button>
+                <a asp-action="AdminHome" class="btn-outline">🔄 Refresh</a>
             </div>
         </header>
 
         <!-- STATS -->
         <div class="stats-row">
-            <div class="stat-card"><div class="label">Total staff</div><div class="value" id="totalStaff">0</div></div>
-            <div class="stat-card"><div class="label">Menu items</div><div class="value" id="totalMenuItems">0</div></div>
-            <div class="stat-card"><div class="label">Today's reservations</div><div class="value" id="todayReservations">0</div></div>
-            <div class="stat-card"><div class="label">Today's revenue</div><div class="value" id="todayRevenue">R 0</div><div class="sub" id="todayOrders">0 orders</div></div>
+            <div class="stat-card">
+                <div class="label">Total Staff</div>
+                <div class="value">@Model.TotalStaff</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Menu Items</div>
+                <div class="value">@Model.TotalMenuItems</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Today's Reservations</div>
+                <div class="value">@Model.TodayReservations</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">Today's Revenue</div>
+                <div class="value">R @Model.TodayRevenue.ToString("N0")</div>
+                <div class="sub">@Model.TodayOrderCount orders</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">This Week</div>
+                <div class="value">R @Model.WeekRevenue.ToString("N0")</div>
+            </div>
         </div>
 
-        <!-- GRID -->
-        <div class="dashboard-grid">
+        <!-- TAB NAV -->
+        <nav class="tab-nav">
+            <a asp-action="AdminHome" asp-route-tab="overview"
+               class="@(tab == "overview" ? "active" : "")">📊 Overview</a>
+            <a asp-action="AdminHome" asp-route-tab="staff"
+               class="@(tab == "staff" ? "active" : "")">👥 Staff</a>
+            <a asp-action="AdminHome" asp-route-tab="menu"
+               class="@(tab == "menu" ? "active" : "")">📋 Menu</a>
+            <a asp-action="AdminHome" asp-route-tab="reports"
+               class="@(tab == "reports" ? "active" : "")">📈 Reports</a>
+        </nav>
 
-            <!-- LEFT COLUMN: Staff + Menu -->
-            <div class="panel">
-                <div class="panel-header">
-                    <h3>👥 Staff</h3>
-                    <span class="badge" id="staffBadge">0 active</span>
-                    <a class="action-link" id="manageStaffLink">Manage →</a>
-                </div>
-                <div class="user-list" id="staffList">
-                    <!-- injected -->
-                </div>
-
-                <div style="margin-top: 1.8rem; border-top: 1px solid rgba(184,134,11,0.12); padding-top: 1.2rem;">
-                    <div class="panel-header" style="margin-bottom: 0.8rem;">
-                        <h3>📋 Menu Overview</h3>
-                        <a class="action-link" id="manageMenuLink">Edit menu →</a>
+        @* ══════════════════════════════════════════════════════════
+       OVERVIEW TAB
+    ══════════════════════════════════════════════════════════ *@
+        @if (tab == "overview")
+        {
+            <div class="two-col">
+                <!-- Today's reservations -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>📅 Today's Reservations</h3>
+                        <span class="badge">@Model.TodayReservations</span>
                     </div>
-                    <div class="menu-preview" id="menuPreview">
-                        <!-- injected -->
-                    </div>
+                    @if (!Model.TodaysReservations.Any())
+                    {
+                        <div class="empty-state">No reservations today.</div>
+                    }
+                    else
+                    {
+                        <div class="res-list">
+                            @foreach (var r in Model.TodaysReservations)
+                            {
+                                <div class="res-item">
+                                    <div>
+                                        <div class="res-name">@r.GuestName</div>
+                                        <div class="res-detail">@r.GuestCapacity guests · Table @r.TableID</div>
+                                    </div>
+                                    <div style="display:flex;gap:0.5rem;align-items:center;">
+                                        <span class="res-time">@r.ReservationDate.ToString("HH:mm")</span>
+                                        <span class="res-status @r.StatusCssClass">@r.StatusLabel</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
                 </div>
-            </div>
 
-            <!-- RIGHT COLUMN: Reservations + Sales -->
-            <div class="panel">
-                <div class="panel-header">
-                    <h3>📅 Today's Reservations</h3>
-                    <span class="badge" id="resBadge">0</span>
-                    <a class="action-link" id="manageResLink">View all →</a>
-                </div>
-                <div class="reservation-list" id="reservationList">
-                    <!-- injected -->
-                </div>
-
-                <div style="margin-top: 1.8rem; border-top: 1px solid rgba(184,134,11,0.12); padding-top: 1.2rem;">
-                    <div class="panel-header" style="margin-bottom: 0.8rem;">
+                <!-- Sales snapshot -->
+                <div class="panel">
+                    <div class="panel-header">
                         <h3>📊 Sales Snapshot</h3>
-                        <span class="badge">last 3 days</span>
+                        <span class="badge">last 7 days</span>
                     </div>
-                    <div class="sales-grid" id="salesGrid">
-                        <!-- injected -->
+
+                    @{
+                        var maxRev = Model.DailySales.Max(d => d.Revenue);
+                        if (maxRev == 0) maxRev = 1;
+                    }
+                    <div class="bar-chart">
+                        @foreach (var day in Model.DailySales.AsEnumerable().Reverse())
+                        {
+                            var pct = (int)((day.Revenue / maxRev) * 100);
+                            var isToday = day.Date.Date == DateTime.Today;
+                            <div class="bar-wrap">
+                                <div class="bar @(isToday ? "today" : "")" style="height:@pct%;" title="R @day.Revenue.ToString("N0")"></div>
+                                <div class="bar-label">@(isToday ? "Today" : day.Date.ToString("ddd"))</div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <div class="sc-label">Today</div>
+                            <div class="sc-value">R @Model.TodayRevenue.ToString("N0")</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="sc-label">This Week</div>
+                            <div class="sc-value">R @Model.WeekRevenue.ToString("N0")</div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="sc-label">Avg/Order</div>
+                            <div class="sc-value">
+                                R @(Model.TodayOrderCount > 0
+                                                            ? (Model.TodayRevenue / Model.TodayOrderCount).ToString("N0")
+                                                            : "0")
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
+                }
 
+        @* ══════════════════════════════════════════════════════════
+       STAFF TAB
+    ══════════════════════════════════════════════════════════ *@
+        else if (tab == "staff")
+        {
+            <div class="two-col">
+                <!-- Staff list -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>👥 Staff Members</h3>
+                        <span class="badge">@Model.TotalStaff total</span>
+                    </div>
+
+                    @if (!Model.Staff.Any())
+                    {
+                        <div class="empty-state">No staff members found.</div>
+                    }
+                    else
+                    {
+                        <div class="user-list">
+                            @foreach (var u in Model.Staff)
+                            {
+                                var initials = (u.Name.Length > 0 ? u.Name[0].ToString() : "") +
+                                (u.Surname.Length > 0 ? u.Surname[0].ToString() : "");
+                                <div class="user-item">
+                                    <div class="user-info">
+                                        <div class="user-avatar">@initials.ToUpper()</div>
+                                        <div>
+                                            <div class="user-name">@u.Name @u.Surname</div>
+                                            <div style="font-size:0.68rem;color:var(--text-muted);">@@@u.Username</div>
+                                        </div>
+                                        <span class="user-role-badge">@u.Role</span>
+                                    </div>
+                                    <div class="user-actions">
+                                        <form method="post" asp-action="RemoveStaff"
+                                              onsubmit="return confirm('Remove @u.Name @u.Surname?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="userID" value="@u.UserID" />
+                                            <button type="submit" class="btn-remove">✕ Remove</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <!-- Add staff form -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3>➕ Add Staff Member</h3>
+                    </div>
+                    <form method="post" asp-action="AddStaff">
+                        @Html.AntiForgeryToken()
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="staffName">First Name</label>
+                                <input id="staffName" type="text" name="name" placeholder="e.g. Marco" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="staffSurname">Surname</label>
+                                <input id="staffSurname" type="text" name="surname" placeholder="e.g. Rossi" required />
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="staffUsername">Username</label>
+                                <input id="staffUsername" type="text" name="username" placeholder="e.g. marco.rossi" required />
+                            </div>
+                            <div class="form-group">
+                                <label for="staffPassword">Password</label>
+                                <input id="staffPassword" type="password" name="password" placeholder="••••••••" required />
+                            </div>
+                        </div>
+                        <div class="form-row single">
+                            <div class="form-group">
+                                <label for="staffRole">Role</label>
+                                <select id="staffRole" name="role" required>
+                                    <option value="">— Select role —</option>
+                                    @foreach (var role in Model.Roles)
+                                    {
+                                        <option value="@role">@role</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-submit">✅ Add Staff Member</button>
+                    </form>
+                </div>
+            </div>
+        }
+
+        @* ══════════════════════════════════════════════════════════
+       MENU TAB
+    ══════════════════════════════════════════════════════════ *@
+        else if (tab == "menu")
+        {
+            <div class="two-col">
+                <!-- Menu table -->
+                <div class="panel" style="grid-column: 1 / -1;">
+                    <div class="panel-header">
+                        <h3>📋 Menu Items</h3>
+                        <span class="badge">@Model.TotalMenuItems items</span>
+                    </div>
+
+                    @if (!Model.MenuItems.Any())
+                    {
+                        <div class="empty-state">No menu items yet.</div>
+                    }
+                    else
+                    {
+                        <table class="menu-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Price</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.MenuItems)
+                                {
+                                    <tr>
+                                        <td>@item.Name</td>
+                                        <td><span class="type-badge">@item.Type</span></td>
+                                        <td class="desc-cell" title="@item.Description">@item.Description</td>
+                                        <td class="price-cell">R @item.Price.ToString("N2")</td>
+                                        <td>
+                                            <div class="td-actions">
+                                                <button type="button" class="btn-edit"
+                                                        onclick="openEditMenu(@item.MenuItemID, '@Html.Raw(item.Name.Replace("'", "\\\'"))', '@item.Type', '@Html.Raw((item.Description ?? "").Replace("'", "\\\'"))', @item.Price)">
+                                                    ✏️ Edit
+                                                </button>
+                                                <form method="post" asp-action="RemoveMenuItem"
+                                                      onsubmit="return confirm('Remove @Html.Raw(item.Name.Replace("'","\\'"))?');"
+                                                      style="display:inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="menuItemID" value="@item.MenuItemID" />
+                                                    <button type="submit" class="btn-remove">✕</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+
+            <!-- Add menu item form -->
+            <div class="panel" style="margin-top:1.5rem;">
+                <div class="panel-header">
+                    <h3>➕ Add Menu Item</h3>
+                </div>
+                <form method="post" asp-action="AddMenuItem">
+                    @Html.AntiForgeryToken()
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Item Name</label>
+                            <input type="text" name="name" placeholder="e.g. Bistecca Fiorentina" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Type / Category</label>
+                            <input type="text" name="type" placeholder="e.g. Secondi, Cocktail, Wine…" required />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Price (R)</label>
+                            <input type="number" name="price" step="0.01" min="0" placeholder="0.00" required />
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <input type="text" name="description" placeholder="Short description…" />
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit gold">✅ Add to Menu</button>
+                </form>
+            </div>
+        }
+
+        @* ══════════════════════════════════════════════════════════
+       REPORTS TAB
+    ══════════════════════════════════════════════════════════ *@
+        else if (tab == "reports")
+        {
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>📈 Income Report</h3>
+                </div>
+
+                <!-- Daily — last 7 days -->
+                <div class="report-section">
+                    <h4>Daily Sales — Last 7 Days</h4>
+
+                    @{
+                        var maxRev2 = Model.DailySales.Max(d => d.Revenue);
+                        if (maxRev2 == 0) maxRev2 = 1;
+                    }
+                    <div class="bar-chart" style="height:120px;">
+                        @foreach (var day in Model.DailySales.AsEnumerable().Reverse())
+                        {
+                            var pct2 = (int)((day.Revenue / maxRev2) * 100);
+                            var isToday2 = day.Date.Date == DateTime.Today;
+                            <div class="bar-wrap">
+                                <div class="bar @(isToday2 ? "today" : "")" style="height:@pct2%;"
+                                     title="R @day.Revenue.ToString("N2") · @day.OrderCount orders"></div>
+                                <div class="bar-label">@(isToday2 ? "Today" : day.Date.ToString("ddd d"))</div>
+                            </div>
+                        }
+                    </div>
+
+                    <table class="sales-table" style="margin-top:1rem;">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Orders</th>
+                                <th>Revenue</th>
+                                <th>Tips</th>
+                                <th>Avg / Order</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var day in Model.DailySales)
+                            {
+                                <tr class="@(day.Date.Date == DateTime.Today ? "today-row" : "")">
+                                    <td>@day.Label</td>
+                                    <td>@day.OrderCount</td>
+                                    <td class="revenue-cell">R @day.Revenue.ToString("N2")</td>
+                                    <td>—</td>
+                                    <td>R @day.AvgOrder.ToString("N2")</td>
+                                </tr>
+                            }
+                            <tr class="total-row">
+                                <td>7-Day Total</td>
+                                <td>@Model.DailySales.Sum(d => d.OrderCount)</td>
+                                <td class="revenue-cell">R @Model.DailySales.Sum(d => d.Revenue).ToString("N2")</td>
+                                <td>—</td>
+                                <td>—</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Monthly — last 6 months -->
+                <div class="report-section">
+                    <h4>Monthly Sales — Last 6 Months</h4>
+                    @if (!Model.MonthlySales.Any())
+                    {
+                        <div class="empty-state">No paid orders recorded yet.</div>
+                    }
+                    else
+                    {
+                        <table class="sales-table">
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Orders</th>
+                                    <th>Revenue</th>
+                                    <th>Avg / Order</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var m in Model.MonthlySales)
+                                {
+                                    <tr>
+                                        <td>@m.Label</td>
+                                        <td>@m.OrderCount</td>
+                                        <td class="revenue-cell">R @m.Revenue.ToString("N2")</td>
+                                        <td>R @m.AvgOrder.ToString("N2")</td>
+                                    </tr>
+                                }
+                                <tr class="total-row">
+                                    <td>Total</td>
+                                    <td>@Model.MonthlySales.Sum(m => m.OrderCount)</td>
+                                    <td class="revenue-cell">R @Model.MonthlySales.Sum(m => m.Revenue).ToString("N2")</td>
+                                    <td>—</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    }
+                </div>
+
+                <!-- Summary cards -->
+                <div class="summary-cards" style="grid-template-columns: repeat(auto-fit, minmax(140px,1fr));">
+                    <div class="summary-card">
+                        <div class="sc-label">Today</div>
+                        <div class="sc-value">R @Model.TodayRevenue.ToString("N0")</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="sc-label">This Week</div>
+                        <div class="sc-value">R @Model.WeekRevenue.ToString("N0")</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="sc-label">This Month</div>
+                        <div class="sc-value">R @Model.MonthRevenue.ToString("N0")</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="sc-label">Today Orders</div>
+                        <div class="sc-value">@Model.TodayOrderCount</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="sc-label">Avg / Order</div>
+                        <div class="sc-value">
+                            R @(Model.TodayOrderCount > 0
+                                                    ? (Model.TodayRevenue / Model.TodayOrderCount).ToString("N0")
+                                                    : "0")
+                    </div>
+                </div>
+            </div>
+        </div>
+                }
+
+    </div>
+
+    <!-- EDIT MENU ITEM MODAL -->
+    <div class="modal-overlay" id="editMenuModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>✏️ Edit Menu Item</h3>
+                <button type="button" class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <form method="post" asp-action="EditMenuItem">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="menuItemID" id="editMenuItemID" />
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Item Name</label>
+                        <input type="text" name="name" id="editName" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Type / Category</label>
+                        <input type="text" name="type" id="editType" required />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Price (R)</label>
+                        <input type="number" name="price" id="editPrice" step="0.01" min="0" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" name="description" id="editDescription" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-modal-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-submit" style="margin-top:0;">Save Changes</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <!-- TOAST -->
     <div class="toast" id="toast"></div>
 
+    @if (TempData["ToastMessage"] != null)
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var t = document.getElementById('toast');
+                t.textContent = '@Html.Raw(TempData["ToastMessage"])';
+                t.classList.add('show');
+                setTimeout(function () { t.classList.remove('show'); }, 3500);
+            });
+        </script>
+    }
+
     <script>
-        // ─── DATA ────────────────────────────────────────────────
-
-        // Staff
-        let staff = [
-          { id: 1, name: 'Marco Rossi', role: 'Waiter', active: true, initials: 'MR' },
-          { id: 2, name: 'Luca Bianchi', role: 'Chef', active: true, initials: 'LB' },
-          { id: 3, name: 'Elena Verdi', role: 'Bartender', active: true, initials: 'EV' },
-          { id: 4, name: 'Sofia Neri', role: 'Waiter', active: false, initials: 'SN' },
-          { id: 5, name: 'Alessandro Gialli', role: 'Chef', active: true, initials: 'AG' }
-        ];
-
-        // Menu
-        let menuItems = [
-          { name: 'Burrata con Prosciutto', category: 'Antipasti', price: 185 },
-          { name: 'Pappardelle al Cinghiale', category: 'Primi', price: 225 },
-          { name: 'Bistecca Fiorentina', category: 'Secondi', price: 445 },
-          { name: 'Tiramisù della Casa', category: 'Dolci', price: 95 },
-          { name: 'Prosecco Superiore', category: 'Vini', price: 160 },
-          { name: 'Aperol Spritz', category: 'Cocktails', price: 105 }
-        ];
-
-        // Reservations (today)
-        let reservations = [
-          { name: 'Gabriella M.', guests: 2, time: '18:30', table: 4 },
-          { name: 'James & Lindiwe', guests: 4, time: '19:00', table: 7 },
-          { name: 'Marco R.', guests: 1, time: '20:15', table: 2 },
-          { name: 'The Johnson Family', guests: 6, time: '19:45', table: 10 }
-        ];
-
-        // Sales data (last 3 days)
-        let salesData = [
-          { day: 'Today', amount: 4850, orders: 18 },
-          { day: 'Yesterday', amount: 3200, orders: 13 },
-          { day: '2 days ago', amount: 4100, orders: 15 }
-        ];
-
-        // ─── DOM REFS ─────────────────────────────────────────────
-        const staffList = document.getElementById('staffList');
-        const staffBadge = document.getElementById('staffBadge');
-        const menuPreview = document.getElementById('menuPreview');
-        const reservationList = document.getElementById('reservationList');
-        const resBadge = document.getElementById('resBadge');
-        const salesGrid = document.getElementById('salesGrid');
-
-        const totalStaffEl = document.getElementById('totalStaff');
-        const totalMenuItemsEl = document.getElementById('totalMenuItems');
-        const todayReservationsEl = document.getElementById('todayReservations');
-        const todayRevenueEl = document.getElementById('todayRevenue');
-        const todayOrdersEl = document.getElementById('todayOrders');
-
-        // ─── TOAST ────────────────────────────────────────────────
-        function showToast(msg, duration = 2800) {
-          const t = document.getElementById('toast');
-          t.textContent = msg;
-          t.classList.add('show');
-          clearTimeout(t._timeout);
-          t._timeout = setTimeout(() => t.classList.remove('show'), duration);
+        function openEditMenu(id, name, type, description, price) {
+            document.getElementById('editMenuItemID').value  = id;
+            document.getElementById('editName').value        = name;
+            document.getElementById('editType').value        = type;
+            document.getElementById('editDescription').value = description;
+            document.getElementById('editPrice').value       = price;
+            document.getElementById('editMenuModal').classList.add('open');
         }
 
-        // ─── RENDER ───────────────────────────────────────────────
-
-        function renderStats() {
-          const activeStaff = staff.filter(s => s.active).length;
-          totalStaffEl.textContent = staff.length;
-          totalMenuItemsEl.textContent = menuItems.length;
-          todayReservationsEl.textContent = reservations.length;
-          const todaySales = salesData[0];
-          todayRevenueEl.textContent = `R ${todaySales.amount}`;
-          todayOrdersEl.textContent = `${todaySales.orders} orders`;
-          staffBadge.textContent = `${activeStaff} active`;
-          resBadge.textContent = reservations.length;
+        function closeModal() {
+            document.getElementById('editMenuModal').classList.remove('open');
         }
 
-        function renderStaff() {
-          if (staff.length === 0) {
-            staffList.innerHTML = `<div style="color: var(--text-muted); font-weight: 300; padding: 0.5rem 0;">No staff.</div>`;
-            return;
-          }
-          let html = '';
-          staff.forEach(s => {
-            html += `
-              <div class="user-item">
-                <div class="user-info">
-                  <div class="user-avatar">${s.initials}</div>
-                  <span class="user-name">${s.name}</span>
-                  <span class="user-role">${s.role}</span>
-                </div>
-                <span class="user-status ${s.active ? '' : 'inactive'}">${s.active ? '● Online' : '○ Offline'}</span>
-              </div>
-            `;
-          });
-          staffList.innerHTML = html;
-        }
-
-        function renderMenuPreview() {
-          if (menuItems.length === 0) {
-            menuPreview.innerHTML = `<div style="color: var(--text-muted); font-weight: 300; padding: 0.5rem 0;">No menu items.</div>`;
-            return;
-          }
-          // show first 6 items
-          const items = menuItems.slice(0, 6);
-          let html = '';
-          items.forEach(item => {
-            html += `
-              <div class="menu-preview-item">
-                <span><span class="item-cat">${item.category}</span> ${item.name}</span>
-                <span class="item-price">R ${item.price}</span>
-              </div>
-            `;
-          });
-          menuPreview.innerHTML = html;
-        }
-
-        function renderReservations() {
-          if (reservations.length === 0) {
-            reservationList.innerHTML = `<div style="color: var(--text-muted); font-weight: 300; padding: 0.5rem 0;">No reservations today.</div>`;
-            return;
-          }
-          let html = '';
-          reservations.forEach(r => {
-            html += `
-              <div class="reservation-item">
-                <div class="res-info">
-                  <span class="res-name">${r.name}</span>
-                  <span class="res-detail">${r.guests} guests · Table ${r.table}</span>
-                </div>
-                <span class="res-time">${r.time}</span>
-              </div>
-            `;
-          });
-          reservationList.innerHTML = html;
-        }
-
-        function renderSales() {
-          let html = '';
-          salesData.forEach((day, idx) => {
-            const highlight = idx === 0 ? 'highlight' : '';
-            html += `
-              <div class="sales-day ${highlight}">
-                <div class="day-label">${day.day}</div>
-                <div class="day-amount">R ${day.amount}</div>
-                <div class="day-orders">${day.orders} orders</div>
-              </div>
-            `;
-          });
-          salesGrid.innerHTML = html;
-        }
-
-        function renderAll() {
-          renderStats();
-          renderStaff();
-          renderMenuPreview();
-          renderReservations();
-          renderSales();
-        }
-
-        // ─── ACTIONS ─────────────────────────────────────────────
-
-        // Reset
-        document.getElementById('resetAdminBtn').addEventListener('click', () => {
-          // reset to initial state
-          staff = [
-            { id: 1, name: 'Marco Rossi', role: 'Waiter', active: true, initials: 'MR' },
-            { id: 2, name: 'Luca Bianchi', role: 'Chef', active: true, initials: 'LB' },
-            { id: 3, name: 'Elena Verdi', role: 'Bartender', active: true, initials: 'EV' },
-            { id: 4, name: 'Sofia Neri', role: 'Waiter', active: false, initials: 'SN' },
-            { id: 5, name: 'Alessandro Gialli', role: 'Chef', active: true, initials: 'AG' }
-          ];
-          menuItems = [
-            { name: 'Burrata con Prosciutto', category: 'Antipasti', price: 185 },
-            { name: 'Pappardelle al Cinghiale', category: 'Primi', price: 225 },
-            { name: 'Bistecca Fiorentina', category: 'Secondi', price: 445 },
-            { name: 'Tiramisù della Casa', category: 'Dolci', price: 95 },
-            { name: 'Prosecco Superiore', category: 'Vini', price: 160 },
-            { name: 'Aperol Spritz', category: 'Cocktails', price: 105 }
-          ];
-          reservations = [
-            { name: 'Gabriella M.', guests: 2, time: '18:30', table: 4 },
-            { name: 'James & Lindiwe', guests: 4, time: '19:00', table: 7 },
-            { name: 'Marco R.', guests: 1, time: '20:15', table: 2 },
-            { name: 'The Johnson Family', guests: 6, time: '19:45', table: 10 }
-          ];
-          salesData = [
-            { day: 'Today', amount: 4850, orders: 18 },
-            { day: 'Yesterday', amount: 3200, orders: 13 },
-            { day: '2 days ago', amount: 4100, orders: 15 }
-          ];
-          renderAll();
-          showToast('🔄 Admin data reset to default.');
+        document.getElementById('editMenuModal').addEventListener('click', function (e) {
+            if (e.target === this) closeModal();
         });
 
-        // Add test data
-        document.getElementById('addDummyDataBtn').addEventListener('click', () => {
-          const newStaff = { id: Date.now(), name: 'Test Staff', role: 'Manager', active: true, initials: 'TS' };
-          staff.push(newStaff);
-          const newMenuItem = { name: 'Test Dish', category: 'Special', price: 199 };
-          menuItems.push(newMenuItem);
-          const newRes = { name: 'Test Reservation', guests: 3, time: '21:00', table: 12 };
-          reservations.push(newRes);
-          // update sales
-          salesData[0].amount += 500;
-          salesData[0].orders += 2;
-          renderAll();
-          showToast('➕ Added test data.');
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeModal();
         });
-
-        // "Manage" links (just toast for demo)
-        document.getElementById('manageStaffLink').addEventListener('click', () => showToast('👥 Staff management panel (demo)'));
-        document.getElementById('manageMenuLink').addEventListener('click', () => showToast('📋 Menu editor (demo)'));
-        document.getElementById('manageResLink').addEventListener('click', () => showToast('📅 Full reservations view (demo)'));
-
-        // ─── INIT ─────────────────────────────────────────────────
-        renderAll();
     </script>
 
 </body>

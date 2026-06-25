@@ -60,9 +60,197 @@ namespace Trattoria.Controllers
 
         // ── Admin ────────────────────────────────────────────────────────────────
 
-        public IActionResult AdminHome(int userID = 0)
+        [HttpGet]
+        public IActionResult AdminHome(string tab = "overview")
         {
-            return View();
+            var adminName = HttpContext.Session.GetString("UserName") ?? "Admin";
+            var today = DateTime.Today;
+
+            // ── Staff ─────────────────────────────────────────────
+            var staff = _dbContext.Users.OrderBy(u => u.Role).ThenBy(u => u.Name).ToList();
+
+            // ── Menu ──────────────────────────────────────────────
+            var menu = _dbContext.MenuItems.OrderBy(m => m.Type).ThenBy(m => m.Name).ToList();
+
+            // ── Today reservations ────────────────────────────────
+            var todaysRes = (
+                from r in _dbContext.Reservations
+                where r.ReservationDate.Date == today
+                join t in _dbContext.Tables on r.TablesID equals t.TableID into tj
+                from t in tj.DefaultIfEmpty()
+                orderby r.ReservationDate
+                select new ReservationDisplayItem
+                {
+                    ReservationID = r.ReservationsID,
+                    GuestName = r.Name + " " + r.Surname,
+                    ContactPhone = r.ContactPhone,
+                    Email = r.Email,
+                    ReservationDate = r.ReservationDate,
+                    GuestCapacity = r.Capacity,
+                    Status = r.Status,
+                    TableID = r.TablesID,
+                    TableType = t != null ? t.Type : "—",
+                    TableCapacity = t != null ? t.Capacity : 0,
+                    TableIsAvailable = t != null && t.IsAvailable
+                }
+            ).ToList();
+
+            // ── Today revenue ─────────────────────────────────────
+            var todayOrders = _dbContext.Orders
+                .Where(o => o.IsPaid && o.OrderTime.Date == today)
+                .ToList();
+
+            // ── Daily sales — last 7 days ─────────────────────────
+            var sevenDaysAgo = today.AddDays(-6);
+            var paidOrders = _dbContext.Orders
+                .Where(o => o.IsPaid && o.OrderTime.Date >= sevenDaysAgo)
+                .ToList();
+
+            var dailySales = Enumerable.Range(0, 7)
+                .Select(i => today.AddDays(-i))
+                .Select(date =>
+                {
+                    var dayOrders = paidOrders.Where(o => o.OrderTime.Date == date).ToList();
+                    return new DailySalesItem
+                    {
+                        Date = date,
+                        Revenue = dayOrders.Sum(o => o.TotalAmount + o.TipAmount),
+                        OrderCount = dayOrders.Count
+                    };
+                })
+                .ToList();
+
+            // ── Monthly sales — last 6 months ─────────────────────
+            var sixMonthsAgo = today.AddMonths(-5);
+            var allPaidOrders = _dbContext.Orders
+                .Where(o => o.IsPaid && o.OrderTime >= new DateTime(sixMonthsAgo.Year, sixMonthsAgo.Month, 1))
+                .ToList();
+
+            var monthlySales = allPaidOrders
+                .GroupBy(o => new { o.OrderTime.Year, o.OrderTime.Month })
+                .Select(g => new MonthlySalesItem
+                {
+                    Year = g.Key.Year,
+                    Month = g.Key.Month,
+                    Revenue = g.Sum(o => o.TotalAmount + o.TipAmount),
+                    OrderCount = g.Count()
+                })
+                .OrderByDescending(m => m.Year).ThenByDescending(m => m.Month)
+                .ToList();
+
+            var vm = new AdminHomeViewModel
+            {
+                AdminName = adminName,
+                ActiveTab = tab,
+                Staff = staff,
+                MenuItems = menu,
+                TodaysReservations = todaysRes,
+                DailySales = dailySales,
+                MonthlySales = monthlySales,
+                TotalStaff = staff.Count,
+                ActiveStaff = staff.Count, // no IsActive field — all are active
+                TotalMenuItems = menu.Count,
+                TodayReservations = todaysRes.Count,
+                TodayRevenue = todayOrders.Sum(o => o.TotalAmount + o.TipAmount),
+                TodayOrderCount = todayOrders.Count
+            };
+
+            return View(vm);
+        }
+
+        // ── Admin: Staff actions ──────────────────────────────────────────────────
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AddStaff(string name, string surname, string username,
+                                      string password, string role)
+        {
+            if (_dbContext.Users.Any(u => u.Username == username))
+            {
+                TempData["ToastMessage"] = "⚠️ Username already exists.";
+                return RedirectToAction("AdminHome", new { tab = "staff" });
+            }
+
+            _dbContext.Users.Add(new Users
+            {
+                Name = name,
+                Surname = surname,
+                Username = username,
+                Password = password,
+                Role = role
+            });
+            _dbContext.SaveChanges();
+            TempData["ToastMessage"] = $"✅ {name} {surname} ({role}) added.";
+            return RedirectToAction("AdminHome", new { tab = "staff" });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult RemoveStaff(int userID)
+        {
+            var user = _dbContext.Users.Find(userID);
+            if (user == null) return NotFound();
+
+            // Prevent removing yourself
+            var currentID = HttpContext.Session.GetInt32("UserID");
+            if (currentID == userID)
+            {
+                TempData["ToastMessage"] = "⚠️ You cannot remove your own account.";
+                return RedirectToAction("AdminHome", new { tab = "staff" });
+            }
+
+            _dbContext.Users.Remove(user);
+            _dbContext.SaveChanges();
+            TempData["ToastMessage"] = $"✕ {user.Name} {user.Surname} removed.";
+            return RedirectToAction("AdminHome", new { tab = "staff" });
+        }
+
+        // ── Admin: Menu actions ───────────────────────────────────────────────────
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AddMenuItem(string name, string type, string description, decimal price)
+        {
+            _dbContext.MenuItems.Add(new MenuItems
+            {
+                Name = name,
+                Type = type,
+                Description = description,
+                Price = price
+            });
+            _dbContext.SaveChanges();
+            TempData["ToastMessage"] = $"✅ {name} added to menu.";
+            return RedirectToAction("AdminHome", new { tab = "menu" });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult EditMenuItem(int menuItemID, string name, string type,
+                                          string description, decimal price)
+        {
+            var item = _dbContext.MenuItems.Find(menuItemID);
+            if (item == null) return NotFound();
+
+            item.Name = name;
+            item.Type = type;
+            item.Description = description;
+            item.Price = price;
+            _dbContext.SaveChanges();
+            TempData["ToastMessage"] = $"✏️ {name} updated.";
+            return RedirectToAction("AdminHome", new { tab = "menu" });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult RemoveMenuItem(int menuItemID)
+        {
+            var item = _dbContext.MenuItems.Find(menuItemID);
+            if (item == null) return NotFound();
+
+            _dbContext.MenuItems.Remove(item);
+            _dbContext.SaveChanges();
+            TempData["ToastMessage"] = $"✕ {item.Name} removed from menu.";
+            return RedirectToAction("AdminHome", new { tab = "menu" });
         }
 
         // ── Chef ─────────────────────────────────────────────────────────────────
